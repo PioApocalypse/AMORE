@@ -1,8 +1,6 @@
 # AMORE
 **Autonomous Management of Outputs for Research Efficiency** (to rename later) is a primitive interface for allowing researchers to upload data on experiments to [eLabFTW](https://github.com/elabftw/elabftw) with minimal effort.
 
-[toc]
-
 <!-- Buona idea per acronimo: 'Alternative Manager of Outputs with Reduced Efforts' -->
 > To-do: translate what follows in English.
 
