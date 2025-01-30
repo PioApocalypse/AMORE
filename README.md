@@ -5,39 +5,41 @@
 > To-do: translate what follows in English.
 
 ## Backend structure
-Dietro le quinte il software dovrà permettere all'utente di **creare nuovi campioni**, **gestirne la posizione** e **segnalare guasti e interventi sui macchinari** (risorse) del laboratorio.
+Behind the stage this software should allow the end user to easily **create new samples**, **update their in-real-time position** and **briefly report faults and maintainance operations of machinery** inside the lab.
 
-### Creazione del campione
-Questa utility avrà a sua volta due funzioni:
+### Creating new sample
+This utility should serve two purposes:
 
-* Assegnazione nome e ID al campione;
-    * [GET] Prende da eLab l'ID dell'ultimo campione;
-    * Incrementa di 1 e assegna il nuovo ID al nuovo campione;
-    * [Input] Ottiene dall'operatore metadati utili;
-    * [POST] Carica sul database il nuovo campione (con i propri metadati e il nuovo ID);
-* Uso consumabili (cioè in sostanza il tracciamento dei substrati residui);
-    * [Input] Prende in input dall'utente il numero (codice?) del batch di substrati da cui si prelevano i materiali richiesti (che possono essere più di uno);
-    * [GET] Prende da eLab il numero di pezzi disponibili per quel batch;
-    * [Input] Prende dall'operatore il numero di substrati da utilizzare (N sempre minore del numero di unità disponibili per quel batch);
-    * [POST] Sottrae N al numero di unità disponibili su eLab.
+* Assign name and ID to sample;
+    * [GET] from eLab ID of latest sample (given location and year);
+    * Increment by one to make a new ID to assign to newest sample;
+    * [Input] from operator giving useful metadata # TO DEFINE;
+        * Can be name of compound, brief description, notes, values of temperature, mass and so on...
+    * [POST] everything to eLab's database;
+* Use of consumables (substrates);
+    * [Input] - operator provides code of the batch(es) from which the substrate(s) was/are taken;
+    * [GET] from eLab the number of available pieces from the same batch;
+    * [Input] - operator gives number of used substrates (N less than available units);
+    * Decrement availability by N;
+    * [POST] new number of available units to eLab.
 
-#### ID dei campioni
-Si è proposto un formato di codice ID per i campioni particolarmente comodo per i ricercatori ma incompatibile con il database preesistente di eLab. Il formato è:
+#### On the subject of samples' ID's
+The following ID scheme for new samples is proposed. While technically incompatible with eLab's own primary keys it can be assigned to a resource in the "Name" field - before the compound's name - and it would be way more useful for Naples' reseach team.
 
 <div style="font-size: 2rem;" align="center">
-XX - AA - ###
+XX YY - ###
 </div>
 
-Dove XX è il codice della città in cui si è svolto l'esperimento (es. NA per Napoli, RM per Roma, etc.), AA sono le ultime due cifre dell'anno (24, 25, 26...) e ### è l'ID progressivo in formato "eLab-compliant" (001, 002, 003...) che dovrebbe però tornare a zero ogni 1° gennaio.
+Where XX is a code assigned to the location (e.g. NA for Naples, RM for Rome, etc.), YY are the last two digits of present year (24, 25, 26...) and ### is the progressive ID in "eLab-compliant" format (just numbers: 001, 002, 003...) which has to be reset to 001 (or 000) every 1^st^ of January.
 
-Possibile soluzione per generare un codice ID simile per i campioni è modificare la struttura del db di eLab, quindi il sorgente del software stesso per usare l'ID completo (nel formato XX-AA-###) come chiave primaria delle varie entry.
-<!-- Usare una tabella nuova per ogni anno forse? -->
+<!-- Possibile soluzione per generare un codice ID simile per i campioni è modificare la struttura del db di eLab, quindi il sorgente del software stesso per usare l'ID completo (nel formato XX-AA-###) come chiave primaria delle varie entry.
+Usare una tabella nuova per ogni anno forse? -->
 
-### Posizione del campione
+### Sample real-time position
 > TBA
 
-### Guasti e interventi
+### Faults and maintainance
 > TBA
 
 ## Frontend structure
-La soluzione migliore sarebbe mettere su un form in HTML e Javascript che esporremo nella rete interna via Apache Web Server; il form, il server e AMORE saranno sulla stessa macchina virtuale su cui sta girando eLab.
+The use of Python library **Flask** has been proposed.
