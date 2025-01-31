@@ -1,2 +1,10 @@
+# envs
 **/.env
 **/.venv
+
+# pytest cache
+**/tests
+**/.pytest*
+
+# other cache
+**/__pycache__
