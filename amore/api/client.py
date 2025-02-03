@@ -49,7 +49,34 @@ def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results)
     response.raise_for_status()
     return response.json()
 
-def create_sample(title, date, status, tags, body, substrate_batch, position):
+def create_sample(title):
+    items_url = f"{full_elab_url}""items/"
+    header = {
+        "Authorization": API_KEY,
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "category_id": 10, # 10 defines this item as 'sample' in our database
+        "tags": [],
+        "body": { # not working
+            "title": title,
+        },
+    }
+
+    response = requests.post(
+    url=items_url,
+    headers=header,
+    json=payload,
+    verify=False
+    )
+
+    response.raise_for_status()
+    return response.json()
+
+
+
+
+def populate_sample(title, date, status, tags, body, substrate_batch, position):
     # like before, different url
     items_url = f"{full_elab_url}""items/"
     
