@@ -3,7 +3,7 @@
 **/.venv
 
 # pytest cache
-**/tests
+#**/tests
 **/.pytest*
 
 # other cache
