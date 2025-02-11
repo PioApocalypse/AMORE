@@ -49,6 +49,8 @@ def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results)
     response.raise_for_status()
     return response.json()
 
+# =====================
+
 def create_sample(title):
     items_url = f"{full_elab_url}""items/"
     header = {
@@ -73,8 +75,7 @@ def create_sample(title):
     response.raise_for_status()
     return response.json()
 
-
-
+# =====================
 
 def populate_sample(title, date, status, tags, body, substrate_batch, position):
     # like before, different url
