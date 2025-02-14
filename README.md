@@ -48,9 +48,9 @@ Usare una tabella nuova per ogni anno forse? -->
 The use of Python library **Flask** has been proposed. On testing ground plain ugly HTML will be preferred instead.
 
 ## Checkbox
-Issue = temporary solution available; \
+Issue = problem to solve, obstacle; \
 Warning = always pay attention; \
-Error = yet to solve.
+Error = returns error.
 
 ### Phase 1 - New sample
 - [x] Post test to website
@@ -64,10 +64,11 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 ```
 
 - [ ] Post test with custom title
+    * Issue: api apparently doesn't support a POST method to directly create a new sample with custom metadata
 - [ ] Post test with custom title and standard ID
 
 ### Phase 2 - Graphical interface
-- [ ] GUI in plain HTML with simple form, whose post button calls my python script.
+- [ ] GUI in plain HTML with simple form, whose post button calls my python script
 - [ ] 
 
 ### Phase 3 - Error handling, data validation
