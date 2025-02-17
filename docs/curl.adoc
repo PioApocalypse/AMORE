@@ -1,0 +1,80 @@
+== Curl commands for kickstarting
+While working with eLabFTW's API, before implementing a new feature it's wise to test if something is even possible through *curl* commands. We'll be referring to this action as _kickstarting_ a feature.
+
+=== On eLabFTW v5.0.4
+==== Creating an empty sample
+After exporting the API key for your account as a Bash variable (`export ELAB_KEY=8-8bd3f...`), run the following command:
+
+```bash
+curl -H "Content-Type: application/json" -H "Authorization: $ELAB_KEY" \ 
+    -d '{ "category_id": 10, "tags": ["primo campione", "altro tag"] }' \
+    -k -X POST https://old.elabftw.net/api/v2/items/
+```
+
+* The header (`-H or --header`) section tells eLab that the content is in json format and that the authentication must occur via API key.
+* The data (`-d` or `--data`) section contains the payload, which unfortunately for eLabFTW 5.0.4 is limited to category ID (10 for "Sample" in OUR VERY OWN instance of eLab) and tags.
+* `-k` or  `--insecure` makes curl skip the verification step and proceed without checking; necessary if your instance of eLab has a self-signed SSL certificate - or no certificate at all.
+* The method (`-X` or `--request`) section decides the method to use when starting the transfer; link:https://en.wikipedia.org/wiki/POST_(HTTP)[HTTP POST^] is used to create new content on eLab.
+* Replace `+https://old.elabftw.net/api/v2/items/+` with the url to the API of your instance of eLabFTW (e.g. "https://elabftw.selfhosted.it:8080/api/v2/items").
+
+NOTE: In Bash single (`'`) and double (`"`) quotation marks are slightly different, as single quotes treat the content literally and do not expand variables (i.e. `'Authorization: $API_KEY'` will try to authenticate you to the server literally as `*$API_KEY*` instead of using your key - the content of the variable).
+
+==== Opening an item by ID
+If you know the ID of the item you wish to get data about, the curl command would be:
+
+```bash
+ITEM_ID=123
+curl -H "Content-Type: application/json" -H "Authorization: $ELAB_KEY" \ 
+    -k -X GET https://old.elabftw.net/api/v2/items/$ITEM_ID
+```
+
+The standard output is "minified", unless jq is added to the pipeline:
+
+```bash
+curl -H "Content-Type: application/json" -H "Authorization: $ELAB_KEY" \ 
+    -k -X GET https://old.elabftw.net/api/v2/items/$ITEM_ID | jq | less
+```
+
+=== On eLabFTW v5.1.15
+==== Creating an empty sample
+v5.1.x has huge improvements for item creation and update. After exporting the API key for your account as a Bash variable (`export ELAB_KEY=8-8bd3f...`), run the following command:
+
+```bash
+curl -H "Content-Type: application/json" -H "Authorization: $ELAB_KEY" \ 
+    -d '{ "template": 10, "title":"My new sample", "body":"<p>Brief description in raw HTML</p>", "tags": ["primo campione", "altro tag"] }' \
+    -k -X POST https://demo.elabftw.net/api/v2/items/
+```
+
+* The header (`-H or --header`) section tells eLab that the content is in json format and that the authentication must occur via API key.
+* The data (`-d` or `--data`) section contains the payload; in v5.1.15 "category_id" has been replaced by "template" and many more fields have been added, which means the user is now capable of populating an item with a single command much like how it's always been the case for the experiments. 
+* `-k` or  `--insecure` makes curl skip the verification step and proceed without checking; necessary if your instance of eLab has a self-signed SSL certificate - or no certificate at all.
+* The method (`-X` or `--request`) section decides the method to use when starting the transfer; link:https://en.wikipedia.org/wiki/POST_(HTTP)[HTTP POST^] is used to create new content on eLab.
+* Replace `+https://demo.elabftw.net/api/v2/items/+` with the url to the API of your instance of eLabFTW (e.g. "https://elabftw.selfhosted.it:8080/api/v2/items").
+
+==== Creating a sample from JSON file
+Assuming you have a JSON file compliant to your eLabFTW instance, you can run the previous command in a "quieter" way:
+
+```bash
+curl -H "Content-Type: application/json" -H "Authorization: $ELAB_KEY" \ 
+    -d '@/path/to/sample.json' \
+    -k -X POST https://demo.elabftw.net/api/v2/items/
+```
+
+NOTE: The path to the JSON file can be relative (e.g. `@tests/example.json`). +
+The `@` symbol is required.
+
+==== Opening an item by ID
+Item visualization works the same as in v5.0.4.
+
+```bash
+ITEM_ID=123
+curl -H "Content-Type: application/json" -H "Authorization: $ELAB_KEY" \ 
+    -k -X GET https://old.elabftw.net/api/v2/items/$ITEM_ID
+```
+
+The standard output is "minified", unless jq is added to the pipeline:
+
+```bash
+curl -H "Content-Type: application/json" -H "Authorization: $ELAB_KEY" \ 
+    -k -X GET https://old.elabftw.net/api/v2/items/$ITEM_ID | jq | less
+```
