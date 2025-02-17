@@ -58,13 +58,12 @@ def create_sample(title, body, status, tags, substrate_batch, position):
         "Content-Type": "application/json"
     }
     payload = {
-        "template": 3, # 10 defines this item as 'sample' in our database
+        "template": 4, # 10 defines this item as 'sample' in our database
         "title": title,
         "body": body,
         "status": status,
         "tags": tags,
-        "metadata":
-        "{ \"extra_fields\": { \"For example\": { \"type\": \"text\", \"value\": \"With a value\" } } }", # somehow this doesn't work
+        "metadata": "{ \"extra_fields\": { \"For example\": { \"type\": \"text\", \"value\": \"With a value\" } } }", # somehow this doesn't work
     }
     
     try:
