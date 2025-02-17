@@ -51,35 +51,42 @@ def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results)
 
 # =====================
 
-def create_sample(title):
+def create_sample(title, body, status, tags, substrate_batch, position):
     items_url = f"{full_elab_url}""items/"
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"
     }
     payload = {
-        "category_id": 10, # 10 defines this item as 'sample' in our database
-        "tags": [],
-        "body": { # not working
-            "title": title,
-        },
+        "template": 3, # 10 defines this item as 'sample' in our database
+        "title": title,
+        "body": body,
+        "status": status,
+        "tags": tags,
+        "metadata":
+        "{ \"extra_fields\": { \"For example\": { \"type\": \"text\", \"value\": \"With a value\" } } }",
     }
+    
+    try:
+        response = requests.post(
+            url=items_url,
+            headers=header,
+            json=payload,
+            verify=False
+        )
+        # figure out what's wrong with the following code which returns error:
+        #response.raise_for_status()
+        return 0 # response.json()
+    except:
+        print('An error occurred.')
+        return 1
 
-    response = requests.post(
-    url=items_url,
-    headers=header,
-    json=payload,
-    verify=False
-    )
-
-    response.raise_for_status()
-    return response.json()
 
 # =====================
-
+'''
 def populate_sample(title, date, status, tags, body, substrate_batch, position):
     # like before, different url
-    items_url = f"{full_elab_url}""items/"
+    items_url = f"{full_elab_url}""items/0/"
     
     header = {
         "Authorization": API_KEY,
@@ -108,7 +115,7 @@ def populate_sample(title, date, status, tags, body, substrate_batch, position):
 
     response.raise_for_status()
     return response.json()
-
+'''
 
 # disaster prevention
 if __name__ == "__main__":
