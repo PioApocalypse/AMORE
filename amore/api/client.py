@@ -64,7 +64,7 @@ def create_sample(title, body, status, tags, substrate_batch, position):
         "status": status,
         "tags": tags,
         "metadata":
-        "{ \"extra_fields\": { \"For example\": { \"type\": \"text\", \"value\": \"With a value\" } } }",
+        "{ \"extra_fields\": { \"For example\": { \"type\": \"text\", \"value\": \"With a value\" } } }", # somehow this doesn't work
     }
     
     try:

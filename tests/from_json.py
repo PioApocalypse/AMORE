@@ -10,5 +10,5 @@ def test_create_sample():
 
     create_sample(title=title, body=body, status="", tags=tags, substrate_batch="", position="")
 
-
-test_create_sample()
+if __name__ == "__main__":
+    test_create_sample()

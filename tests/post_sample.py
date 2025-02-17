@@ -16,4 +16,5 @@ def test_create_sample():
     #assert response["title"] == title
     #assert response["category_id"] == 10
 
-test_create_sample()
+if __name__ == "__main__":
+    test_create_sample()
