@@ -1,0 +1,16 @@
+{
+  "body": "<h1>Ex(s)ample: A puppet JSON to test features.</h1>",
+  "canread": "{\"base\": 30, \"teams\": [], \"users\": [], \"teamgroups\": []}",
+  "canwrite": "{\"base\": 20, \"teams\": [], \"users\": [], \"teamgroups\": []}",
+  "content_type": 1,
+  "metadata": "{ \"extra_fields\": { \"For example\": { \"type\": \"text\", \"value\": \"With a value\", \"required\": false, \"description\": \"An extra field of type text.\" }, { \"STD-ID\": { \"type\": \"number\", \"value\": \"\", \"required\": true, \"description\": \"This is an internal ID identifier.\" } } }",
+  "rating": 0,
+  "status": 1,
+  "template": 4,
+  "tags": [
+    "primo campione",
+    "altro tag",
+    "test"
+  ],
+  "title": "Na-25-test"
+}
