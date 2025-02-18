@@ -1,3 +1,6 @@
+:toc:
+:toclevels: 3
+
 == Curl commands for kickstarting
 While working with eLabFTW's API, before implementing a new feature it's wise to test if something is even possible through *curl* commands. We'll be referring to this action as _kickstarting_ a feature.
 
@@ -78,3 +81,72 @@ The standard output is "minified", unless jq is added to the pipeline:
 curl -H "Content-Type: application/json" -H "Authorization: $ELAB_KEY" \ 
     -k -X GET https://old.elabftw.net/api/v2/items/$ITEM_ID | jq | less
 ```
+
+== Debugging with curl
+Oftentimes executing a certain command returns a different result from what's expected. What follows is a "journal" of curl prompts I've tried to achieve a certain result which instead returned something wrong or unexpected.
+
+=== On eLabFTW v5.1.15
+==== Posting metadata in "extra fields" +[Items]+
+Link to GitHub Issue: link:https://github.com/elabftw/elabftw/issues/5480[elabftw / issues / 5480].
+
+I want to create a new item on the demo instance (demo.elabftw.net) via API using curl; I copy the item model directly from the link:https://doc.elabftw.net/api/v2/#/Items/post-item[official API documentation^] with no editing and paste it in a variable `$MYJSON`:
+
+```bash
+export MYJSON='{
+  "body": "<h1>Section title</h1><p>Main text of resource</p>",
+  "canread": "{\"base\": 30, \"teams\": [], \"users\": [], \"teamgroups\": []}",
+  "canwrite": "{\"base\": 20, \"teams\": [], \"users\": [], \"teamgroups\": []}",
+  "content_type": 1,
+  "metadata": "{ \"extra_fields\": { \"For example\": { \"type\": \"text\", \"value\": \"With a value\", \"required\": true, \"description\": \"An extra field of type text\" } } }",
+  "rating": 0,
+  "status": 1,
+  "template": 1,
+  "tags": [
+    "TIRF",
+    "Nikon",
+    "mandatory booking"
+  ],
+  "title": "TIRF microscope"
+}'
+```
+
+After that I launch curl with the following options - where $ELAB_KEY is my personal API key:
+
+```bash
+curl -H "Content-Type: application/json" -H "Authorization: $ELAB_KEY" \
+    -k -X POST https://demo.elabftw.net/api/v2/items/ \
+    -d "$MYJSON"
+
+```
+
+All is good, I don't get any error and the new item is created on the demo. Title, tags, template/category and status are exactly what I want; however:
+
+* The body field is clear;
+* The metadata/extra fields are clear - or set to the template's default.
+
+I've also tried many small changes, like:
+
+* Storing my JSON in a file instead of a Bash variable;
+* Pasting the contents of the JSON directly into my terminal while running curl;
+* Editing the model to fit a different template's default extra fields:
+
+```json
+{
+  "body": "<h1>Section title</h1><p>Main text of resource</p>",
+  "canread": "{\"base\": 30, \"teams\": [], \"users\": [], \"teamgroups\": []}",
+  "canwrite": "{\"base\": 20, \"teams\": [], \"users\": [], \"teamgroups\": []}",
+  "content_type": 1,
+  "metadata": "{\"extra_fields\": {\"Concentration\": {\"type\": \"number\", \"value\": \"20\", \"description\": \"in μg/μL\"}, \"Growth temperature\": {\"type\": \"text\", \"value\": \"50\", \"description\": \"in °C\"}}}",
+  "rating": 3,
+  "status": 1,
+  "template": 5,
+  "tags": [
+    "TIRF",
+    "Nikon",
+    "mandatory booking"
+  ],
+  "title": "TIRF microscope"
+}
+```
+
+While the original example contains a single extra field called "For example", my edited file contains two extra fields supported officially on the eLabFTW's demo instance (*Concentration* and *Growth temperature*) for the _Plasmid_ template. I've also changed the template value from 1 to 5 (Plasmid) and the rating from 0 (no rating) to 3, discovering that not even the rating field is set to the value I provide.
