@@ -6,11 +6,12 @@
   "metadata": "{ \"extra_fields\": { \"For example\": { \"type\": \"text\", \"value\": \"With a value\", \"required\": false, \"description\": \"An extra field of type text.\" }, { \"STD-ID\": { \"type\": \"number\", \"value\": \"\", \"required\": true, \"description\": \"This is an internal ID identifier.\" } } }",
   "rating": 0,
   "status": 1,
+  "std_id": "25420",
   "template": 4,
   "tags": [
     "primo campione",
     "altro tag",
     "test"
   ],
-  "title": "Na-25-test"
+  "title": "Glutammato di smerdio"
 }
