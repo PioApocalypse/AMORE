@@ -89,6 +89,8 @@ Oftentimes executing a certain command returns a different result from what's ex
 ==== Posting metadata in "extra fields" +[Items]+
 Link to GitHub Issue: link:https://github.com/elabftw/elabftw/issues/5480[elabftw / issues / 5480].
 
+WARNING: The issue has been closed as the problem is solved in v5.2.0-alpha.
+
 I want to create a new item on the demo instance (demo.elabftw.net) via API using curl; I copy the item model directly from the link:https://doc.elabftw.net/api/v2/#/Items/post-item[official API documentation^] with no editing and paste it in a variable `$MYJSON`:
 
 ```bash
