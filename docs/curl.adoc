@@ -66,13 +66,22 @@ curl -H "Content-Type: application/json" -H "Authorization: $ELAB_KEY" \
 NOTE: The path to the JSON file can be relative (e.g. `@tests/example.json`). +
 The `@` symbol is required.
 
-==== Opening an item by ID
+==== Visualize all items
 Item visualization works the same as in v5.0.4.
+
+```bash
+curl -H "Content-Type: application/json" -H "Authorization: $ELAB_KEY" \ 
+    -k -X GET https://demo.elabftw.net/api/v2/items?limit=9999
+```
+
+Note that this only goes up to ten thousands items, and I've yet to find a way to show every item regardless of the total number in the database. But it's probably useless since the items with the highest STD-ID's will always be on top of the list anyways. Even if we ever DO create more than 10k items on the database and it somehow doesn't collapse it's almost impossible that the most recently created item is somehow lower than 10k other items.
+
+==== Opening an item by ID
 
 ```bash
 ITEM_ID=123
 curl -H "Content-Type: application/json" -H "Authorization: $ELAB_KEY" \ 
-    -k -X GET https://old.elabftw.net/api/v2/items/$ITEM_ID
+    -k -X GET https://demo.elabftw.net/api/v2/items/$ITEM_ID
 ```
 
 The standard output is "minified", unless jq is added to the pipeline:
@@ -81,6 +90,34 @@ The standard output is "minified", unless jq is added to the pipeline:
 curl -H "Content-Type: application/json" -H "Authorization: $ELAB_KEY" \ 
     -k -X GET https://old.elabftw.net/api/v2/items/$ITEM_ID | jq | less
 ```
+
+==== Looking for items with a specific title, body or elabid
+Let's suppose we want to look up an item by title, body or elabid. The appropriate key to use is `q` (_query_):
+
+```bash
+curl -H "Content-Type: application/json" -H "Authorization: $ELAB_KEY" \ 
+    -k -X GET https://demo.elabftw.net/api/v2/items?q='Na-25' | jq | less
+```
+
+This returns every item whose title, body or elabid contains the string "Na-25". It seems to be caps-insensitive.
+
+==== Selecting metadata/extra_field/STD-ID values from every item with 'Na' in its name
+```bash
+curl -H "Content-Type: application/json" -H "Authorization: $ELAB_KEY" \ 
+    -k -X GET "https://demo.elabftw.net/api/v2/items?q=na&limit=9999" -s | \
+    jq -r '.[] | "\(.metadata | fromjson | .extra_fields["STD-ID"].value)"' \
+    2>/dev/null | grep -v null
+```
+
+Where `-s` runs curl in _silent mode_, while `jq` is used to process the string downloaded by the command.
+
+* `jq -r '.[]'` iterates over every element of the array.
+* `\(.metadata | fromjson | .extra_fields["STD-ID"].value)`:
+** `fromjson` converts the string (minified) to JSON.
+** `.extra_fields["STD-ID"].value` extracts the values of STD-ID for every item.
+* `2>/dev/null` redirects errors from jq to /dev/null.
+* `grep -v null` excludes from output null values of the STD-ID.
+
 
 == Debugging with curl
 Oftentimes executing a certain command returns a different result from what's expected. What follows is a "journal" of curl prompts I've tried to achieve a certain result which instead returned something wrong or unexpected.
