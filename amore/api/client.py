@@ -51,19 +51,19 @@ def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results)
 
 # =====================
 
-def create_sample(title, body, status, tags, substrate_batch, position):
+def create_sample(title, body, status, tags, std_id, substrate_batch, position):
     items_url = f"{full_elab_url}""items/"
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"
     }
     payload = {
-        "template": 4, # 10 defines this item as 'sample' in our database
+        "template": 2, # 10 defines this item as 'sample' in our database
         "title": title,
         "body": body,
         "status": status,
         "tags": tags,
-        "metadata": "{ \"extra_fields\": { \"For example\": { \"type\": \"text\", \"value\": \"With a value\" } } }", # somehow this doesn't work
+        "metadata": '{ "extra_fields": { "CAS number": { "type": "number", "value": "'+str(std_id)+'" } } }', # todo: add other fields
     }
     
     try:
