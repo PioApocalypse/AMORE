@@ -1,9 +1,12 @@
 import os
 import requests
+import json
 from datetime import datetime
 from dotenv import load_dotenv
 from amore.var import locations as ll
-from random import randrange as rr # TO REMOVE after feature is finished
+import random # TO REMOVE after feature is finished
+#from random import randrange as rr # TO REMOVE after feature is finished
+#from random import choice as rc # TO REMOVE after feature is finished
 
 """
 Utils for AMORE to read and elaborate internal ID's
@@ -11,18 +14,35 @@ Utils for AMORE to read and elaborate internal ID's
 
 def get_location():
     # city from user input
-    city = random.choice(['Salerno','Roma','Napoli']) # placeholder to try diff locations
-    #city = "Salerno" # placeholder to try multiple ID's
+    #city = random.choice(['Salerno','Roma','Napoli']) # placeholder to try diff locations
+    city = "Salerno" # placeholder to try multiple ID's
     location_code = ll.location_to_code(city)
     return location_code
 
 def get_std_id(loc_code):
-    # query to get all std_id FROM LOCATION
-    # compare std_id, pick biggest
-    # make sure std_id is number not string
-    # make sure first 2 digits are less or equal to current year
-    last_id = 25000 + rr(1,999,1) # placeholder to try higher ID's
-    return last_id
+    API_URL = os.getenv('ELABFTW_BASE_URL')
+    API_KEY = os.getenv('API_KEY')
+    every_id = []
+    header = {
+        "Authorization": API_KEY,
+        "Content-Type": "application/json"
+    }
+
+    search_query = f'{API_URL}api/v2/items?q={loc_code}-'
+    
+    response = requests.get(
+    headers=header,
+    url=search_query,
+    )
+
+    for i in response.json():
+        try:
+            every_id.append(int(json.loads(i['metadata'])['extra_fields']['STD-ID']['value']))
+        except:
+            pass
+    #last_id = 25000 + random.randrange(1,999,1) # placeholder to try higher ID's
+    
+    return max(every_id)
     
 def id_generator():
     location_code = get_location()
@@ -51,4 +71,4 @@ if __name__=="__main__":
     print(f"Last ID: {last_id}, STD-ID: {std_id}, Name: {complete_id}")
 # TO REMOVE when this file is ready
 else: 
-    print("Feature not ready yet.")
+    print("Feature not ready yet, proceed with caution.")
