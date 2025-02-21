@@ -1,3 +1,4 @@
+from amore.api.utils import id_generator
 from amore.api.client import create_sample
 from datetime import datetime
 from random import randrange as rr
@@ -9,13 +10,13 @@ as this project is put in production.
 '''
 
 def test_create_sample():
-    mytitle = "Test sample"
-    title = f"NA-{datetime.now().strftime("%y")}-001 - {mytitle}"
-    status = 2
+    mytitle = "Glutammato di stronzio"
+    id = id_generator()
+    std_id = id[0]
+    title = f"{id[1]} {mytitle}"
+    status = 1
     tags = ["test", "primo campione"]
     body = "Bla bla bla"
-    unique = f"{rr(1,999,1)}" # unique is randomly generated
-    std_id = 25101
     substrate_batch = "Batch 1"
     position = "A1"
 

@@ -58,12 +58,12 @@ def create_sample(title, body, status, tags, std_id, substrate_batch, position):
         "Content-Type": "application/json"
     }
     payload = {
-        "template": 2, # 10 defines this item as 'sample' in our database
+        "template": 10, # 10 defines this item as 'sample' in our database
         "title": title,
         "body": body,
         "status": status,
         "tags": tags,
-        "metadata": '{ "extra_fields": { "CAS number": { "type": "number", "value": "'+str(std_id)+'" } } }', # todo: add other fields
+        "metadata": '{ "extra_fields": { "STD-ID": { "type": "number", "value": "'+str(std_id)+'" } } }', # todo: add other fields
     }
     
     try:
