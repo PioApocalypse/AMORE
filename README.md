@@ -63,15 +63,15 @@ Error = returns error.
 ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 ```
 
-- [ ] Post test with custom title
-    * Issue: api apparently doesn't support a POST method to directly create a new sample with custom metadata
-- [ ] Post test with custom title and standard ID
+- [x] Post test with custom title
+- [x] Post test with custom title and standard ID
+    * Issue: api apparently doesn't support a POST method to directly create a new sample with extra fields, waiting for eLabFTW 5.2.0. Feature technically implemented.
 
 ### Phase 2 - Graphical interface
 - [ ] GUI in plain HTML with simple form, whose post button calls my python script
 - [ ] 
 
-### Phase 3 - Error handling, data validation
+### Phase 3 - Error handling, data validation, sanification
 > TBA
 
 ### Phase 4 - Other features
