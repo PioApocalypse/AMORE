@@ -33,6 +33,7 @@ def get_std_id(loc_code):
     response = requests.get(
     headers=header,
     url=search_query,
+    verify=False
     )
 
     for i in response.json():
