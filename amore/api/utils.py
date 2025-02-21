@@ -12,7 +12,7 @@ import random # TO REMOVE after feature is finished
 Utils for AMORE to read and elaborate internal ID's
 """
 
-def get_location(): # get_location(city)
+def get_location(city): # get_location(city)
     # city from user input - Napoli as default location
     #city = random.choice(['Salerno','Roma','Napoli']) # placeholder to try diff locations
     city = "Napoli" # placeholder to try multiple ID's on same location
@@ -52,8 +52,8 @@ def get_std_id(loc_code):
     print(last_id)
     return last_id
     
-def id_generator():
-    location_code = get_location()
+def id_generator(city):
+    location_code = get_location(city)
     last_id = get_std_id(location_code)
     last_year = last_id // 1000 # first 2 digits
     last_unique = last_id % 1000 # last 3 digits

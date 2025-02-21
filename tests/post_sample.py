@@ -11,7 +11,7 @@ as this project is put in production.
 
 def test_create_sample():
     mytitle = "Glutammato di stronzio"
-    id = id_generator()
+    id = id_generator(city)
     std_id = id[0]
     title = f"{id[1]} {mytitle}"
     status = 1
@@ -19,8 +19,9 @@ def test_create_sample():
     body = "Bla bla bla"
     substrate_batch = "Batch 1"
     position = "A1"
+    city = "Napoli"
 
-    create_sample(title, body, status, tags, std_id, substrate_batch, position)
+    create_sample(title, body, status, tags, std_id, substrate_batch, position, city)
     #populate_sample(title, date, status, tags, body, substrate_batch, position)
     #assert "id" in response
     #assert response["title"] == title
