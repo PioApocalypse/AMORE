@@ -63,6 +63,7 @@ def create_sample(title, body, status, tags, std_id, substrate_batch, position):
         "status": status,
         "tags": tags,
         "metadata": '{ "extra_fields": { "STD-ID": { "type": "number", "value": "'+str(std_id)+'" } } }', # todo: add other fields
+        "custom_id": None,
     }
     
     try:
