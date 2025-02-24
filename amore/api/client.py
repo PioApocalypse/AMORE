@@ -13,7 +13,6 @@ Later on, I will also implement url and key selection. Probably. Possibly.
 load_dotenv()
 API_URL = os.getenv('ELABFTW_BASE_URL')
 API_KEY = os.getenv('API_KEY')
-VERIFY = os.getenv('VERIFY_SSL')
 full_elab_url = f"{API_URL}api/v2/"
 """
 ED: about the key - would it be better to just implement a login page?
@@ -43,7 +42,7 @@ def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results)
         url=experiments_url,
         headers=header,
         json=payload,
-        verify=VERIFY
+        verify=os.getenv('VERIFY_SSL')
     )
 
     response.raise_for_status()
@@ -71,7 +70,7 @@ def create_sample(title, body, status, tags, std_id, substrate_batch, position):
             url=items_url,
             headers=header,
             json=payload,
-            verify=False
+            verify=True
         )
         # figure out what's wrong with the following code which returns error:
         #response.raise_for_status()

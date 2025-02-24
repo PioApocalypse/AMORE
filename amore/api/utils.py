@@ -33,7 +33,7 @@ def get_std_id(loc_code):
     response = requests.get(
     headers=header,
     url=search_query,
-    verify=False
+    verify=True
     )
 
     for i in response.json():
@@ -47,9 +47,8 @@ def get_std_id(loc_code):
         last_id = 0
     else:
         last_id = max(every_id)
-    
-    print(every_id)
-    print(last_id)
+    # print(every_id) #for debugging to be removed
+    # print(last_id)  #for debugging to be removed
     return last_id
     
 def id_generator(city):
