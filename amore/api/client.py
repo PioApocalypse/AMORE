@@ -50,7 +50,7 @@ def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results)
 
 # =====================
 
-def create_sample(title, body, status, tags, std_id, substrate_batch, position):
+def create_sample(title, body, status, tags, std_id): #, substrate_batch, position):
     items_url = f"{full_elab_url}""items/"
     header = {
         "Authorization": API_KEY,
