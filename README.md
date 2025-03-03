@@ -66,11 +66,11 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [x] Post test with custom title
 - [x] Post test with custom title and standard ID
     * Issue: api apparently doesn't support a POST method to directly create a new sample with extra fields, waiting for eLabFTW 5.2.0. Feature technically implemented.
-- [ ] Fix issue: use a PATCH request on fresh new sample to inject body, STD-ID, other metadata.
+- [x] Fix issue: use a PATCH request on fresh new sample to inject body, STD-ID, other metadata.
 
 ### Phase 2 - Graphical interface
 - [x] GUI in plain HTML with simple form, whose post button calls my python script
-- [ ] Add all required fields to the form
+- [ ] Additional extra fields like batch, holder, position, proposal
 
 ### Phase 3 - Error handling, data validation, sanification
 > TBA

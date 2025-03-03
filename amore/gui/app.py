@@ -13,13 +13,16 @@ def handle_create_sample():
     title = request.form.get("title")
     description = request.form.get("description")
     tags = request.form.get("tags").split(",")  # Convert tags to a list
-    full_id=id_generator("Napoli")[1] # index 1 of id_generator returns full code in Na-{%y}-### format
+    std_id = id_generator("Napoli")[0] # index 0 of id_generator returns numeric id in yyxxx format
+    full_id = id_generator("Napoli")[1] # index 1 of id_generator returns full code in Na-{%y}-xxx format
 
     # This is where the fun begins:
     create_sample(
-        title=f"{full_id} -- {title}",
+        title=f"{full_id} - {title}",
         status=0,                       # Placeholder to be removed
         tags=tags,
+        std_id=std_id,
+        body=description,
         # substrate_batch="BATCH123",   # Placeholder to be removed
         # position="A1"                 # Placeholder to be removed
     )

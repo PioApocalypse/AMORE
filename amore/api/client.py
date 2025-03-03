@@ -58,7 +58,6 @@ def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results)
 # =======================
 
 def get_new_sample():
-    API_URL = os.getenv('ELABFTW_BASE_URL')
     API_KEY = os.getenv('API_KEY')
     every_id = []
     header = {
@@ -79,37 +78,38 @@ def get_new_sample():
     new_sample = max(response.json(), key=lambda ev: ev['id'])
     return new_sample
 
-'''
-def patch_sample(title, date, status, tags, body, substrate_batch, position):
+
+def patch_sample(new_elabid, body, std_id):
     # like before, different url
-    items_url = f"{full_elab_url}""items/0/"
+    API_URL = os.getenv('ELABFTW_BASE_URL')
+    API_KEY = os.getenv('API_KEY')
+    items_url = f"{full_elab_url}items/{new_elabid}/"
     
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"
     }
-
     payload = {
         "body": body,
         "metadata": '{ "extra_fields": { "STD-ID": { "type": "number", "value": "'+str(std_id)+'" } } }', # todo: add other fields
         "custom_id": None
     }
 
-    try:
-        response = requests.post(
-        url=items_url,
-        headers=header,
-        json=payload,
-        verify=True
-        )
-        response.raise_for_status()
-        return 0
-    except:
-        print('An error occurred during item patching.')
-        return 1
-'''
+    # try:
+    response = requests.patch(
+    url=items_url,
+    headers=header,
+    json=payload,
+    verify=True
+    )
+    # response.raise_for_status()
+    # return 0
+    # except:
+    #     print('An error occurred during item patching.')
+    #     return 1
 
-def create_sample(title, status, tags): #, substrate_batch, position):
+
+def create_sample(title, status, tags, body, std_id): #, substrate_batch, position):
     items_url = f"{full_elab_url}""items/"
     header = {
         "Authorization": API_KEY,
@@ -118,34 +118,35 @@ def create_sample(title, status, tags): #, substrate_batch, position):
     payload = {
         "template": 10, # 10 defines this item as 'sample' in our database
         "title": title,
-        "status": status,
+        "status": status, # not passed ???
         "tags": tags
     }
     
-    try:
+    # try:
         # request item creation with template, title, status and tags as instructed by user
-        response = requests.post(
-            url=items_url,
-            headers=header,
-            json=payload,
-            verify=True
-        )
-        # get new sample metadata as dictionary:
-        new_sample = get_new_sample()
-        # get [elabftw] id of newly created sample:
-        new_elabid = new_sample['id']
+    response = requests.post(
+        url=items_url,
+        headers=header,
+        json=payload,
+        verify=True
+    )
+    # get new sample metadata as dictionary:
+    new_sample = get_new_sample()
+    # get [elabftw] id of newly created sample:
+    new_elabid = new_sample['id']
 
-        # patch_sample(new_elabid)
+    # patch new sample to inject metadata not accepted by post request:
+    patch_sample(new_elabid, body, std_id)
 
-        # get std-id [yyxxx] and std-name [Aa-yy-xxx] of newly created sample:
-        new_stdid = json.loads(new_sample["metadata"])["extra_fields"]["STD-ID"]["value"]
-        new_stdname = new_sample["title"][:9]
-        print(f"{new_elabid},{new_stdid},{new_stdname}") # DEBUG
-        
-        return new_elabid, new_stdid, new_stdname
-    except:
-        print('An error occurred during item creation.')
-        return 1
+    # get std-id [yyxxx] and std-name [Aa-yy-xxx] of newly created sample:
+    new_stdid = json.loads(new_sample["metadata"])["extra_fields"]["STD-ID"]["value"]
+    new_stdname = new_sample["title"][:9]
+    print(f"{new_elabid},{new_stdid},{new_stdname}") # DEBUG
+    
+    return new_elabid, new_stdid, new_stdname
+    # except:
+    #     print('An error occurred during item creation.')
+    #     return 1
 
 
 
