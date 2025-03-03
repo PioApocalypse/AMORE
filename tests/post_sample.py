@@ -21,7 +21,7 @@ def test_create_sample():
     substrate_batch = "Batch 1"
     position = "A1"
 
-    create_sample(title, body, status, tags, std_id, substrate_batch, position)
+    create_sample(title=title, status=status, tags=tags)
     #populate_sample(title, date, status, tags, body, substrate_batch, position)
     #assert "id" in response
     #assert response["title"] == title
