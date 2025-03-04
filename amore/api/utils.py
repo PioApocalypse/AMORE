@@ -33,7 +33,8 @@ def get_std_id(loc_code):
     response = requests.get(
     headers=header,
     url=search_query,
-    verify=True
+    verify= os.getenv('VERIFY_SSL').lower() == 'true' # this way you can toggle SSL verification in .env file
+
     )
 
     for i in response.json():

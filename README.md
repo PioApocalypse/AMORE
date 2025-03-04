@@ -56,12 +56,13 @@ Error = returns error.
 - [x] Post test to website
     * Issue #1: `export PYTHONPATH=$(pwd)` necessary for the script to recognise *amore* as module.
     * Issue #2: remember to initialize venv with `python -m venv ./.venv` and `pip install -r requirements.txt`.
-    * Warning: pay attention to the fucking correct port (**8080**, not 8006 - PVE - nor 443 - standard https).
-    * Error: after successful post, pytest exits with following error:
-
+    * <strike>Warning: pay attention to the fucking correct port (**8080**, not 8006 - PVE - nor 443 - standard https).</strike> Default port changed to 443.
+    * <strike>Error: after successful post, pytest exits with following error:</strike> pytest use removed for good, response was not json.
+<strike>
 ```python
 ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 ```
+</strike>
 
 - [x] Post test with custom title
 - [x] Post test with custom title and standard ID
@@ -70,13 +71,25 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 
 ### Phase 2 - Graphical interface
 - [x] GUI in plain HTML with simple form, whose post button calls my python script
+- [ ] Dropdown menus
 - [ ] Additional extra fields like batch, holder, position, proposal
 
 ### Phase 3 - Error handling, data validation, sanification
+- [ ] Sanification of inputs provided - avoid code/SQL injections
 > TBA
 
 ### Phase 4 - Other features
+- [ ] Auto update batch for decrementing number of substrates on every use
+- [ ] Send warning when batch is low on substrates
+- [ ] Make sure position is not shared among different samples
+- [ ] Search sample feature
+- [ ] Possibly delete sample feature
 > TBA
 
-### Phase 5 - Flask and general improvement
+### Phase 5 - From dev to prod
+- [ ] Base URL and verification check must be provided during installation
+    * Base URL and verification check can still be edited in .env file by user
+- [ ] Personal API key must be provided by user manually
+    * Can I create a login screen and automate the API key creation? I can always delete it on logout...
+- [ ] Finish up setup.py file
 > TBA

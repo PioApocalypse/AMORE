@@ -15,6 +15,7 @@ load_dotenv()
 API_URL = os.getenv('ELABFTW_BASE_URL')
 API_KEY = os.getenv('API_KEY')
 full_elab_url = f"{API_URL}api/v2/"
+ssl_verification = os.getenv('VERIFY_SSL').lower() == 'true' # this way you can toggle SSL verification in .env file
 """
 ED: about the key - would it be better to just implement a login page?
 The software would save the api key of each user locally in cache and
@@ -47,7 +48,7 @@ def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results)
         url=experiments_url,
         headers=header,
         json=payload,
-        verify=os.getenv('VERIFY_SSL')
+        verify=ssl_verification
     )
 
     response.raise_for_status()
@@ -70,7 +71,7 @@ def get_new_sample():
     response = requests.get(
     headers=header,
     url=search_query,
-    verify=True
+    verify=ssl_verification
     )
     
     # returns 'id' from entry whose 'id' is max among all entries in response.json()
@@ -100,7 +101,7 @@ def patch_sample(new_elabid, body, std_id):
     url=items_url,
     headers=header,
     json=payload,
-    verify=True
+    verify=ssl_verification
     )
     # response.raise_for_status()
     # return 0
@@ -128,7 +129,7 @@ def create_sample(title, status, tags, body, std_id): #, substrate_batch, positi
         url=items_url,
         headers=header,
         json=payload,
-        verify=True
+        verify=ssl_verification
     )
     # get new sample metadata as dictionary:
     new_sample = get_new_sample()
