@@ -41,7 +41,7 @@ prov_code = {
     "Grosseto": "Gr",
     "Imperia": "Im",
     "Isernia": "Is",
-    "L'Aquila": "Aq",
+    "LAquila": "Aq",
     "La Spezia": "Sp",
     "Latina": "Lt",
     "Lecce": "Le",
