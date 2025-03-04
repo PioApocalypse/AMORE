@@ -21,29 +21,27 @@
                 <form action="/create_sample" method="post">
                     <h2>Create a new sample</h2>
                     <div class="form-grid">
+                        <!-- FIRST COLUMN -->
                         <div class="form-column">
                             <div class="form-group">
                                 <label for="title">Title<span class="red">*</span>:</label>
-                                <input type="text" id="title" name="title" required>
+                                <input type="text" id="title" name="title" placeholder="Name of your sample" required>
                             </div>
                             <div class="form-group">
-                                <label for="description">Description:</label>
-                                <textarea id="description" name="description" maxlength="128"></textarea>
+                                <label for="position">Position:</label>
+                                <input type="text" id="position" name="position">
                             </div>
                             <div class="form-group">
                                 <label for="batch">Substrate Batch<span class="red">*</span>:</label>
                                 <input type="text" id="batch" name="batch" required>
                             </div>
                             <div class="form-group">
-                                <label for="sub_holder">Substrate Holder<span class="red">*</span>:</label>
-                                <input type="text" id="sub_holder" name="sub_holder" required>
+                                <label for="subholder">Substrate Holder<span class="red">*</span>:</label>
+                                <input type="text" id="subholder" name="subholder" required>
                             </div>
                         </div>
+                        <!-- SECOND COLUMN -->
                         <div class="form-column">
-                            <div class="form-group">
-                                <label for="position">Position:</label>
-                                <input type="text" id="position" name="position">
-                            </div>
                             <div class="form-group">
                                 <label for="location">Location of faculty<span class="red">*</span>:</label>
                                 <select id="location" name="location" required>
@@ -60,10 +58,17 @@
                             </div>
                             <div class="form-group">
                                 <label for="tags">Tags (comma-separated):</label>
-                                <input type="text" id="tags" name="tags">
+                                <input type="text" id="tags" name="tags" placeholder="e.g.: deposition, nffa, [...]">
                             </div>
-                            <div>
+                            <div class="form-group" style="margin-top: 3rem;">
                                 <p>Note: Fields with <span class="red">*</span> are required.</p>
+                            </div>
+                        </div>
+                        <!-- THIRD COLUMN -->
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="description">Description:</label>
+                                <textarea id="description" name="description" maxlength="128" placeholder="Other things you might want to write down for later? Nothing at all?"></textarea>
                             </div>
                         </div>
                     </div>
@@ -73,5 +78,8 @@
             </div>
         </div>
     </div>
+    <footer>
+        <p>alpha ver. for development only</p>
+    </footer>
 </body>
 </html>

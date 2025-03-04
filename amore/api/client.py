@@ -80,20 +80,28 @@ def get_new_sample():
     return new_sample
 
 
-def patch_sample(new_elabid, body, std_id):
+def patch_sample(new_elabid, new_userid, body, std_id, position, batch, subholder, proposal, next_step):
     # like before, different url
     API_URL = os.getenv('ELABFTW_BASE_URL')
     API_KEY = os.getenv('API_KEY')
     items_url = f"{full_elab_url}items/{new_elabid}/"
-    
+
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"
     }
     payload = {
+        "custom_id": None,
         "body": body,
-        "metadata": '{ "extra_fields": { "STD-ID": { "type": "number", "value": "'+str(std_id)+'" } } }', # todo: add other fields
-        "custom_id": None
+        "metadata": ('{ "extra_fields": {'
+            ' "Owner": { "type": "users", "value": "'+str(new_userid)+'", "required": true },'
+            ' "Position": { "type": "items", "value": "'+str(position)+'" },'
+            ' "Proposal": { "type": "items", "value": "'+str(proposal)+'" },'
+            ' "Substrate Batch": { "type": "items", "value": "'+str(batch)+'" },'
+            ' "Substrate Holder": { "type": "text", "value": "'+str(subholder)+'" },'
+            ' "STD-ID": { "type": "number", "value": "'+str(std_id)+'" }'
+            ' } }'),
+        "steps": [next_step],
     }
 
     # try:
@@ -110,7 +118,7 @@ def patch_sample(new_elabid, body, std_id):
     #     return 1
 
 
-def create_sample(title, status, tags, body, std_id): #, substrate_batch, position):
+def create_sample(title, tags, body, std_id, position, batch, subholder, proposal, next_step): #, substrate_batch, position):
     items_url = f"{full_elab_url}""items/"
     header = {
         "Authorization": API_KEY,
@@ -119,7 +127,6 @@ def create_sample(title, status, tags, body, std_id): #, substrate_batch, positi
     payload = {
         "template": 10, # 10 defines this item as 'sample' in our database
         "title": title,
-        "status": status, # not passed ???
         "tags": tags
     }
     
@@ -135,9 +142,21 @@ def create_sample(title, status, tags, body, std_id): #, substrate_batch, positi
     new_sample = get_new_sample()
     # get [elabftw] id of newly created sample:
     new_elabid = new_sample['id']
+    # get userid of newly created sample
+    new_userid = new_sample['userid']
 
     # patch new sample to inject metadata not accepted by post request:
-    patch_sample(new_elabid, body, std_id)
+    patch_sample(
+        new_elabid=new_elabid,
+        new_userid=new_userid,
+        body=body,
+        std_id=std_id,
+        position=position,
+        batch=batch,
+        subholder=subholder,
+        proposal=proposal,
+        next_step=next_step
+        )
 
     # get std-id [yyxxx] and std-name [Aa-yy-xxx] of newly created sample:
     new_stdid = json.loads(new_sample["metadata"])["extra_fields"]["STD-ID"]["value"]

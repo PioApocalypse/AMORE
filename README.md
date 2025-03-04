@@ -72,7 +72,7 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 ### Phase 2 - Graphical interface
 - [x] GUI in plain HTML with simple form, whose post button calls my python script
 - [x] Dropdown menus
-- [x] Additional extra fields like batch, holder, position, proposal
+- [x] Additional extra fields like batch, holder, position, proposal, owner
 - [ ] Additional fields must be taken from other elabftw resources
 
 ### Phase 3 - Other features
@@ -81,6 +81,7 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [ ] Make sure position is not shared among different samples
 - [ ] Search sample feature
 - [ ] Possibly delete sample feature
+- [ ] Must-discuss idea: upload attachment files to sample
 > TBA
 
 ### Phase 4 - Error handling, data validation, sanification

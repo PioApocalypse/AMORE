@@ -42,8 +42,8 @@ body {
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* two columns of 1fr width */
-  gap: 1.5rem; /* gap between columns */
+  grid-template-columns: 1fr 1fr 1fr; /* two columns of 1fr width */
+  gap: 2rem; /* gap between columns */
 }
 
 .form-column {
@@ -91,7 +91,9 @@ select {
 
 textarea {
   resize: vertical;
-  min-height: 100px;
+  min-height: 150px;
+  max-height: 350px;
+  font-family: Titillium Web, Cambria, sans-serif;
 }
 
 button {
@@ -113,4 +115,20 @@ button:hover {
 .red {
   font-weight: bolder;
   color: red;
+}
+
+footer {
+  position: fixed; /* Fissa il footer in basso */
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 0.2rem 0;
+  font-size: 0.8rem;
+}
+
+footer p {
+  margin: 0;
 }

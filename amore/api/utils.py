@@ -8,16 +8,9 @@ import random # TO REMOVE after feature is finished
 #from random import randrange as rr # TO REMOVE after feature is finished
 #from random import choice as rc # TO REMOVE after feature is finished
 
-"""
+'''
 Utils for AMORE to read and elaborate internal ID's
-"""
-
-def get_location(city): # get_location(city)
-    # city from user input - Napoli as default location
-    #city = random.choice(['Salerno','Roma','Napoli']) # placeholder to try diff locations
-    city = "Napoli" # placeholder to try multiple ID's on same location
-    location_code = ll.location_to_code(city)
-    return location_code
+'''
 
 def get_std_id(loc_code):
     API_URL = os.getenv('ELABFTW_BASE_URL')
@@ -53,7 +46,7 @@ def get_std_id(loc_code):
     return last_id
     
 def id_generator(city):
-    location_code = get_location(city)
+    location_code = ll.location_to_code(city)
     last_id = get_std_id(location_code)
     last_year = last_id // 1000 # first 2 digits
     last_unique = last_id % 1000 # last 3 digits
