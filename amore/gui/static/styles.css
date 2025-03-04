@@ -13,6 +13,17 @@ body {
   height: 100vh;
 }
 
+.home-grid {
+  display: flex;
+  align-items: center;
+}
+
+.home-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* gap between groups */
+}
+
 .title-box {
   margin-left: 1.5rem;
   margin-right: 3rem;
@@ -26,7 +37,25 @@ body {
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 400px;
+  max-width: 800px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* two columns of 1fr width */
+  gap: 1.5rem; /* gap between columns */
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* gap between groups */
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
 }
 
 h1 {
@@ -41,10 +70,6 @@ h2 {
   font-size: 1.5rem;
   color: #333;
   text-align: center;
-}
-
-.form-group {
-  margin-bottom: 1rem;
 }
 
 label {
@@ -83,4 +108,9 @@ button {
 
 button:hover {
   background-color: #0056b3;
+}
+
+.red {
+  font-weight: bolder;
+  color: red;
 }

@@ -71,19 +71,20 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 
 ### Phase 2 - Graphical interface
 - [x] GUI in plain HTML with simple form, whose post button calls my python script
-- [ ] Dropdown menus
-- [ ] Additional extra fields like batch, holder, position, proposal
+- [x] Dropdown menus
+- [x] Additional extra fields like batch, holder, position, proposal
+- [ ] Additional fields must be taken from other elabftw resources
 
-### Phase 3 - Error handling, data validation, sanification
-- [ ] Sanification of inputs provided - avoid code/SQL injections
-> TBA
-
-### Phase 4 - Other features
+### Phase 3 - Other features
 - [ ] Auto update batch for decrementing number of substrates on every use
 - [ ] Send warning when batch is low on substrates
 - [ ] Make sure position is not shared among different samples
 - [ ] Search sample feature
 - [ ] Possibly delete sample feature
+> TBA
+
+### Phase 4 - Error handling, data validation, sanification
+- [ ] Sanification of inputs provided - avoid code/SQL injections
 > TBA
 
 ### Phase 5 - From dev to prod
@@ -92,4 +93,9 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [ ] Personal API key must be provided by user manually
     * Can I create a login screen and automate the API key creation? I can always delete it on logout...
 - [ ] Finish up setup.py file
+> TBA
+
+### Phase 6 - Enduser test in production
+- [ ] Make sure eLabFTW is properly configured
+- [ ] Distribute software via GitHub (open repository)
 > TBA

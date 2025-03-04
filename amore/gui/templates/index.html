@@ -7,28 +7,71 @@
     <link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}">
 </head>
 <body>
-    <div class="title-box">
-        <h1>AMORE for eLabFTW</h1>
-        <p align="center">Autonomous Management of Outputs<br>for Research Efficiency</p>
-    </div>
-    <div class="form-container">
-        <form action="/create_sample" method="post">
-            <h2>Create a new sample</h2>
-            <div class="form-group">
-                <label for="title">Title (required):</label>
-                <input type="text" id="title" name="title" required>
-            
-                <label for="description">Description:</label>
-                <textarea id="description" name="description" maxlength="128"></textarea>
+    <div class="home-grid">
+        <div class="home-column">
+            <div class="title-box">
+                <h1>AMORE for eLabFTW</h1>
+                <p align="center">Autonomous Management of Outputs<br>for Research Efficiency</p>
             </div>
+        </div>
 
-            <div class="form-group">
-                <label for="tags">Tags (comma-separated):</label>
-                <input type="text" id="tags" name="tags">
+
+        <div class="home-column">
+            <div class="form-container">
+                <form action="/create_sample" method="post">
+                    <h2>Create a new sample</h2>
+                    <div class="form-grid">
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="title">Title<span class="red">*</span>:</label>
+                                <input type="text" id="title" name="title" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description:</label>
+                                <textarea id="description" name="description" maxlength="128"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="batch">Substrate Batch<span class="red">*</span>:</label>
+                                <input type="text" id="batch" name="batch" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="sub_holder">Substrate Holder<span class="red">*</span>:</label>
+                                <input type="text" id="sub_holder" name="sub_holder" required>
+                            </div>
+                        </div>
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="position">Position:</label>
+                                <input type="text" id="position" name="position">
+                            </div>
+                            <div class="form-group">
+                                <label for="location">Location of faculty<span class="red">*</span>:</label>
+                                <select id="location" name="location" required>
+                                    <option value="Napoli" selected="selected">Naples</option>
+                                    <option value="Roma">Rome</option>
+                                    <option value="Genova">Genoa</option>
+                                    <option value="LAquila">L'Aquila</option>
+                                    <option value="Salerno">Salerno</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="proposal">Proposal:</label>
+                                <input type="text" id="proposal" name="proposal">
+                            </div>
+                            <div class="form-group">
+                                <label for="tags">Tags (comma-separated):</label>
+                                <input type="text" id="tags" name="tags">
+                            </div>
+                            <div>
+                                <p>Note: Fields with <span class="red">*</span> are required.</p>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <button type="submit">Create Sample</button>
+                </form>
             </div>
-
-            <button type="submit">Create Sample</button>
-        </form>
+        </div>
     </div>
 </body>
 </html>
