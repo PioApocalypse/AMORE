@@ -108,5 +108,4 @@ prov_code = {
 }
 
 def location_to_code(location_name):
-    loc_title = location_name.title() # suggested by DS to make sure input is caps insensitive
-    return prov_code.get(loc_title, "Xx")
+    return prov_code.get(location_name, "Xx")
