@@ -1,14 +1,14 @@
 from flask import Flask, request, render_template, redirect, flash
-from amore.api.client import create_sample, get_substrate_batches, get_positions, get_proposals
+import amore.api.client as amore
 from amore.api.utils import id_generator
 
 app = Flask(__name__)
 
 @app.route("/")
 def home():
-    positions = get_positions() # which is a list of dicts
-    batches = get_substrate_batches() # which is a list of dicts
-    proposals = get_proposals() # you get the gist
+    positions = amore.get_positions() # which is a list of dicts
+    batches = amore.get_substrate_batches() # which is a list of dicts
+    proposals = amore.get_proposals() # you get the gist
     return render_template("index.html", positions=positions, batches=batches, proposals=proposals)
 
 @app.route("/create_sample", methods=["POST"])
@@ -27,7 +27,7 @@ def handle_create_sample():
     full_id = id_generated[1] # index 1 of id_generator returns full code in Na-{%y}-xxx format
 
     # This is where the fun begins:
-    create_sample(
+    amore.create_sample(
         title=f"{full_id} - {title}",
         tags=tags,
         std_id=std_id,
