@@ -52,7 +52,7 @@ Issue = problem to solve, obstacle; \
 Warning = always pay attention; \
 Error = returns error.
 
-### Phase 1 - New sample
+### Phase 1 COMPLETE - New sample
 - [x] Post test to website
     * Issue #1: `export PYTHONPATH=$(pwd)` necessary for the script to recognise *amore* as module.
     * Issue #2: remember to initialize venv with `python -m venv ./.venv` and `pip install -r requirements.txt`.
@@ -69,20 +69,19 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
     * Issue: api apparently doesn't support a POST method to directly create a new sample with extra fields, waiting for eLabFTW 5.2.0. Feature technically implemented.
 - [x] Fix issue: use a PATCH request on fresh new sample to inject body, STD-ID, other metadata.
 
-### Phase 2 - Graphical interface
+### Phase 2 COMPLETE - Graphical interface
 - [x] GUI in plain HTML with simple form, whose post button calls my python script
 - [x] Dropdown menus
 - [x] Additional extra fields like batch, holder, position, proposal, owner
-- [ ] Additional fields must be taken from other elabftw resources
+- [x] Additional fields must be taken from other elabftw resources
 
 ### Phase 3 - Other features
 - [ ] Auto update batch for decrementing number of substrates on every use
 - [ ] Send warning when batch is low on substrates
-- [ ] Make sure position is not shared among different samples
-- [ ] Search sample feature
-- [ ] Possibly delete sample feature
+- [ ] Make sure position is not shared among different samples [ED: is it even possible?]
+- [ ] "Search sample" feature
+- [x] <strike>Possibly "delete sample" feature</strike> Terrible idea.
 - [ ] Must-discuss idea: upload attachment files to sample
-> TBA
 
 ### Phase 4 - Error handling, data validation, sanification
 - [ ] Sanification of inputs provided - avoid code/SQL injections
