@@ -186,7 +186,7 @@ def get_positions():
     
     # from response parse only useful info - which is title for the enduser and id for the create_sample client function
     positions = [
-        {'id': item.get('id'), 'title': item.get('title')} # WARNING! .get method avoids KeyError exceptions - but it's really bad if eLab allows missing title or id
+        {'id': item.get('id'), 'title': item.get('title')[4:]} # WARNING! .get method avoids KeyError exceptions - but it's really bad if eLab allows missing title or id
         for item in response.json() # which is an array of json objects/dictionaries
     ]
     return positions # which is a list of dictionaries with 'id' and 'title'
