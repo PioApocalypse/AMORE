@@ -115,6 +115,7 @@ button:hover {
 .red {
   font-weight: bolder;
   color: red;
+  font-size: 110%;
 }
 
 footer {
