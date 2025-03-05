@@ -74,7 +74,7 @@ h2 {
 
 label {
   display: block;
-  margin-bottom: 0.5rem;
+  /* margin-bottom: 0.5rem; /* deactivated to save vertical space */
   color: #555;
 }
 

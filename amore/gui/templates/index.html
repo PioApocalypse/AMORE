@@ -28,16 +28,28 @@
                                 <input type="text" id="title" name="title" placeholder="Name of your sample" required>
                             </div>
                             <div class="form-group">
-                                <label for="position">Position:</label>
-                                <input type="text" id="position" name="position">
+                                <label for="position">Position:<span class="red">*</span>:</label>
+                                <!-- THIS PART GETS POSITIONS (ITEMS) FROM ELABFTW AND AUTOMATICALLY PUTS THEM IN OUR FORM -->
+                                <select id="position" name="position" required>
+                                    <option value="" selected="selected">- Select a position -</option>
+                                    {% for i in positions %}
+                                        <option value="{{ i['id'] }}">{{ i['title'] }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="batch">Substrate Batch<span class="red">*</span>:</label>
-                                <input type="text" id="batch" name="batch" required>
+                                <!-- THIS PART GETS BATCHES (ITEMS) FROM ELABFTW AND AUTOMATICALLY PUTS THEM IN OUR FORM -->
+                                <select id="batch" name="batch" required>
+                                    <option value="" selected="selected">- Select a batch -</option>
+                                    {% for i in batches %}
+                                        <option value="{{ i['id'] }}">{{ i['title'] }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label for="subholder">Substrate Holder<span class="red">*</span>:</label>
-                                <input type="text" id="subholder" name="subholder" required>
+                                <label for="subholder">Substrate Holder:</label>
+                                <input type="text" id="subholder" name="subholder">
                             </div>
                         </div>
                         <!-- SECOND COLUMN -->
@@ -54,7 +66,13 @@
                             </div>
                             <div class="form-group">
                                 <label for="proposal">Proposal:</label>
-                                <input type="text" id="proposal" name="proposal">
+                                <!-- THIS PART GETS PROPOSALS (ITEMS) FROM ELABFTW AND AUTOMATICALLY PUTS THEM IN OUR FORM -->
+                                <select id="proposal" name="proposal">
+                                    <option value="" selected="selected">-- No proposal --</option>
+                                    {% for i in proposals %}
+                                        <option value="{{ i['id'] }}">{{ i['title'] }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="tags">Tags (comma-separated):</label>

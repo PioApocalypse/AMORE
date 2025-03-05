@@ -1,12 +1,15 @@
 from flask import Flask, request, render_template, redirect, flash
-from amore.api.client import create_sample
+from amore.api.client import create_sample, get_substrate_batches, get_positions, get_proposals
 from amore.api.utils import id_generator
 
 app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    positions = get_positions() # which is a list of dicts
+    batches = get_substrate_batches() # which is a list of dicts
+    proposals = get_proposals() # you get the gist
+    return render_template("index.html", positions=positions, batches=batches, proposals=proposals)
 
 @app.route("/create_sample", methods=["POST"])
 def handle_create_sample():
@@ -18,12 +21,6 @@ def handle_create_sample():
     id_generated = id_generator(request.form.get("location"))
     proposal = request.form.get("proposal")
     tags = request.form.get("tags").split(",")  # Convert tags to a list
-    next_step = request.form.get("next_step")
-    print(next_step) # debug
-    try:
-        next_step
-    except:
-        next_step = "conquer the world" # placeholder
     description = request.form.get("description")
 
     std_id = id_generated[0] # index 0 of id_generator returns numeric id in yyxxx format
@@ -39,7 +36,6 @@ def handle_create_sample():
         batch=batch,
         subholder=subholder,
         proposal=proposal,
-        next_step=next_step
     )
 
     # Redirect back to the home page

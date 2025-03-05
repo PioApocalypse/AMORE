@@ -22,9 +22,9 @@ The software would save the api key of each user locally in cache and
 discard it as soon as the user logs out...
 """
 
-# ========================
-# == EXPERIMENT SECTION ==
-# ========================
+# =========================================================================================================================================
+# == EXPERIMENT SECTION ===================================================================================================================
+# =========================================================================================================================================
 
 def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results):
     # a post request needs url, header and payload
@@ -54,9 +54,9 @@ def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results)
     response.raise_for_status()
     return response.json()
 
-# =======================
-# == RESOURCES SECTION ==
-# =======================
+# =========================================================================================================================================
+# == RESOURCES SECTION ====================================================================================================================
+# =========================================================================================================================================
 
 def get_new_sample():
     API_KEY = os.getenv('API_KEY')
@@ -80,7 +80,7 @@ def get_new_sample():
     return new_sample
 
 
-def patch_sample(new_elabid, new_userid, body, std_id, position, batch, subholder, proposal, next_step):
+def patch_sample(new_elabid, new_userid, body, std_id, position, batch, subholder, proposal):
     # like before, different url
     API_URL = os.getenv('ELABFTW_BASE_URL')
     API_KEY = os.getenv('API_KEY')
@@ -101,7 +101,6 @@ def patch_sample(new_elabid, new_userid, body, std_id, position, batch, subholde
             ' "Substrate Holder": { "type": "text", "value": "'+str(subholder)+'" },'
             ' "STD-ID": { "type": "number", "value": "'+str(std_id)+'" }'
             ' } }'),
-        "steps": [next_step],
     }
 
     # try:
@@ -118,7 +117,7 @@ def patch_sample(new_elabid, new_userid, body, std_id, position, batch, subholde
     #     return 1
 
 
-def create_sample(title, tags, body, std_id, position, batch, subholder, proposal, next_step): #, substrate_batch, position):
+def create_sample(title, tags, body, std_id, position, batch, subholder, proposal): 
     items_url = f"{full_elab_url}""items/"
     header = {
         "Authorization": API_KEY,
@@ -155,7 +154,6 @@ def create_sample(title, tags, body, std_id, position, batch, subholder, proposa
         batch=batch,
         subholder=subholder,
         proposal=proposal,
-        next_step=next_step
         )
 
     # get std-id [yyxxx] and std-name [Aa-yy-xxx] of newly created sample:
@@ -168,6 +166,74 @@ def create_sample(title, tags, body, std_id, position, batch, subholder, proposa
     #     print('An error occurred during item creation.')
     #     return 1
 
+# =========================================================================================================================================
+# == DATA FOR FORM BUILDING SECTION =======================================================================================================
+# =========================================================================================================================================
+
+def get_positions():
+    header = {
+        "Authorization": API_KEY,
+        "Content-Type": "application/json"
+    }
+
+    search_query = f'{API_URL}api/v2/items?q=&cat=17&limit=9999' # dove 17 = "SAMPLE POSITION"
+    
+    response = requests.get(
+        headers=header,
+        url=search_query,
+        verify=ssl_verification
+    )
+    
+    # from response parse only useful info - which is title for the enduser and id for the create_sample client function
+    positions = [
+        {'id': item.get('id'), 'title': item.get('title')} # WARNING! .get method avoids KeyError exceptions - but it's really bad if eLab allows missing title or id
+        for item in response.json() # which is an array of json objects/dictionaries
+    ]
+    return positions # which is a list of dictionaries with 'id' and 'title'
+
+def get_substrate_batches():
+    header = {
+        "Authorization": API_KEY,
+        "Content-Type": "application/json"
+    }
+
+    search_query = f'{API_URL}api/v2/items?q=&cat=9&limit=9999' # dove 9 = "SUBSTRATE BATCH"
+    
+    response = requests.get(
+        headers=header,
+        url=search_query,
+        verify=ssl_verification
+    )
+    
+    # from response parse only useful info - which is title for the enduser and id for the create_sample client function
+    batches = [
+        {'id': item.get('id'), 'title': item.get('title')}
+        for item in response.json() # which is an array of json objects/dictionaries
+    ]
+    # !!! WARNING !!! .get method avoids KeyError exceptions - but it's really bad anyways if eLab allows missing title or id
+    return batches # which is a list of dictionaries with 'id' and 'title'
+
+def get_proposals():
+    header = {
+        "Authorization": API_KEY,
+        "Content-Type": "application/json"
+    }
+
+    search_query = f'{API_URL}api/v2/items?q=&cat=15&limit=9999' # dove 15 = "PROPOSAL"
+    
+    response = requests.get(
+        headers=header,
+        url=search_query,
+        verify=ssl_verification
+    )
+    
+    # from response parse only useful info - which is title for the enduser and id for the create_sample client function
+    proposals = [
+        {'id': item.get('id'), 'title': item.get('title')}
+        for item in response.json() # which is an array of json objects/dictionaries
+    ]
+    # !!! WARNING !!! .get method avoids KeyError exceptions - but it's really bad anyways if eLab allows missing title or id
+    return proposals # which is a list of dictionaries with 'id' and 'title'
 
 
 # disaster prevention
