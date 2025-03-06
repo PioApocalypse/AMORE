@@ -157,11 +157,8 @@ def create_sample(title, tags, body, std_id, position, batch, subholder, proposa
         )
 
     # get std-id [yyxxx] and std-name [Aa-yy-xxx] of newly created sample:
-    new_stdid = json.loads(new_sample["metadata"])["extra_fields"]["STD-ID"]["value"]
-    new_stdname = new_sample["title"][:9]
-    print(f"{new_elabid},{new_stdid},{new_stdname}") # DEBUG
-    
-    return new_elabid, new_stdid, new_stdname
+    new_stdname = new_sample['title'][:9]
+    return new_elabid, new_stdname # for confirmation message to user
     # except:
     #     print('An error occurred during item creation.')
     #     return 1

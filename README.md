@@ -77,6 +77,8 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 
 ### Phase 3 - Other features
 - [ ] Auto update batch for decrementing number of substrates on every use
+    * Only show batches with int('Available pieces') > 0
+    * Get value for extra field 'Available pieces' of batch selected on post, patch with 'Available pieces' -1
 - [ ] Send warning when batch is low on substrates
 - [ ] Make sure position is not shared among different samples [ED: is it even possible?]
 - [ ] "Search sample" feature
@@ -85,6 +87,7 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 
 ### Phase 4 - Error handling, data validation, sanification
 - [ ] Sanification of inputs provided - avoid code/SQL injections
+- [ ] Warn user if posting fails, say reason
 > TBA
 
 ### Phase 5 - From dev to prod

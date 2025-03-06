@@ -70,6 +70,3 @@ if __name__=="__main__":
     complete_id = id_array[1]
     last_id = id_array[2]
     print(f"Last ID: {last_id}, STD-ID: {std_id}, Name: {complete_id}")
-# TO REMOVE when this file is ready
-else: 
-    print("Feature not ready yet, proceed with caution.")
