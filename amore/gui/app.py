@@ -14,12 +14,12 @@ def home():
 @app.route("/create_sample", methods=["POST"])
 def handle_create_sample():
     title = request.form.get("title")
-    position = request.form.get("position")
-    batch = request.form.get("batch")
+    position = request.form.get("position") # ID of item
+    batch = request.form.get("batch") # ID of item
     subholder = request.form.get("subholder")
 
-    id_generated = id_generator(request.form.get("location"))
-    proposal = request.form.get("proposal")
+    id_generated = id_generator(request.form.get("location")) # list
+    proposal = request.form.get("proposal") # ID of item
     tags = request.form.get("tags").split(",")  # Convert tags to a list
     description = request.form.get("description")
 
