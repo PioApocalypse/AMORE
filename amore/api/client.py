@@ -69,9 +69,9 @@ def get_new_sample():
     search_query = f'{API_URL}api/v2/items?limit=9999'
     
     response = requests.get(
-    headers=header,
-    url=search_query,
-    verify=ssl_verification
+        headers=header,
+        url=search_query,
+        verify=ssl_verification
     )
     
     # returns 'id' from entry whose 'id' is max among all entries in response.json()
@@ -105,10 +105,10 @@ def patch_sample(new_elabid, new_userid, body, std_id, position, batch, subholde
 
     # try:
     response = requests.patch(
-    url=items_url,
-    headers=header,
-    json=payload,
-    verify=ssl_verification
+        url=items_url,
+        headers=header,
+        json=payload,
+        verify=ssl_verification
     )
     # response.raise_for_status()
     # return 0
@@ -163,6 +163,42 @@ def create_sample(title, tags, body, std_id, position, batch, subholder, proposa
     #     print('An error occurred during item creation.')
     #     return 1
 
+def batch_pieces_decreaser(batch):
+    batch_url = f"{full_elab_url}items/{batch}/"
+    header = {
+        "Authorization": API_KEY,
+        "Content-Type": "application/json"
+    }
+
+    # Step 1: get metadata from batch id
+    batch_data = requests.get(
+        headers=header,
+        url=batch_url,
+        verify=ssl_verification
+    )
+
+    # Step 2: parse metadata from batch id
+    batch_meta = json.loads(batch_data.json()['metadata']) # dictionary containing metadata
+
+    # Step 3: decrease available pieces
+    pieces_before = batch_meta['extra_fields']['Available pieces']['value']
+    pieces_after = int(pieces_before) -1
+
+    # Step 4: replace avail.pieces value with decreased value in metadata dictionary
+    batch_meta['extra_fields']['Available pieces']['value'] = pieces_after
+    
+    # Step 5: patch batch with new metadata
+    payload_batch = {
+        "metadata": json.dumps(batch_meta)
+    }
+    response = requests.patch(
+        url=batch_url,
+        headers=header,
+        json=payload_batch,
+        verify=ssl_verification
+    )
+    return response
+
 # =========================================================================================================================================
 # == DATA FOR FORM BUILDING SECTION =======================================================================================================
 # =========================================================================================================================================
@@ -206,9 +242,11 @@ def get_substrate_batches():
     batches = [
         {'id': item.get('id'), 'title': item.get('title')}
         for item in response.json()
-        if int(json.loads(item['metadata'])['extra_fields']['Available pieces']['value']) > 0 # which is an array of json objects/dictionaries
+        if int(json.loads(item['metadata'])['extra_fields']['Available pieces']['value'].replace('', '0')) > 0 # which is an array of json objects/dictionaries
     ]
-    # !!! WARNING !!! .get method avoids KeyError exceptions - but it's really bad anyways if eLab allows missing title or id
+    # !!! WARNING !!! .get method avoids KeyError exceptions - but it's really bad anyways if eLab allows missing title or id.
+    # Also note that previous if statement is exceptionally weird: json.loads returns dictionary, then I get the 'value' of extra field 'Available pieces'.
+    # Unfortunately, that value is still a fucking string and it can be empty; I replace empty string with 0 and turn str to int. THEN it checks if it's >0.
     return batches # which is a list of dictionaries with 'id' and 'title'
 
 def get_proposals():

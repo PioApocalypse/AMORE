@@ -26,7 +26,9 @@ def handle_create_sample():
     std_id = id_generated[0] # index 0 of id_generator returns numeric id in yyxxx format
     full_id = id_generated[1] # index 1 of id_generator returns full code in Na-{%y}-xxx format
 
-    # This is where the fun begins:
+    # decrease number of available pieces in selected batch
+    amore.batch_pieces_decreaser(batch)
+    # this is where the magic happens:
     amore.create_sample(
         title=f"{full_id} - {title}",
         tags=tags,
@@ -37,8 +39,7 @@ def handle_create_sample():
         subholder=subholder,
         proposal=proposal,
     )
-
-    # Redirect back to the home page
+    # redirect back to the home page
     return redirect("/")
 
 if __name__ == '__main__':

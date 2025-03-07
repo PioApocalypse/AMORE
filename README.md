@@ -76,7 +76,7 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [x] Additional fields must be taken from other elabftw resources
 
 ### Phase 3 - Other features
-- [ ] Auto update batch for decrementing number of substrates on every use
+- [x] Auto update batch for decrementing number of substrates on every use
     * Only show batches with int('Available pieces') > 0
     * Get value for extra field 'Available pieces' of batch selected on post, patch with 'Available pieces' -1
 - [ ] Send warning when batch is low on substrates
