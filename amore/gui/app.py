@@ -26,19 +26,29 @@ def handle_create_sample():
     std_id = id_generated[0] # index 0 of id_generator returns numeric id in yyxxx format
     full_id = id_generated[1] # index 1 of id_generator returns full code in Na-{%y}-xxx format
 
-    # decrease number of available pieces in selected batch
-    amore.batch_pieces_decreaser(batch)
-    # this is where the magic happens:
-    amore.create_sample(
-        title=f"{full_id} - {title}",
-        tags=tags,
-        std_id=std_id,
-        body=description,
-        position=position,
-        batch=batch,
-        subholder=subholder,
-        proposal=proposal,
-    )
+    try:
+        # decrease number of available pieces in selected batch
+        remaining = amore.batch_pieces_decreaser(batch)
+        # this is where the magic happens:
+        amore.create_sample(
+            title=f"{full_id} - {title}",
+            tags=tags,
+            std_id=std_id,
+            body=description,
+            position=position,
+            batch=batch,
+            subholder=subholder,
+            proposal=proposal,)
+
+        batches = amore.get_substrate_batches() # recalling
+        batch_name = next((item['name'] for item in batches if item['id'] == batch), None)
+        # if remaining <= 0:
+        #     flash(f"Warning: The batch '{batch_name}' is now out of stock!", "warning")
+        # elif remaining < 5:
+        #     flash(f"Warning: The batch '{batch_name}' is low on stock with {remaining} pieces left!", "warning")
+        
+    except:
+        pass #flash(f'Error processing your request.', 'error')
     # redirect back to the home page
     return redirect("/")
 

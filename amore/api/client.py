@@ -186,11 +186,11 @@ def batch_pieces_decreaser(batch):
     batch_meta = json.loads(batch_data.json()['metadata']) # dictionary containing metadata
 
     # Step 3: decrease available pieces
-    pieces_before = batch_meta['extra_fields']['Available pieces']['value']
-    pieces_after = int(pieces_before) -1
+    available = batch_meta['extra_fields']['Available pieces']['value']
+    remaining = int(available) -1
 
     # Step 4: replace avail.pieces value with decreased value in metadata dictionary
-    batch_meta['extra_fields']['Available pieces']['value'] = pieces_after
+    batch_meta['extra_fields']['Available pieces']['value'] = remaining
     
     # Step 5: patch batch with new metadata
     payload_batch = {
@@ -202,7 +202,8 @@ def batch_pieces_decreaser(batch):
         json=payload_batch,
         verify=ssl_verification
     )
-    return response
+    # Bonus: return remaining pieces to warn user if number is too low or zero
+    return remaining
 '''
 =========================================================================================================================================
 == DATA FOR FORM BUILDING SECTION =======================================================================================================

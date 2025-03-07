@@ -5,9 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create new sample - AMORE for eLabFTW</title>
     <link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='flash.css') }}">
 </head>
 <body>
+    <!-- Flask flash pop-ups -->
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
     <div class="home-grid">
+        <!-- TITLE -->
         <div class="home-column">
             <div class="title-box">
                 <h1>AMORE for eLabFTW</h1>
@@ -15,7 +28,7 @@
             </div>
         </div>
 
-
+        <!-- FORM -->
         <div class="home-column">
             <div class="form-container">
                 <form action="/create_sample" method="post">
