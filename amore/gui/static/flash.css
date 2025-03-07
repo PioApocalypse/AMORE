@@ -1,3 +1,5 @@
+/* Disclamer: this stylesheet is AI-generated */
+/* Flash messages */
 .flash-messages {
     position: fixed;
     top: 1rem;
@@ -11,20 +13,68 @@
     border-radius: 4px;
     color: #fff;
     animation: slideIn 0.5s ease-out;
+    transition: opacity 0.5s ease-out; /* for fade-out */
+    position: relative;
+    padding-right: 2.5rem; /* Space for the close button */
+    overflow: hidden; /* Ensure the timebar doesn't overflow */
 }
 
 .flash.success {
     background-color: #28a745; /* Green for success */
 }
 
-.flash.warning {
-    background-color: #ffc107; /* Yellow for warnings */
+.flash.batch_los {
+    background-color: #e0a500; /* Yellow for warnings */
+}
+
+.flash.batch_oos {
+    background-color: #dc3545; /* Red for out-of-stock */
 }
 
 .flash.error {
-    background-color: #dc3545; /* Red for errors */
+    background-color: #7700ff; /* Violet for errors */
 }
 
+/* Close button */
+.close-btn {
+    position: absolute;
+    top: 50%;
+    right: 0.75rem;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #fff;
+    opacity: 0.8;
+}
+
+.close-btn:hover {
+    opacity: 1;
+}
+
+/* Timebar */
+.timebar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.3); /* Light background for the timebar */
+    transform-origin: left;
+    animation: timebar 30s linear forwards; /* 30-second animation */
+}
+
+/* Animation for the timebar */
+@keyframes timebar {
+    from {
+        transform: scaleX(1);
+    }
+    to {
+        transform: scaleX(0);
+    }
+}
+
+/* Animation for sliding in */
 @keyframes slideIn {
     from {
         transform: translateX(100%);
@@ -32,4 +82,14 @@
     to {
         transform: translateX(0);
     }
+}
+
+/* Stop closing timer on hover */
+.flash:hover .timebar {
+    animation-play-state: paused;
+}
+
+/* For fade-out con closing */
+.flash.fade-out {
+    opacity: 0;
 }

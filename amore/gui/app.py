@@ -1,8 +1,10 @@
 from flask import Flask, request, render_template, redirect, flash
+import secrets
 import amore.api.client as amore
 from amore.api.utils import id_generator
 
 app = Flask(__name__)
+app.secret_key = secrets.token_hex(16)
 
 @app.route("/")
 def home():
@@ -27,6 +29,8 @@ def handle_create_sample():
     full_id = id_generated[1] # index 1 of id_generator returns full code in Na-{%y}-xxx format
 
     try:
+        # recall batches variable BEFORE patching batch
+        batches = amore.get_substrate_batches()
         # decrease number of available pieces in selected batch
         remaining = amore.batch_pieces_decreaser(batch)
         # this is where the magic happens:
@@ -39,16 +43,14 @@ def handle_create_sample():
             batch=batch,
             subholder=subholder,
             proposal=proposal,)
-
-        batches = amore.get_substrate_batches() # recalling
-        batch_name = next((item['name'] for item in batches if item['id'] == batch), None)
-        # if remaining <= 0:
-        #     flash(f"Warning: The batch '{batch_name}' is now out of stock!", "warning")
-        # elif remaining < 5:
-        #     flash(f"Warning: The batch '{batch_name}' is low on stock with {remaining} pieces left!", "warning")
-        
-    except:
-        pass #flash(f'Error processing your request.', 'error')
+        flash(f'Item successfully created with Standard ID "{full_id}".', "success")
+        batch_name = next((item['name'] for item in batches if item['id'] == batch), "you've just selected")
+        if remaining <= 0:
+            flash(f"Beware: The batch {batch_name} is now out of stock!", "batch_oos") # oos = out of stock
+        elif remaining < 5:
+            flash(f"Urgent: The batch {batch_name} is low on stock with {remaining} pieces left!", "batch_los") # los = low on stock
+    except Exception as e:
+        flash(f'Error processing your request: {str(e)}.', 'error')
     # redirect back to the home page
     return redirect("/")
 
