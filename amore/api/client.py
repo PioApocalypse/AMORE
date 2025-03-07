@@ -205,7 +205,8 @@ def get_substrate_batches():
     # from response parse only useful info - which is title for the enduser and id for the create_sample client function
     batches = [
         {'id': item.get('id'), 'title': item.get('title')}
-        for item in response.json() # which is an array of json objects/dictionaries
+        for item in response.json()
+        if int(json.loads(item['metadata'])['extra_fields']['Available pieces']['value']) > 0 # which is an array of json objects/dictionaries
     ]
     # !!! WARNING !!! .get method avoids KeyError exceptions - but it's really bad anyways if eLab allows missing title or id
     return batches # which is a list of dictionaries with 'id' and 'title'
