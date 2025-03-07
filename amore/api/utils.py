@@ -9,7 +9,9 @@ import random # TO REMOVE after feature is finished
 #from random import choice as rc # TO REMOVE after feature is finished
 
 '''
+===================================================
 Utils for AMORE to read and elaborate internal ID's
+===================================================
 '''
 
 def get_std_id(loc_code):
@@ -62,6 +64,26 @@ def id_generator(city):
     std_id = int(current_year)*1000 + unique
     complete_id = f"{location_code}-{current_year}-{unique:03d}"
     return std_id, complete_id, last_id # last_id only for testing purposes
+
+'''
+===========================
+Sanification, normalization
+===========================
+'''
+
+# function to normalize a value which is usually a string with a number or an empty string to integer
+def normalize_to_int(value):
+    if value == '':
+        value = 0
+    elif not isinstance(value, int):
+        try:
+            value = int(value)
+        except:
+            # returns 0 on error
+            value = 0
+    return value
+
+
 
 if __name__=="__main__":
     print("Debug mode.")

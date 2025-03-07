@@ -3,6 +3,7 @@ import requests
 import json
 from datetime import datetime
 from dotenv import load_dotenv
+from .utils import normalize_to_int as to_int
 
 """
 Variables will be only imported from env for testing purposes.
@@ -16,15 +17,17 @@ API_URL = os.getenv('ELABFTW_BASE_URL')
 API_KEY = os.getenv('API_KEY')
 full_elab_url = f"{API_URL}api/v2/"
 ssl_verification = os.getenv('VERIFY_SSL').lower() == 'true' # this way you can toggle SSL verification in .env file
-"""
+'''
 ED: about the key - would it be better to just implement a login page?
 The software would save the api key of each user locally in cache and
 discard it as soon as the user logs out...
-"""
+'''
 
-# =========================================================================================================================================
-# == EXPERIMENT SECTION ===================================================================================================================
-# =========================================================================================================================================
+'''
+=========================================================================================================================================
+== EXPERIMENT SECTION ===================================================================================================================
+=========================================================================================================================================
+'''
 
 def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results):
     # a post request needs url, header and payload
@@ -54,9 +57,11 @@ def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results)
     response.raise_for_status()
     return response.json()
 
-# =========================================================================================================================================
-# == RESOURCES SECTION ====================================================================================================================
-# =========================================================================================================================================
+'''
+=========================================================================================================================================
+== RESOURCES SECTION ====================================================================================================================
+=========================================================================================================================================
+'''
 
 def get_new_sample():
     API_KEY = os.getenv('API_KEY')
@@ -198,10 +203,11 @@ def batch_pieces_decreaser(batch):
         verify=ssl_verification
     )
     return response
-
-# =========================================================================================================================================
-# == DATA FOR FORM BUILDING SECTION =======================================================================================================
-# =========================================================================================================================================
+'''
+=========================================================================================================================================
+== DATA FOR FORM BUILDING SECTION =======================================================================================================
+=========================================================================================================================================
+'''
 
 def get_positions():
     header = {
@@ -242,7 +248,7 @@ def get_substrate_batches():
     batches = [
         {'id': item.get('id'), 'title': item.get('title')}
         for item in response.json()
-        if int(json.loads(item['metadata'])['extra_fields']['Available pieces']['value'].replace('', '0')) > 0 # which is an array of json objects/dictionaries
+        if to_int( json.loads(item['metadata'])['extra_fields']['Available pieces']['value'] ) > 0 # which is an array of json objects/dictionaries
     ]
     # !!! WARNING !!! .get method avoids KeyError exceptions - but it's really bad anyways if eLab allows missing title or id.
     # Also note that previous if statement is exceptionally weird: json.loads returns dictionary, then I get the 'value' of extra field 'Available pieces'.
