@@ -83,7 +83,38 @@ def normalize_to_int(value):
             value = 0
     return value
 
+'''
+=========================
+Handling attachment files
+=========================
+'''
 
+def attachment_handler(uploads):
+    attachments = []
+    UPLOAD_FOLDER = ".uploads"
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True) # create temporary uploads folder
+    for file in uploads:
+        if file.filename == "": # if empty continue
+            continue
+        # get file size
+        file.seek(0, os.SEEK_END)
+        file_size = file.tell()
+        file.seek(0)
+        # check for 100 MB limit
+        if file_size > 100 * 1024 * 1024:
+            raise Exception(f"File '{file.filename}' exceeds the 100 MB size limit.", "error")
+        # save in tmp folder
+        file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(file_path)
+        # append to attachments list
+        attachments.append(("file", (file.filename, open(file_path, "rb"))))
+    return(attachments)
+
+def tmp_remover(attachments):
+    for _, (_, file) in attachments:
+        file.close()
+        os.remove(file.name)
+        
 
 if __name__=="__main__":
     print("Debug mode.")

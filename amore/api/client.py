@@ -121,8 +121,26 @@ def patch_sample(new_elabid, new_userid, body, std_id, position, batch, subholde
     #     print('An error occurred during item patching.')
     #     return 1
 
+def upload_attachments(new_elabid, attachments):
+    API_URL = os.getenv('ELABFTW_BASE_URL')
+    API_KEY = os.getenv('API_KEY')
+    uploads_url = f"{full_elab_url}items/{new_elabid}/uploads"
+    for field_name, (filename, file) in attachments:
+        header = {"Authorization": API_KEY}
+        files = {field_name: (filename, file)}
+        try:
+            response = requests.post(
+                url=uploads_url,
+                headers=header,
+                files=files,
+                verify=ssl_verification
+            )
+        except Exception as e:
+            raise Exception(f"Exception during file upload: {str(e)}")
+    return 0
 
-def create_sample(title, tags, body, std_id, position, batch, subholder, proposal): 
+
+def create_sample(title, tags, body, std_id, position, batch, subholder, proposal, attachments=None): 
     items_url = f"{full_elab_url}""items/"
     header = {
         "Authorization": API_KEY,
@@ -148,7 +166,6 @@ def create_sample(title, tags, body, std_id, position, batch, subholder, proposa
     new_elabid = new_sample['id']
     # get userid of newly created sample
     new_userid = new_sample['userid']
-
     # patch new sample to inject metadata not accepted by post request:
     patch_sample(
         new_elabid=new_elabid,
@@ -160,13 +177,12 @@ def create_sample(title, tags, body, std_id, position, batch, subholder, proposa
         subholder=subholder,
         proposal=proposal,
         )
-
+    # upload attachments
+    if attachments:
+        upload_attachments(new_elabid=new_elabid, attachments=attachments)
     # get std-id [yyxxx] and std-name [Aa-yy-xxx] of newly created sample:
-    new_stdname = new_sample['title'][:9]
-    return new_elabid, new_stdname # for confirmation message to user
-    # except:
-    #     print('An error occurred during item creation.')
-    #     return 1
+    # new_stdname = new_sample['title'][:9]
+    return 0 # for confirmation message to user
 
 def batch_pieces_decreaser(batch):
     batch_url = f"{full_elab_url}items/{batch}/"
