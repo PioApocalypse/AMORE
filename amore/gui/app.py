@@ -33,6 +33,10 @@ def handle_create_sample():
         batches = amore.get_substrate_batches()
         # decrease number of available pieces in selected batch
         remaining = amore.batch_pieces_decreaser(batch)
+    except Exception as e:
+        flash(f'Error handling batch availability: {str(e)}.', 'error')
+    
+    try:
         # this is where the magic happens:
         amore.create_sample(
             title=f"{full_id} - {title}",
@@ -50,7 +54,7 @@ def handle_create_sample():
         elif remaining < 5:
             flash(f"Urgent: The batch {batch_name} is low on stock with {remaining} pieces left!", "batch_los") # los = low on stock
     except Exception as e:
-        flash(f'Error processing your request: {str(e)}.', 'error')
+        flash(f'Error processing your submission: {str(e)}.', 'error')
     # redirect back to the home page
     return redirect("/")
 
