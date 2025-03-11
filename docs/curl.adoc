@@ -189,3 +189,22 @@ I've also tried many small changes, like:
 ```
 
 While the original example contains a single extra field called "For example", my edited file contains two extra fields supported officially on the eLabFTW's demo instance (*Concentration* and *Growth temperature*) for the _Plasmid_ template. I've also changed the template value from 1 to 5 (Plasmid) and the rating from 0 (no rating) to 3, discovering that not even the rating field is set to the value I provide.
+
+=== Uploading attachments to item
+It is possible to send a POST request to `items/{id}/uploads` to add a new attachment file to a certain resource. Curl manages requests containing files with the `-F` option; F stands for *form* and it «_emulate[s] a filled-in form in which a user has pressed the submit button. This makes curl POST data using the Content-Type multipart/form-data according to RFC 2388_» (Source: `man curl`). Beware as no "Content-Type" needs to be explicitly stated in our request's header, and prompt `-H "Content-Type: application/json"` WILL return error (400 Bad Request, `Error decoding json payload: Syntax error`).
+
+Testing on item of ID 652. The command to upload file `./tests/attachment.txt` is simply:
+
+```bash
+curl -H "Authorization: $ELAB_KEY" -F "file=@tests/attachment.txt" -k -X POST https://demo.elabftw.net/api/v2/items/652/uploads
+```
+
+NOTE: Please pay attention that Bash and Python handle these requests differently; python-requests uses the keyword "files" - plural - while bash uses "file". This exceptionally dumb error cost me 30 minutes.
+
+Supported file formats (all tested):
+
+* [x] txt, csv
+* [x] json, html, other text files
+* [x] PDF
+* [x] Any image format (JPG, PNG, BMP)
+* [x] Any binary file (exe, proprietary)

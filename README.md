@@ -80,7 +80,7 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
     * Only show batches with int('Available pieces') > 0
     * Get value for extra field 'Available pieces' of batch selected on post, patch with 'Available pieces' -1
 - [x] Send warning when batch is low on substrates
-- [ ] Must-discuss idea: upload attachment files to sample
+- [x] Must-discuss idea: upload attachment files to sample
 - [ ] <strike>"Search sample" feature</strike> Let's talk about it...
 - [x] <strike>Possibly "delete sample" feature</strike> Terrible idea.
 - [ ] Make sure position is not shared among different samples [ED: is it even possible?]
