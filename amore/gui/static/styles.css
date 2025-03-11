@@ -72,10 +72,16 @@ h2 {
   text-align: center;
 }
 
-label {
+label,
+.label {
   display: block;
   /* margin-bottom: 0.5rem; /* deactivated to save vertical space */
   color: #555;
+}
+
+.label {
+  font-size: smaller;
+  margin-top: 0.5rem;
 }
 
 input[type="text"],
