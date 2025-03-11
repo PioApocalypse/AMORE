@@ -13,7 +13,7 @@ def home():
     positions = amore.get_positions() # which is a list of dicts
     batches = amore.get_substrate_batches() # which is a list of dicts
     proposals = amore.get_proposals() # you get the gist
-    return render_template("index.html", positions=positions, batches=batches, proposals=proposals)
+    return render_template("create_sample.html", positions=positions, batches=batches, proposals=proposals)
 
 @app.route("/create_sample", methods=["POST"])
 def handle_create_sample():
@@ -68,6 +68,14 @@ def handle_create_sample():
         tmp_remover(attachments) # removes tmp files in upload
     # redirect back to the home page
     return redirect("/")
+
+@app.route("/positions")
+def handle_positions():
+    positions = amore.get_positions() # which is a list of dicts
+    batches = amore.get_substrate_batches() # which is a list of dicts
+    proposals = amore.get_proposals() # you get the gist
+    return render_template("positions.html", positions=positions, batches=batches, proposals=proposals)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
