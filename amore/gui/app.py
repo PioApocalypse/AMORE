@@ -6,6 +6,7 @@ from amore.api.utils import id_generator, attachment_handler, tmp_remover
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024 # default Flask limit is 16 MB
 
 @app.route("/")
 def home():
