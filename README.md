@@ -81,16 +81,20 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
     * Get value for extra field 'Available pieces' of batch selected on post, patch with 'Available pieces' -1
 - [x] Send warning when batch is low on substrates
 - [x] Must-discuss idea: upload attachment files to sample
-- [ ] <strike>"Search sample" feature</strike> Let's talk about it...
+- [x] <strike>"Search sample" feature</strike> Let's talk about it...
 - [x] <strike>Possibly "delete sample" feature</strike> Terrible idea.
-- [ ] Make sure position is not shared among different samples [ED: is it even possible?]
 
-### Phase 4 - Error handling, data validation, sanification
+### Phase 4 - Position viewer and handler
+- [ ] Post new sample to any position, linking sample to position
+- [ ] Move sample from one position to the other
+- [ ] Make sure position is not shared among different samples
+
+### Phase 5 - Error handling, data validation, sanification
 - [ ] Sanification of inputs provided - avoid code/SQL injections
 - [ ] Warn user if posting fails, say reason
 > TBA
 
-### Phase 5 - From dev to prod
+### Phase 6 - From dev to prod
 - [ ] Base URL and verification check must be provided during installation
     * Base URL and verification check can still be edited in .env file by user
 - [ ] Personal API key must be provided by user manually
@@ -98,7 +102,7 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [ ] Finish up setup.py file
 > TBA
 
-### Phase 6 - Enduser test in production
+### Phase 7 - Enduser test in production
 - [ ] Make sure eLabFTW is properly configured
 - [ ] Distribute software via GitHub (open repository)
 > TBA
