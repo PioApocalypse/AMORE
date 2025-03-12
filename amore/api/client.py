@@ -115,11 +115,8 @@ def patch_sample(new_elabid, new_userid, body, std_id, position, batch, subholde
         json=payload,
         verify=ssl_verification
     )
-    # response.raise_for_status()
-    # return 0
-    # except:
-    #     print('An error occurred during item patching.')
-    #     return 1
+    return 0
+
 
 def upload_attachments(new_elabid, attachments):
     API_URL = os.getenv('ELABFTW_BASE_URL')
@@ -220,6 +217,45 @@ def batch_pieces_decreaser(batch):
     )
     # Bonus: return remaining pieces to warn user if number is too low or zero
     return remaining
+
+'''
+=========================================================================================================================================
+== ADDING/MOVING TO POSITIONS ===========================================================================================================
+=========================================================================================================================================
+'''
+
+def add_to_position(sample_id, position_id): # POST to empty position
+    header = {
+        "Authorization": API_KEY,
+        "Content-Type": "application/json"
+    }
+    position_url = f'{API_URL}api/v2/items/{position_id}/items_links/{sample_id}'
+    add = requests.post(
+        headers=header,
+        url=position_url,
+        verify=ssl_verification
+    )
+    return 0
+
+def move_to_position(sample_id, old_position_id, new_position_id): # DELETE from old position then POST to empty position
+    header = {
+        "Authorization": API_KEY,
+        "Content-Type": "application/json"
+    }
+    old_position_url = f'{API_URL}api/v2/items/{old_position_id}/items_links/{sample_id}'
+    new_position_url = f'{API_URL}api/v2/items/{new_position_id}/items_links/{sample_id}'
+    delete = requests.delete(
+        headers=header,
+        url=old_position_url,
+        verify=ssl_verification  
+    )
+    add = requests.post(
+        headers=header,
+        url=new_position_url,
+        verify=ssl_verification
+    )
+    return 0
+
 '''
 =========================================================================================================================================
 == DATA FOR FORM BUILDING SECTION =======================================================================================================
