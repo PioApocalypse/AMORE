@@ -2,9 +2,86 @@
 **Autonomous Management of Outputs for Research Efficiency** (to rename later) is a primitive interface for allowing researchers to upload data on experiments to [eLabFTW](https://github.com/elabftw/elabftw) with minimal effort.
 
 <!-- Buona idea per acronimo: 'Alternative Manager of Outputs with Reduced Efforts' -->
-> To-do: translate what follows in English.
 
-## Backend structure
+## Installation
+AMORE requires the following packages to run. Number in parenthesis is the minimum version with which the software has been confirmed to be working.
+
+* Flask (3.1.0) - for the HTML graphical interface
+* Requests (2.32.3) - to communicate with eLabFTW's API
+* dotenv (1.0.1) - to load variables from your environment file
+
+Requirements can be installed via pip. The use of virtual environments is highly encouraged.
+
+### Suggested method
+> Please notice this software is still alpha. Improvement will come in due time.  
+...A proper installer too, hopefully.
+
+**Clone the repository** (or download the source code).
+
+```bash
+git clone https://github.com/PioApocalypse/AMORE.git
+cd AMORE/
+```
+
+Optionally (but highly encouraged) you can create a **virtual environment** in the root folder of the project.
+
+```bash
+python -m venv .venv
+```
+
+The software also **needs the `$PYTHONPATH` variable to be set** to the ***full* path** of your local folder. For semplicity you can add an instruction directly in your virtual environment activator script to export the `$PYTHONPATH` variable upon venv activation. On bash this can be accomplished without text editors:
+
+```bash
+echo 'export PYTHONPATH="</full/path/to/AMORE/>"' >> .venv/bin/activate
+```
+
+> Pay attention to the quote marks' positions (single `'` outside and double `"` inside).
+
+Activate the virtual environment with **source** from your shell:
+
+```bash
+source .venv/bin/activate
+```
+
+> Note that you can verify if variable `$PYTHONPATH` is correctly assigned in your venv by echoing it (`echo $PYTHONPATH`, which should return the *full* path to your local AMORE folder).
+
+From the root folder of the software **install dependencies** using the provided requirements file, or "by-hand" if you prefer so:
+
+```bash
+pip install -r requirements.txt
+# OR alternatively:
+python3 -m pip install flask requests python-dotenv
+```
+
+### Authenticating and running
+Before starting, create your own **environment file** by copying or renaming my example. The following steps are (currently) **REQUIRED**.
+
+```bash
+cp .env.example .env
+```
+
+Open the .env file with your editor of choice and change the variables in it to accomodate your needs. Here's a list of the variables this app uses to work.
+
+* `ELABFTW_BASE_URL`: URL of the index/root of your eLabFTW instance, which will be in one of these formats:
+    * `'https://elabftw.example.net/'` for regular instances of eLabFTW;
+    * `'https://elabftw.example.net:8080/'` if you use an https port different from 443;
+    * `'https://host.example.net/elabftw/'` if your eLab instance is installed in a directory of another webserver.  
+    > Note that currently the URL must always be followed by a trailing / and included between single quotes `'`.
+* `API_KEY`: your personal API key generated on eLabFTW → Settings → API keys, also between single quotes. Official guide [here](https://doc.elabftw.net/api.html#generating-a-key).  
+    This will probably be removed in the future in favor of a login page.
+* `VERIFY_SSL`: leave default (True) unless your eLab instance is not secure, i.e. only runs in HTTP mode or no CA certificate is provided, which also includes instances with self-signed certificates; warnings may be shown.
+
+Finally, you can run the webapp via Flask. By default the web page will be running on HTTP [localhost port 5000](http://127.0.0.1:5000).
+
+```bash
+python amore/gui/app.py
+```
+
+You can terminate Flask with CTRL+C or by closing your terminal.
+
+
+
+### Other info (to be removed)
 Behind the stage this software should allow the end user to easily **create new samples**, **update their in-real-time position** and **briefly report faults and maintainance operations of machinery** inside the lab.
 
 ### Creating new sample
@@ -38,16 +115,7 @@ Additionally, a numeric ID (integer) is assigned to every sample in the format Y
 <!-- Possibile soluzione per generare un codice ID simile per i campioni è modificare la struttura del db di eLab, quindi il sorgente del software stesso per usare l'ID completo (nel formato XX-AA-###) come chiave primaria delle varie entry.
 Usare una tabella nuova per ogni anno forse? -->
 
-### Sample real-time position
-> TBA
-
-### Faults and maintainance
-> TBA
-
-## Frontend structure
-The use of Python library **Flask** has been proposed. On testing ground plain ugly HTML will be preferred instead.
-
-## Checkbox
+## To-do list
 Issue = problem to solve, obstacle; \
 Warning = always pay attention; \
 Error = returns error.
@@ -67,7 +135,7 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [x] Post test with custom title
 - [x] Post test with custom title and standard ID
     * Issue: api apparently doesn't support a POST method to directly create a new sample with extra fields, waiting for eLabFTW 5.2.0. Feature technically implemented.
-- [x] Fix issue: use a PATCH request on fresh new sample to inject body, STD-ID, other metadata.
+- [x] Fix issue: use a PATCH request on fresh new sample to inject body, STD-ID, other metadata
 
 ### Phase 2 COMPLETE - Graphical interface
 - [x] GUI in plain HTML with simple form, whose post button calls my python script
@@ -75,7 +143,7 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [x] Additional extra fields like batch, holder, position, proposal, owner
 - [x] Additional fields must be taken from other elabftw resources
 
-### Phase 3 - Other features
+### Phase 3 COMPLETE - Other features in item creation
 - [x] Auto update batch for decrementing number of substrates on every use
     * Only show batches with int('Available pieces') > 0
     * Get value for extra field 'Available pieces' of batch selected on post, patch with 'Available pieces' -1
@@ -85,9 +153,11 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [x] <strike>Possibly "delete sample" feature</strike> Terrible idea.
 
 ### Phase 4 - Position viewer and handler
-- [ ] Post new sample to any position, linking sample to position
-- [ ] Move sample from one position to the other
+- [x] Post new sample to any position, linking sample to position
+- [x] Move sample from one position to the other
 - [ ] Make sure position is not shared among different samples
+    * Don't even show position in create_sample form if already occupied (except for "*LOST", "out-of-chamber", etc.)
+- [ ] Visualize list of positions
 
 ### Phase 5 - Error handling, data validation, sanification
 - [ ] Sanification of inputs provided - avoid code/SQL injections
