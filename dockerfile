@@ -7,15 +7,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 5000
 
 ENV PYTHONPATH="/app"
-ENV BASE_URL="https://elabftw.fisica.unina.it/"
-ENV API_KEY="asdasdasd"
-ENV VERIFY=True
+ARG URL
+ARG KEY
+ARG VERIFY
 
-RUN echo "ELABFTW_BASE_URL=$BASE_URL" >> .env
-RUN echo "API_KEY=$API_KEY" >> .env
-RUN echo "VERIFY_SSL=$VERIFY" >> .env
+RUN echo "ELABFTW_BASE_URL=${URL}" >> .env
+RUN echo "API_KEY='${KEY}'" >> .env
+RUN echo "VERIFY_SSL=${VERIFY}" >> .env
 
 ENV FLASK_APP=amore/gui/app.py
 ENV FLASK_ENV=production
 
-CMD ["flask", "run", "--host=127.0.0.1"]
+CMD ["flask", "run", "--host=0.0.0.0"]
