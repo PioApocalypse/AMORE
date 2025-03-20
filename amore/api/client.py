@@ -333,6 +333,29 @@ def get_proposals(): # get every item in category 15 (PROPOSAL)
     # !!! WARNING !!! .get method avoids KeyError exceptions - but it's really bad anyways if eLab allows missing title or id
     return proposals # which is a list of dictionaries with 'id' and 'title'
 
+'''
+=========================================================================================================================================
+== DATA FOR POSITION HANDLING ===========================================================================================================
+=========================================================================================================================================
+'''
+
+def get_linked_items(item_id): # get linked item for specified resource 
+    header = {
+        "Authorization": API_KEY,
+        "Content-Type": "application/json"
+    }
+    items_links = f'{API_URL}api/v2/items/{item_id}/items_links'
+    response = requests.get(
+        headers=header,
+        url=items_links,
+        verify=ssl_verification
+    )
+    linked_items = [
+        {'id': item.get('entityid'), 'full_id': item.get('title')[:9], 'title': item.get('title')[12:] }
+        for item in response.json()
+    ]
+    return linked_items # list of dicts containing only data on linked resource, not parent resource
+
 
 # disaster prevention
 if __name__ == "__main__":
