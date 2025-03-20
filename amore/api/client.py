@@ -63,16 +63,13 @@ def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results)
 =========================================================================================================================================
 '''
 
-def get_new_sample():
-    API_KEY = os.getenv('API_KEY')
+def get_new_sample(): # catch newly created sample, return its 'id'
     every_id = []
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"
     }
-
     search_query = f'{API_URL}api/v2/items?limit=9999'
-    
     response = requests.get(
         headers=header,
         url=search_query,
@@ -85,12 +82,12 @@ def get_new_sample():
     return new_sample
 
 
-def patch_sample(new_elabid, new_userid, body, std_id, position, batch, subholder, proposal):
-    # like before, different url
-    API_URL = os.getenv('ELABFTW_BASE_URL')
-    API_KEY = os.getenv('API_KEY')
+def patch_sample(new_elabid, new_userid, body, std_id, position, batch, subholder, proposal): # push other data into newly created sample
+    '''
+    Note that this was made because eLabFTW 5.1.15 API endpoints do not accept any of these parameters while creating a new resource/item.
+    eLabFTW's main feature is still the "Experiments" section.
+    '''
     items_url = f"{full_elab_url}items/{new_elabid}/"
-
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"
@@ -107,7 +104,6 @@ def patch_sample(new_elabid, new_userid, body, std_id, position, batch, subholde
             ' "STD-ID": { "type": "number", "value": "'+str(std_id)+'" }'
             ' } }'),
     }
-
     # try:
     response = requests.patch(
         url=items_url,
@@ -118,11 +114,10 @@ def patch_sample(new_elabid, new_userid, body, std_id, position, batch, subholde
     return 0
 
 
-def upload_attachments(new_elabid, attachments):
-    API_URL = os.getenv('ELABFTW_BASE_URL')
+def upload_attachments(item_id, attachments): # upload attached files to specified resource
     API_KEY = os.getenv('API_KEY')
-    uploads_url = f"{full_elab_url}items/{new_elabid}/uploads"
-    for field_name, (filename, file) in attachments:
+    uploads_url = f"{full_elab_url}items/{item_id}/uploads"
+    for field_name, (filename, file) in attachments: # maybe add clamav check?
         header = {"Authorization": API_KEY}
         files = {field_name: (filename, file)}
         try:
@@ -137,7 +132,7 @@ def upload_attachments(new_elabid, attachments):
     return 0
 
 
-def create_sample(title, tags, body, std_id, position, batch, subholder, proposal, attachments=None): 
+def create_sample(title, tags, body, std_id, position, batch, subholder, proposal, attachments=None): # MAIN: create new item in category 10 (SAMPLE)
     items_url = f"{full_elab_url}""items/"
     header = {
         "Authorization": API_KEY,
@@ -176,12 +171,12 @@ def create_sample(title, tags, body, std_id, position, batch, subholder, proposa
         )
     # upload attachments
     if attachments:
-        upload_attachments(new_elabid=new_elabid, attachments=attachments)
+        upload_attachments(item_id=new_elabid, attachments=attachments)
     # get std-id [yyxxx] and std-name [Aa-yy-xxx] of newly created sample:
     # new_stdname = new_sample['title'][:9]
     return 0 # for confirmation message to user
 
-def batch_pieces_decreaser(batch):
+def batch_pieces_decreaser(batch): # for a certain batch (item) get metadata, take available pieces, reduce by one and patch with new metadata
     batch_url = f"{full_elab_url}items/{batch}/"
     header = {
         "Authorization": API_KEY,
@@ -262,14 +257,12 @@ def move_to_position(sample_id, old_position_id, new_position_id): # DELETE from
 =========================================================================================================================================
 '''
 
-def get_positions():
+def get_positions(): # get every item in category 17 (SAMPLE POSITION)
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"
     }
-
     search_query = f'{API_URL}api/v2/items?q=&cat=17&limit=9999' # dove 17 = "SAMPLE POSITION"
-    
     response = requests.get(
         headers=header,
         url=search_query,
@@ -284,7 +277,7 @@ def get_positions():
     # return positions # which is a list of dictionaries with 'id' and 'title'
     return response.json()
 
-def get_available_positions():
+def get_available_positions(): # filter items with status "available" from get_positions
     all_positions = get_positions()
     available_positions = [ # read below
         {'id': item.get('id'), 'title': item.get('title')}
@@ -293,7 +286,7 @@ def get_available_positions():
     ]
     return available_positions # which is a list of dicts with 'id' and 'title' of available or working positions
 
-def get_substrate_batches():
+def get_substrate_batches(): # get every item in category 9 (SUBSTRATE BATCH)
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"
@@ -318,7 +311,7 @@ def get_substrate_batches():
     # Unfortunately, that value is still a fucking string and it can be empty; I replace empty string with 0 and turn str to int. THEN it checks if it's >0.
     return batches # which is a list of dictionaries with 'id' and 'title'
 
-def get_proposals():
+def get_proposals(): # get every item in category 15 (PROPOSAL)
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"

@@ -14,7 +14,7 @@ Utils for AMORE to read and elaborate internal ID's
 ===================================================
 '''
 
-def get_std_id(loc_code):
+def get_std_id(loc_code): # only function to use a request in this file, consider moving to client.py
     API_URL = os.getenv('ELABFTW_BASE_URL')
     API_KEY = os.getenv('API_KEY')
     every_id = []
@@ -47,7 +47,7 @@ def get_std_id(loc_code):
     # print(last_id)  #for debugging to be removed
     return last_id
     
-def id_generator(city):
+def id_generator(city): # generates STD-ID as requested by EDG using city for the first two characters (Na-YY-XXX)
     location_code = ll.location_to_code(city)
     last_id = get_std_id(location_code)
     last_year = last_id // 1000 # first 2 digits
@@ -71,8 +71,7 @@ Sanification, normalization
 ===========================
 '''
 
-# function to normalize a value which is usually a string with a number or an empty string to integer
-def normalize_to_int(value):
+def normalize_to_int(value): # function to normalize a value which is usually a string with a number or an empty string to integer
     if value == '':
         value = 0
     elif not isinstance(value, int):
@@ -89,7 +88,7 @@ Handling attachment files
 =========================
 '''
 
-def attachment_handler(uploads):
+def attachment_handler(uploads): # handles attachments locally (e.g. size control) before uploading
     attachments = []
     UPLOAD_FOLDER = ".uploads"
     os.makedirs(UPLOAD_FOLDER, exist_ok=True) # create temporary uploads folder
@@ -110,7 +109,7 @@ def attachment_handler(uploads):
         attachments.append(("file", (file.filename, open(file_path, "rb"))))
     return(attachments)
 
-def tmp_remover(attachments):
+def tmp_remover(attachments): # removes garbage from attachment_handler
     for _, (_, file) in attachments:
         file.close()
         os.remove(file.name)
