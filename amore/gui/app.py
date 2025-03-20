@@ -10,7 +10,7 @@ app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024 # default Flask limit is 16
 
 @app.route("/")
 def home():
-    positions = amore.get_positions() # which is a list of dicts
+    positions = amore.get_available_positions() # which is a list of dicts containing available or working pos
     batches = amore.get_substrate_batches() # which is a list of dicts
     proposals = amore.get_proposals() # you get the gist
     return render_template("create_sample.html", positions=positions, batches=batches, proposals=proposals)
@@ -72,9 +72,7 @@ def handle_create_sample():
 @app.route("/positions")
 def handle_positions():
     positions = amore.get_positions() # which is a list of dicts
-    batches = amore.get_substrate_batches() # which is a list of dicts
-    proposals = amore.get_proposals() # you get the gist
-    return render_template("positions.html", positions=positions, batches=batches, proposals=proposals)
+    return render_template("positions.html", positions=positions)
 
 
 if __name__ == '__main__':
