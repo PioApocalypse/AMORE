@@ -48,17 +48,17 @@ done
 # normalize and check for elab instance
 while true; do
     read -p "Please input the url of a valid eLabFTW instance: " URL
-    normalized_url=$(normalize_url "$URL")
+    URL=$(normalize_url "$URL")
     if [[ "$force_mode" == true ]]; then
         echo "Warning: Force mode enabled, skipping website validation."
-        echo "Normalized URL: $normalized_url"
+        echo "Normalized URL: $URL"
         echo
         break
     fi
 
     echo "Checking..." && sleep 1
-    if check_elabftw "$normalized_url"; then
-        echo "Valid eLabFTW URL: $normalized_url"
+    if check_elabftw "$URL"; then
+        echo "Valid eLabFTW URL: $URL"
         echo
         break
     else
