@@ -277,11 +277,21 @@ def get_positions():
     )
     
     # from response parse only useful info - which is title for the enduser and id for the create_sample client function
-    positions = [
-        {'id': item.get('id'), 'title': item.get('title')[4:]} # WARNING! .get method avoids KeyError exceptions - but it's really bad if eLab allows missing title or id
-        for item in response.json() # which is an array of json objects/dictionaries
+    # positions = [
+    #     {'id': item.get('id'), 'title': item.get('title')[4:], 'status': item.get('status')} # WARNING! .get method avoids KeyError exceptions - but it's really bad if eLab allows missing title or id
+    #     for item in response.json() # which is an array of json objects/dictionaries
+    # ]
+    # return positions # which is a list of dictionaries with 'id' and 'title'
+    return response.json()
+
+def get_available_positions():
+    all_positions = get_positions()
+    available_positions = [ # read below
+        {'id': item.get('id'), 'title': item.get('title')}
+        for item in all_positions
+        if item['status'] == None or item['status'] in [1,4]
     ]
-    return positions # which is a list of dictionaries with 'id' and 'title'
+    return available_positions # which is a list of dicts with 'id' and 'title' of available or working positions
 
 def get_substrate_batches():
     header = {
