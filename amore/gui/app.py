@@ -9,6 +9,10 @@ app.secret_key = secrets.token_hex(16)
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024 # default Flask limit is 16 MB
 
 @app.route("/")
+def redirect_to_home():
+    return redirect("/new")
+
+@app.route("/new")
 def home():
     positions = amore.get_available_positions() # which is a list of dicts containing available or working pos
     batches = amore.get_substrate_batches() # which is a list of dicts
@@ -67,7 +71,7 @@ def handle_create_sample():
     if attachments != None:
         utils.tmp_remover(attachments) # removes tmp files in upload
     # redirect back to the home page
-    return redirect("/")
+    return redirect("/new")
 
 @app.route("/positions")
 def handle_positions():
