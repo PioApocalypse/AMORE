@@ -10,6 +10,7 @@ echo
 
 # FUNCTIONS
 # define function which checks for valid root dir url in the stupidest way possible: DOES IT REDIRECT?
+# To-do: sanify this check, currently it works very poorly and doesn't differentiate between https and http
 check_elabftw() {
     local url=$1
     if curl -s "$url" -k | grep -q "Redirecting to /dashboard.php"; then
