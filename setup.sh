@@ -12,7 +12,7 @@ echo
 # define function which checks for valid root dir url in the stupidest way possible: DOES IT REDIRECT?
 check_elabftw() {
     local url=$1
-    if curl -s "$url" | grep -q "Redirecting to /dashboard.php"; then
+    if curl -s "$url" -k | grep -q "Redirecting to /dashboard.php"; then
         return 0
     else
         return 1
@@ -77,11 +77,13 @@ read -p "Only allow secure connections (Y/n)? " secure
 secure=${secure,,} # to lowercase
 if [[ -z "$secure" ]]; then
     VERIFY=True
+    else case "$secure" in
+        y|ye|yes) VERIFY=True ;;  # 0 = true (yes)
+        n|nay|no) VERIFY=False ;;   # 1 = false (no)
+        *) echo I assume you mean 'yes' then... ; VERIFY=True ;;
+    esac
 fi
-case "$secure" in
-    y|ye|yes) VERIFY=True ;;  # 0 = true (yes)
-    n|nay|no) VERIFY=False ;;   # 1 = false (no)
-esac
+
 
 echo
 echo "Building the docker image with following parameters:"
@@ -91,7 +93,7 @@ read -p "Press enter to continue."
 docker build \
   --build-arg URL=${URL} \
   --build-arg KEY="${KEY}" \
-  --build-arg VERIFY="${VERIFY}" \
+  --build-arg VERIFY=${VERIFY} \
   -t amore .
 
 echo
