@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, redirect, flash
 import secrets
 import os
 import amore.api.client as amore
-from amore.api.utils import id_generator, attachment_handler, tmp_remover
+import amore.api.utils as utils
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
@@ -13,7 +13,7 @@ def home():
     positions = amore.get_positions() # which is a list of dicts
     batches = amore.get_substrate_batches() # which is a list of dicts
     proposals = amore.get_proposals() # you get the gist
-    return render_template("index.html", positions=positions, batches=batches, proposals=proposals)
+    return render_template("create_sample.html", positions=positions, batches=batches, proposals=proposals)
 
 @app.route("/create_sample", methods=["POST"])
 def handle_create_sample():
@@ -22,14 +22,14 @@ def handle_create_sample():
     batch = request.form.get("batch") # ID of item
     subholder = request.form.get("subholder")
 
-    id_generated = id_generator(request.form.get("location")) # list
+    id_generated = utils.id_generator(request.form.get("location")) # list
     proposal = request.form.get("proposal") # ID of item
     tags = request.form.get("tags").split(",")  # Convert tags to a list
     description = request.form.get("description")
     
     uploads = request.files.getlist("attachments")
     try:
-        attachments = attachment_handler(uploads=uploads)
+        attachments = utils.attachment_handler(uploads=uploads)
     except Exception as e:
         flash(str(e), 'error')
         # return redirect("/")
@@ -65,9 +65,17 @@ def handle_create_sample():
     except Exception as e:
         flash(f'Error processing your submission: {str(e)}.', 'error')
     if attachments != None:
-        tmp_remover(attachments) # removes tmp files in upload
+        utils.tmp_remover(attachments) # removes tmp files in upload
     # redirect back to the home page
     return redirect("/")
+
+@app.route("/positions")
+def handle_positions():
+    positions = amore.get_positions() # which is a list of dicts
+    batches = amore.get_substrate_batches() # which is a list of dicts
+    proposals = amore.get_proposals() # you get the gist
+    return render_template("positions.html", positions=positions, batches=batches, proposals=proposals)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

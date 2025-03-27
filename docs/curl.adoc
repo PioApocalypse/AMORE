@@ -208,3 +208,18 @@ Supported file formats (all tested):
 * [x] PDF
 * [x] Any image format (JPG, PNG, BMP)
 * [x] Any binary file (exe, proprietary)
+
+=== Adding sample to position (item of category_id = 17)
+Experiments and resources can be interlinked. To link a resource (sample) to another (position) the POST method can be used as follows:
+
+```bash
+curl -X POST -H "Authorization: $ELAB_KEY" -H "Content-Type: application/json" https://demo.elabftw.net/api/v2/items/<position_id>/items_links/<sample_id>
+```
+
+In the same way it is possible to remove a linked resource from another using the DELETE method:
+
+```bash
+curl -X DELETE -H "Authorization: $ELAB_KEY" -H "Content-Type: application/json" https://demo.elabftw.net/api/v2/items/<position_id>/items_links/<sample_id>
+```
+
+The only difference is the method used, the rest of the string is the same.
