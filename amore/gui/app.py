@@ -1,14 +1,41 @@
+'''
+External modules. In particular, from flask:
+- Flask object implements the WSGI. Usage: app = Flask(__name__) - operations on variable 'app' setup the environment configuration.
+- request is used to get variables values from the HTML form upon submission.
+- render_template and redirect are quite obvious, look them up.
+- flash allows for "flash" (pop-up) messages to warn user if something goes wrong (or right).
+'''
 from flask import Flask, request, render_template, redirect, flash
-import secrets
-import os
-import amore.api.client as amore
-import amore.api.utils as utils
+import secrets # for session cookies
+import os # use method os.environ.get() to bypass the need for a .env file/dotenv module
+import amore.api.client as amore # client module, see: amore/api/client.py
+import amore.api.utils as utils # utilities module, see: amore/api/utils.py
+import amore.api.auth as auth # authentication module, see: amore/api/auth.py
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024 # default Flask limit is 16 MB
 
+@app.route("/login", methods=["GET","POST"])
+def login():
+    # If user is submitting their API key then method is POST, therefore validate:
+    if request.method == "POST":
+        API_KEY = request.form.get("api_key")
+        try:
+            user = auth.check_apikey(KEY=API_KEY)
+            flash(f'Welcome, {user}!', 'success')
+            return redirect("/create")
+        except Exception as e:
+            flash(str(e), 'error')
+            return redirect("/login")
+    # If user is just loading the page then method is GET, therefore render login:
+    return render_template("login.html")
+
 @app.route("/")
+def root():
+    return redirect("/login")
+
+@app.route("/create")
 def home():
     positions = amore.get_positions() # which is a list of dicts
     batches = amore.get_substrate_batches() # which is a list of dicts
@@ -67,7 +94,7 @@ def handle_create_sample():
     if attachments != None:
         utils.tmp_remover(attachments) # removes tmp files in upload
     # redirect back to the home page
-    return redirect("/")
+    return redirect("/create")
 
 @app.route("/positions")
 def handle_positions():
