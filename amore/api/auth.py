@@ -52,16 +52,9 @@ def check_apikey(KEY=""):
     # Last check: is the key read only?
     if key_can_write == 0:
         raise Exception("API key is read-only, not read/write.\nPlease use (eventually create) one with read/write permissions.")
-    # If AND ONLY IF the key exists, is valid and is not read-only, return 0:
-    return 0
-
-def get_user(KEY):
-    # No empty key check since this function will be always called after check_apikey.
+    
+    # If AND ONLY IF the key exists, is valid and is not read-only, return user's full name:
     endpoint = f"{API_URL}api/v2/users/me/"
-    header = {
-        "Authorization": KEY,
-        "Content-Type": "application/json"
-    }
     response = requests.get(
         url=endpoint,
         headers=header,
