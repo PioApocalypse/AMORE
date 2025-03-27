@@ -25,7 +25,7 @@ def ismyapivalid(KEY):
     )
 
     if response.status_code // 100 > 3:
-        return 'Invalid API key'
+        raise Exception('Invalid API key.')
 
     apikeys = [
         { 'date': item.get('last_used_at'), 'rw': item.get('can_write') }
@@ -33,7 +33,11 @@ def ismyapivalid(KEY):
     ]
 
     last_used = max(apikeys, key=lambda x: datetime.strptime(x['date'], '%Y-%m-%d %H:%M:%S'))
-    return last_used['rw']
+    key_can_write = last_used['rw']
+    if key_can_write == 0:
+        raise Exception("API key is read-only, not read/write.\nPlease use (eventually create) one with read/write permissions.")
+
+    return 0
 """
 tests show function returns 0 if key is read only, otherwise 1
 tests show function returns 'Invalid API key' if API key is empty or invalid

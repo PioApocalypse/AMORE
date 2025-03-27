@@ -1,6 +1,10 @@
 import os
 import requests
-import json
+from datetime import datetime
+from dotenv import load_dotenv
+
+load_dotenv()
+API_URL = os.getenv('ELABFTW_BASE_URL')
 
 '''
 Use this file for AND ONLY FOR storing functions for authentication.
@@ -15,3 +19,51 @@ The only way is making a GET request to the apikey endpoint and look for the one
 /tests/api_get.py
 """
 
+def check_apikey(KEY=""):
+    # No sense proceeding if the user somehow submitted an empty key...
+    if KEY == "":
+        raise Exception('HOW DID YOU EVEN MANAGE TO SUBMIT AN EMPTY KEY?!')
+    # Request section
+    endpoint = f"{API_URL}api/v2/apikeys"
+    header = {
+        "Authorization": KEY,
+        "Content-Type": "application/json"
+    }
+    response = requests.get(
+        url=endpoint,
+        headers=header,
+        verify=True,
+    )
+    # Check zero: is the request not accepted by the server?
+    if response.status_code // 100 == 5:
+        raise Exception('There''s a problem on the server. Try asking the sysadmin.')
+    # First check: is the API key invalid? If so server returns 4xx error and no further check is required.
+    if response.status_code // 100 == 4:
+        raise Exception('Invalid API key.')
+
+    # Get last used API key - the one you made your request with - and see if it can write.
+    apikeys = [
+        { 'date': item.get('last_used_at'), 'rw': item.get('can_write') }
+        for item in response.json() ]
+    last_used = max(apikeys, key=lambda x: datetime.strptime(x['date'], '%Y-%m-%d %H:%M:%S'))
+    key_can_write = last_used['rw']
+    # Last check: is the key read only?
+    if key_can_write == 0:
+        raise Exception("API key is read-only, not read/write.\nPlease use (eventually create) one with read/write permissions.")
+    # If AND ONLY IF the key exists, is valid and is not read-only, return 0:
+    return 0
+
+def get_user(KEY):
+    # No empty key check since this function will be always called after check_apikey.
+    endpoint = f"{API_URL}api/v2/users/me/"
+    header = {
+        "Authorization": KEY,
+        "Content-Type": "application/json"
+    }
+    response = requests.get(
+        url=endpoint,
+        headers=header,
+        verify=True,
+    )
+    user = response.json()['fullname']
+    return user
