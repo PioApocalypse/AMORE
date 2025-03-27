@@ -51,7 +51,7 @@ def check_apikey(KEY=""):
     key_can_write = last_used['rw']
     # Last check: is the key read only?
     if key_can_write == 0:
-        raise Exception("API key is read-only, not read/write.\nPlease use (eventually create) one with read/write permissions.")
+        raise Exception(f"API key is read-only, not read/write.<br>Please use (eventually create) one with read/write permissions.")
     
     # If AND ONLY IF the key exists, is valid and is not read-only, return user's full name:
     endpoint = f"{API_URL}api/v2/users/me/"

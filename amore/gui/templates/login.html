@@ -14,7 +14,9 @@
             {% if messages %}
                 {% for category, message in messages %}
                     <div class="flash {{ category }}">
-                        {{ message }}
+                        {% autoescape false %}
+                            {{ message }}
+                        {% endautoescape %}
                         <span class="close-btn" onclick="this.parentElement.remove()">×</span>
                     </div>
                 {% endfor %}
