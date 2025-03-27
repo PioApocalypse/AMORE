@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 API_URL = os.getenv('ELABFTW_BASE_URL')
+# Maybe load API_KEY too?
+ssl_verification = os.getenv('VERIFY_SSL').lower() == 'true' # this way you can toggle SSL verification in .env file
 
 '''
 Use this file for AND ONLY FOR storing functions for authentication.
@@ -32,7 +34,7 @@ def check_apikey(KEY=""):
     response = requests.get(
         url=endpoint,
         headers=header,
-        verify=True,
+        verify=ssl_verification,
     )
     # Check zero: is the request not accepted by the server?
     if response.status_code // 100 == 5:
@@ -63,7 +65,7 @@ def get_user(KEY):
     response = requests.get(
         url=endpoint,
         headers=header,
-        verify=True,
+        verify=ssl_verification,
     )
     user = response.json()['fullname']
     return user
