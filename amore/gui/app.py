@@ -4,8 +4,9 @@ External modules. In particular, from flask:
 - request is used to get variables values from the HTML form upon submission.
 - render_template and redirect are quite obvious, look them up.
 - flash allows for "flash" (pop-up) messages to warn user if something goes wrong (or right).
+- session allows to store information into cookies.
 '''
-from flask import Flask, request, render_template, redirect, flash
+from flask import Flask, request, render_template, redirect, flash, session
 import secrets # for session cookies
 import os # use method os.environ.get() to bypass the need for a .env file/dotenv module
 import amore.api.client as amore # client module, see: amore/api/client.py
@@ -16,27 +17,78 @@ app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024 # default Flask limit is 16 MB
 
+
+'''
+The following function is not associated to a route. It checks if current
+session contains an "api_key" non-null value then calls check_apikey
+function to verify if that value is a valid API key. If both this
+conditions are not met, it clears the entire session altogether and
+redirects to login. Otherwise it returns 0.
+'''
+def check_session():
+    if session.get('api_key') == None:
+        session.clear()
+        return redirect("/login")
+    else:
+        try:
+            auth.check_apikey(session['api_key'])
+            return 0
+        except Exception as e:
+            session.clear()
+            flash(str(e), 'error')
+            return redirect("/login")
+'''
+Usage: if check_session() != 0 return output of check_session, which
+is just redirect to login page, otherwise, execute the rest.
+
+    check = check_session()
+    if check != 0:
+        return check
+    # <rest of the function>
+'''
+
+
+
 @app.route("/login", methods=["GET","POST"])
 def login():
+    # First of all check if session already exists and user doesn't need to login.
+    check = check_session()
+    if check == 0:
+        return redirect("/") # no need to login = let's get down to business
     # If user is submitting their API key then method is POST, therefore validate:
     if request.method == "POST":
         API_KEY = request.form.get("api_key")
         try:
-            user = auth.check_apikey(KEY=API_KEY)
-            flash(f'Welcome, {user}!', 'success')
+            session['user'] = auth.check_apikey(KEY=API_KEY)
+            session['api_key'] = API_KEY
+            flash(f"Welcome, {session['user']}!", 'success')
+            # flash(f"Here's you key: {session['api_key']}", 'success') # debug only
             return redirect("/create")
         except Exception as e:
             flash(str(e), 'error')
-            return redirect("/login")
-    # If user is just loading the page then method is GET, therefore render login:
+            # return redirect("/login")
+
+    # If user is just loading the page then method is GET, therefore render login page:
     return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    flash(f"Successfully logged out.", 'success')
+    return redirect("/login")
 
 @app.route("/")
 def root():
-    return redirect("/login")
+    check = check_session()
+    if check != 0:
+        return check
+    return redirect("/create")
 
 @app.route("/create")
 def home():
+    check = check_session()
+    if check != 0:
+        return check
     positions = amore.get_positions() # which is a list of dicts
     batches = amore.get_substrate_batches() # which is a list of dicts
     proposals = amore.get_proposals() # you get the gist
@@ -44,6 +96,9 @@ def home():
 
 @app.route("/create_sample", methods=["POST"])
 def handle_create_sample():
+    check = check_session()
+    if check != 0:
+        return check
     title = request.form.get("title")
     position = request.form.get("position") # ID of item
     batch = request.form.get("batch") # ID of item
@@ -70,7 +125,7 @@ def handle_create_sample():
         # decrease number of available pieces in selected batch
         remaining = amore.batch_pieces_decreaser(batch)
     except Exception as e:
-        flash(f'Error handling batch availability: {str(e)}. Sample might have still been created.', 'batch_oos')
+        flash(f"Error handling batch availability: {str(e)}. Sample might have still been created.", 'batch_oos')
     
     try: # this is where the magic happens:
         amore.create_sample(
@@ -98,6 +153,9 @@ def handle_create_sample():
 
 @app.route("/positions")
 def handle_positions():
+    check = check_session()
+    if check != 0:
+        return check
     positions = amore.get_positions() # which is a list of dicts
     batches = amore.get_substrate_batches() # which is a list of dicts
     proposals = amore.get_proposals() # you get the gist
