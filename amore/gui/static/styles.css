@@ -21,12 +21,13 @@ body {
 .home-column {
   display: flex;
   flex-direction: column;
-  gap: 1rem; /* gap between groups */
+  gap: 2rem; /* gap between groups */
+  margin: 0 1rem;
 }
 
 .title-box {
   margin-left: 1.5rem;
-  margin-right: 3rem;
+  margin-right: 1.5rem;
   font-weight: 500;
   font-size: 1.1rem;
 }
@@ -103,7 +104,8 @@ textarea {
   font-family: Titillium Web, Cambria, sans-serif;
 }
 
-button {
+button,
+.button {
   width: 100%;
   padding: 0.75rem;
   background-color: #007bff;
@@ -111,11 +113,13 @@ button {
   border: none;
   border-radius: 4px;
   font-size: 1rem;
+  font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-button:hover {
+button:hover,
+.button:hover {
   background-color: #0056b3;
 }
 
@@ -139,4 +143,5 @@ footer {
 
 footer p {
   margin: 0;
+  padding: 0;
 }
