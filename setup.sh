@@ -105,6 +105,24 @@ echo "Building the docker image with following parameters:"
 echo -e "URL: $URL\nSSL verification: $VERIFY"
 read -p "Press enter to continue, or ^C to abort."
 
+echo
+echo "Looking for docker..."
+sleep 1
+if [ command -v docker ] &>/dev/null; then
+    echo "Docker found at $(command -v docker)"
+else
+    echo "Docker not installed. Refer to: https://docs.docker.com/engine/install/"
+    exit 1
+fi
+echo "Is docker running?"
+sleep 1
+if [ "$( systemctl is-active docker )" == "active" ]; then
+    echo "Docker is up and running." && sleep 1
+else
+    echo "Docker is not running."
+    echo "Have you tried 'systemctl enable --now docker && systemctl start docker'?"
+    exit 1
+
 docker build \
   --build-arg URL=${URL} \
   --build-arg VERIFY=${VERIFY} \
