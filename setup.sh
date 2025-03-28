@@ -32,11 +32,6 @@ normalize_url() {
 }
 
 
-LICENSE=$(echo $(head -n 1 LICENSE))
-echo -e "By proceeding you acknowledge that AMORE is\npublished under $LICENSE."
-sleep 1
-echo
-
 # Check arguments for options: --force, --literal
 # Literal mode: do not normalize the url
 literal_mode=false
@@ -54,8 +49,22 @@ for arg in "$@"; do
         break
     fi
 done
+# Quick mode: no sleeping between instructions
+SLEEP=1
+for arg in "$@"; do
+    if [[ "$arg" == "--quick" ]]; then
+        SLEEP=0
+        break
+    fi
+done
 
-# normalize and check for elab instance
+# STARTING POINT
+LICENSE=$(echo $(head -n 1 LICENSE))
+echo -e "By proceeding you acknowledge that AMORE is\npublished under $LICENSE."
+sleep $SLEEP
+echo
+
+# Normalize and check for elab instance if proper flags not specified
 while true; do
     read -p "Please input the url of a valid eLabFTW instance: " URL
     if [[ "$literal_mode" == false ]]; then
@@ -71,7 +80,7 @@ while true; do
         break
     fi
 
-    echo "Checking..." && sleep 1
+    echo "Checking..." && sleep $SLEEP
     if check_elabftw "$URL"; then
         echo "Valid eLabFTW URL: $URL"
         echo
@@ -107,21 +116,22 @@ read -p "Press enter to continue, or ^C to abort."
 
 echo
 echo "Looking for docker..."
-sleep 1
-if [ command -v docker ] &>/dev/null; then
+sleep $SLEEP
+if command -v docker &>/dev/null ; then
     echo "Docker found at $(command -v docker)"
 else
     echo "Docker not installed. Refer to: https://docs.docker.com/engine/install/"
     exit 1
 fi
 echo "Is docker running?"
-sleep 1
+sleep $SLEEP
 if [ "$( systemctl is-active docker )" == "active" ]; then
-    echo "Docker is up and running." && sleep 1
+    echo "Docker is up and running." && sleep $SLEEP
 else
     echo "Docker is not running."
     echo "Have you tried 'systemctl enable --now docker && systemctl start docker'?"
     exit 1
+fi
 
 docker build \
   --build-arg URL=${URL} \
@@ -131,12 +141,12 @@ docker build \
 echo
 echo "Docker image ready."
 echo "Running the container..."
-sleep 1
+sleep $SLEEP
 docker run -d -p 5000:5000 --name amore-container --restart always amore && \
     echo && \
     echo "AMORE is now running on http://localhost:5000." && \
     echo "Thank you for your patience. ♥"
-sleep 1
+sleep $SLEEP
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # This script serves as installer of AMORE on a computer.   #
