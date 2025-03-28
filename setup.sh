@@ -123,6 +123,7 @@ else
     echo "Docker not installed. Refer to: https://docs.docker.com/engine/install/"
     exit 1
 fi
+# Feel free to remove this block if your init system is different from Systemd
 echo "Is docker running?"
 sleep $SLEEP
 if [ "$( systemctl is-active docker )" == "active" ]; then
@@ -132,6 +133,7 @@ else
     echo "Have you tried 'systemctl enable --now docker && systemctl start docker'?"
     exit 1
 fi
+# end
 
 docker build \
   --build-arg URL=${URL} \

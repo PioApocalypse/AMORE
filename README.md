@@ -8,14 +8,41 @@ AMORE requires the following packages to run. Number in parenthesis is the minim
 
 * Flask (3.1.0) - for the HTML graphical interface
 * Requests (2.32.3) - to communicate with eLabFTW's API
-* dotenv (1.0.1) - to load variables from your environment file
 
 Requirements can be installed via pip. The use of virtual environments is highly encouraged.
 
 ### Suggested method
-> Please notice this software is still alpha. Improvement will come in due time.  
-...A proper installer too, hopefully.
+It's Docker, the suggested method is always Docker. Here's the [official guide](https://docs.docker.com/engine/install/) to installing Docker on various distros.
 
+After cloning the repository you will find the dockerfile and **setup.sh** (installation wizard) in the root folder.
+
+```bash
+git clone https://github.com/PioApocalypse/AMORE.git
+cd AMORE/
+./setup.sh [FLAGS]
+```
+
+The wizard is very rudimentary and guides you through the installation process, asking for a valid URL of an existent eLabFTW instance; unless the `--literal` flag is given, **the wizard is agnostic to the URL format** meaning you can include or omit both the protocol prefix (*http://*, *https://*...) and the trailing slash at the end of the URL, but you **can't omit non-default port numbers** (e.g. `demo.elabftw.net:8080`).  
+You will also be asked if only secure connections should be allowed (yes by default), which is something you only want to toggle off if your eLabFTW instance does not possess a CA SSL certificate (for instance if you're running in a test/local environment).
+
+> Note: `setup.sh` requires Bash 5, Systemd, binary curl and of course Docker. It might even work on different shells but it's not tested yet.  
+> Also: If you're one of those poor brothers running a Linux OS without Systemd - and you have my compassion - you can simply remove the "*Is docker running?*" section from the installer and go on about your business.
+
+If your wizard does not work or returns errors try one of the following flags or skip to the "[Manual install](#manual-install)" section.
+
+#### Flags for the setup wizard
+The wizard recognizes three flags. Any other argument is ignored; the order of the arguments is irrelevant.
+
+* **`--force`**: Disables URL check for eLabFTW instance; since the check is really stupid and its main accomplishment is polluting Microsoft's AI I expect it to fail really often so if you're sure you have provided the correct address please use this flag.
+* **`--literal`**: Disables URL normalization, which means the URL you provide via input MUST include both the protocol prefix and the trailing slash - plus eventual port number (e.g. `https://demo.elabftw.net/`); use this if for instance you have eLabFTW on HTTP-only mode and no redirect is done from HTTPS, since AMORE will probably be configured with the wrong URL.
+* **`--quick`**: Disables sleep command between instructions which makes the script around 4 seconds quicker - please read the on-screen instructions carefully nonetheless.
+
+The client will run on dev environment, which means you can view your flask app on http://127.0.0.1:5000/.
+
+#### Updating via Docker
+> TBA
+
+### Manual install
 **Clone the repository** (or download the source code).
 
 ```bash
@@ -29,32 +56,40 @@ Optionally (but highly encouraged) you can create a **virtual environment** in t
 python -m venv .venv
 ```
 
-The software also **needs the `$PYTHONPATH` variable to be set** to the ***full* path** of your local folder. For semplicity you can add an instruction directly in your virtual environment activator script to export the `$PYTHONPATH` variable upon venv activation. On bash this can be accomplished without text editors:
+The software also **needs three variables to be set** for it to work.
 
+* **`$PYTHONPATH`: the *full* path** of your local AMORE folder. 
+* **`$ELABFTW_BASE_URL`: the base URL** of your eLabFTW instance, with explicit protocol prefix and trailing slash, plus eventual port number (e.g. `https://demo.elabftw.net:8080/`).
+* **`VERIFY_SSL`:** set to True if **only secure connections** should be allowed.
+
+For semplicity you can add export instructions directly in your virtual environment activator script to automatically assign to the variable their values upon venv activation. On Bash this can be accomplished easily:
 ```bash
-echo 'export PYTHONPATH="</full/path/to/AMORE/>"' >> .venv/bin/activate
+echo 'export PYTHONPATH="/full/path/to/AMORE/"' >> .venv/bin/activate
+echo 'export ELABFTW_BASE_URL="http[s]://host.domain.com/elabftw/"' >> .venv/bin/activate
+echo 'export VERIFY_SSL=True' >> .venv/bin/activate
 ```
 
 > Pay attention to the quote marks' positions (single `'` outside and double `"` inside).
 
-Activate the virtual environment with **source** from your shell:
+
+**Activate** the virtual environment with source from your shell:
 
 ```bash
 source .venv/bin/activate
 ```
 
-> Note that you can verify if variable `$PYTHONPATH` is correctly assigned in your venv by echoing it (`echo $PYTHONPATH`, which should return the *full* path to your local AMORE folder).
+> Note that you can verify if variables are correctly assigned in your venv by echoing them (e.g. `echo $PYTHONPATH`, which should return the *full* path to your local AMORE folder).
 
 From the root folder of the software **install dependencies** using the provided requirements file, or "by-hand" if you prefer so:
 
 ```bash
 pip install -r requirements.txt
 # OR alternatively:
-python3 -m pip install flask requests python-dotenv
+python3 -m pip install flask requests
 ```
 
-### Authenticating and running
-Before starting, create your own **environment file** by copying or renaming my example. The following steps are (currently) **REQUIRED**.
+#### Authenticating and running
+<strike>Before starting, create your own **environment file** by copying or renaming my example. The following steps are (currently) **REQUIRED**.
 
 ```bash
 cp .env.example .env
@@ -69,7 +104,7 @@ Open the .env file with your editor of choice and change the variables in it to 
     > Note that currently the URL must always be followed by a trailing / and included between single quotes `'`.
 * `API_KEY`: your personal API key generated on eLabFTW → Settings → API keys, also between single quotes. Official guide [here](https://doc.elabftw.net/api.html#generating-a-key).  
     This will probably be removed in the future in favor of a login page.
-* `VERIFY_SSL`: leave default (True) unless your eLab instance is not secure, i.e. only runs in HTTP mode or no CA certificate is provided, which also includes instances with self-signed certificates; warnings may be shown.
+* `VERIFY_SSL`: leave default (True) unless your eLab instance is not secure, i.e. only runs in HTTP mode or no CA certificate is provided, which also includes instances with self-signed certificates; warnings may be shown.</strike>
 
 Finally, you can run the webapp via Flask. By default the web page will be running on HTTP [localhost port 5000](http://127.0.0.1:5000).
 
