@@ -162,6 +162,7 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [x] Enforce login
 - [x] BYOK system which takes API key for request directly from session cookie
 - [x] Log out buttons
+- [ ] Testing on server
 - [x] Post new sample to any position, linking sample to position
 - [x] Move sample from one position to the other
 - [ ] Make sure position is not shared among different samples
@@ -173,15 +174,16 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [ ] Warn user if posting fails, say reason
 > TBA
 
-### Phase 7 - From dev to prod
-- [ ] Base URL and verification check must be provided during installation
+### Phase 7 COMPLETE - Login shenanigans
+- [x] Base URL and verification check must be provided during installation
     * Base URL and verification check can still be edited in .env file by user
-- [ ] Personal API key must be provided by user manually
+- [x] Personal API key must be provided by user manually
     * Can I create a login screen and automate the API key creation? I can always delete it on logout...
-- [ ] Finish up setup.py file
-> TBA
+- [x] Finish up setup.sh file
 
 ### Phase 8 - Enduser test in production
 - [ ] Make sure eLabFTW is properly configured
-- [ ] Distribute software via GitHub (open repository)
+- [ ] Make sure software is fully documented
+- [ ] Make sure endpoint keywords and category IDs can be easily changed (config file)
+- [x] Distribute software via GitHub (open repository)
 > TBA
