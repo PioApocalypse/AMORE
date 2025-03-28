@@ -2,7 +2,6 @@ import os
 import requests
 import json
 from datetime import datetime
-from dotenv import load_dotenv
 from amore.var import locations as ll
 from flask import session
 import random # TO REMOVE after feature is finished

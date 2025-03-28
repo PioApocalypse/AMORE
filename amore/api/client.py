@@ -2,21 +2,13 @@ import os
 import requests
 import json
 from datetime import datetime
-from dotenv import load_dotenv
 from .utils import normalize_to_int as to_int
 from flask import session, request
 
-"""
-Variables will be only imported from env for testing purposes.
-Later on, I will also implement url and key selection. Probably. Possibly.
-"""
-
-# ED: import .env variables api url and api key
+# Import ENV variables api url and boolean ssl verification
 # PLEASE DO NOT push api keys to public repos
-load_dotenv()
 API_URL = os.getenv('ELABFTW_BASE_URL')
-# API_KEY = os.getenv('API_KEY')
-full_elab_url = f"{API_URL}api/v2/"
+full_elab_url = f"{API_URL}api/v2/" # API endpoint root for eLabFTW
 ssl_verification = os.getenv('VERIFY_SSL').lower() == 'true' # this way you can toggle SSL verification in .env file
 """
 ED: about the key - would it be better to just implement a login page?
@@ -71,7 +63,7 @@ def get_new_sample(API_KEY):
         "Content-Type": "application/json"
     }
 
-    search_query = f'{API_URL}api/v2/items?limit=9999'
+    search_query = f'{full_elab_url}items?limit=9999'
     
     response = requests.get(
         headers=header,
@@ -87,7 +79,6 @@ def get_new_sample(API_KEY):
 
 def patch_sample(API_KEY, new_elabid, new_userid, body, std_id, position, batch, subholder, proposal):
     # like before, different url
-    API_URL = os.getenv('ELABFTW_BASE_URL')
     items_url = f"{full_elab_url}items/{new_elabid}/"
 
     header = {
@@ -118,7 +109,6 @@ def patch_sample(API_KEY, new_elabid, new_userid, body, std_id, position, batch,
 
 
 def upload_attachments(API_KEY, new_elabid, attachments):
-    API_URL = os.getenv('ELABFTW_BASE_URL')
     uploads_url = f"{full_elab_url}items/{new_elabid}/uploads"
     for field_name, (filename, file) in attachments:
         header = {"Authorization": API_KEY}

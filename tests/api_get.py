@@ -1,9 +1,7 @@
 import requests
-from dotenv import load_dotenv
 import os
 from datetime import datetime
 
-load_dotenv()
 API_URL = os.getenv('ELABFTW_BASE_URL')
 API_KEY = os.getenv('API_KEY')
 if not API_KEY:

@@ -1,12 +1,9 @@
 import os
 import requests
 from datetime import datetime
-from dotenv import load_dotenv
 
-load_dotenv()
 API_URL = os.getenv('ELABFTW_BASE_URL')
-# Maybe load API_KEY too?
-ssl_verification = os.getenv('VERIFY_SSL').lower() == 'true' # this way you can toggle SSL verification in .env file
+ssl_verification = os.getenv('VERIFY_SSL').lower() == 'true' # this way you can toggle SSL verification if ENV var VERIFY_SSL is True, TRUE, true...
 
 '''
 Use this file for AND ONLY FOR storing functions for authentication.
