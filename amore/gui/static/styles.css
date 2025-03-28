@@ -13,6 +13,10 @@ body {
   height: 100vh;
 }
 
+a {
+  text-decoration: none;
+}
+
 .home-grid {
   display: flex;
   align-items: center;
@@ -154,5 +158,4 @@ footer div {
 
 footer a {
   color: #f4f4f4;
-  text-decoration: none;
 }
