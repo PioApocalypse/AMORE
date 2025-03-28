@@ -152,19 +152,28 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [x] <strike>"Search sample" feature</strike> Let's talk about it...
 - [x] <strike>Possibly "delete sample" feature</strike> Terrible idea.
 
-### Phase 4 - Position viewer and handler
+### Phase 4 - Periodic export of data
+> To where? How often?
+- [ ] Create API client which periodically (or manually) exports experiments, samples, etc. in JSON format
+- [ ] Send data automatically to specific repository
+
+### Phase 5 - Advanced features
+- [x] Functional login page
+- [x] Enforce login
+- [x] BYOK system which takes API key for request directly from session cookie
+- [x] Log out buttons
 - [x] Post new sample to any position, linking sample to position
 - [x] Move sample from one position to the other
 - [ ] Make sure position is not shared among different samples
     * Don't even show position in create_sample form if already occupied (except for "*LOST", "out-of-chamber", etc.)
 - [ ] Visualize list of positions
 
-### Phase 5 - Error handling, data validation, sanification
+### Phase 6 - Error handling, data validation, sanification
 - [ ] Sanification of inputs provided - avoid code/SQL injections
 - [ ] Warn user if posting fails, say reason
 > TBA
 
-### Phase 6 - From dev to prod
+### Phase 7 - From dev to prod
 - [ ] Base URL and verification check must be provided during installation
     * Base URL and verification check can still be edited in .env file by user
 - [ ] Personal API key must be provided by user manually
@@ -172,7 +181,7 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [ ] Finish up setup.py file
 > TBA
 
-### Phase 7 - Enduser test in production
+### Phase 8 - Enduser test in production
 - [ ] Make sure eLabFTW is properly configured
 - [ ] Distribute software via GitHub (open repository)
 > TBA

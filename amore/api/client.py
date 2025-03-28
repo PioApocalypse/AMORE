@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 from dotenv import load_dotenv
 from .utils import normalize_to_int as to_int
+from flask import session, request
 
 """
 Variables will be only imported from env for testing purposes.
@@ -14,21 +15,21 @@ Later on, I will also implement url and key selection. Probably. Possibly.
 # PLEASE DO NOT push api keys to public repos
 load_dotenv()
 API_URL = os.getenv('ELABFTW_BASE_URL')
-API_KEY = os.getenv('API_KEY')
+# API_KEY = os.getenv('API_KEY')
 full_elab_url = f"{API_URL}api/v2/"
 ssl_verification = os.getenv('VERIFY_SSL').lower() == 'true' # this way you can toggle SSL verification in .env file
-'''
+"""
 ED: about the key - would it be better to just implement a login page?
 The software would save the api key of each user locally in cache and
 discard it as soon as the user logs out...
-'''
+"""
 
 '''
 =========================================================================================================================================
 == EXPERIMENT SECTION ===================================================================================================================
 =========================================================================================================================================
 '''
-
+'''
 def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results):
     # a post request needs url, header and payload
     experiments_url = f"{full_elab_url}""experiments/"
@@ -56,15 +57,14 @@ def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results)
 
     response.raise_for_status()
     return response.json()
-
+'''
 '''
 =========================================================================================================================================
 == RESOURCES SECTION ====================================================================================================================
 =========================================================================================================================================
 '''
 
-def get_new_sample():
-    API_KEY = os.getenv('API_KEY')
+def get_new_sample(API_KEY):
     every_id = []
     header = {
         "Authorization": API_KEY,
@@ -85,10 +85,9 @@ def get_new_sample():
     return new_sample
 
 
-def patch_sample(new_elabid, new_userid, body, std_id, position, batch, subholder, proposal):
+def patch_sample(API_KEY, new_elabid, new_userid, body, std_id, position, batch, subholder, proposal):
     # like before, different url
     API_URL = os.getenv('ELABFTW_BASE_URL')
-    API_KEY = os.getenv('API_KEY')
     items_url = f"{full_elab_url}items/{new_elabid}/"
 
     header = {
@@ -118,9 +117,8 @@ def patch_sample(new_elabid, new_userid, body, std_id, position, batch, subholde
     return 0
 
 
-def upload_attachments(new_elabid, attachments):
+def upload_attachments(API_KEY, new_elabid, attachments):
     API_URL = os.getenv('ELABFTW_BASE_URL')
-    API_KEY = os.getenv('API_KEY')
     uploads_url = f"{full_elab_url}items/{new_elabid}/uploads"
     for field_name, (filename, file) in attachments:
         header = {"Authorization": API_KEY}
@@ -137,7 +135,7 @@ def upload_attachments(new_elabid, attachments):
     return 0
 
 
-def create_sample(title, tags, body, std_id, position, batch, subholder, proposal, attachments=None): 
+def create_sample(API_KEY, title, tags, body, std_id, position, batch, subholder, proposal, attachments=None): 
     items_url = f"{full_elab_url}""items/"
     header = {
         "Authorization": API_KEY,
@@ -158,13 +156,14 @@ def create_sample(title, tags, body, std_id, position, batch, subholder, proposa
         verify=ssl_verification
     )
     # get new sample metadata as dictionary:
-    new_sample = get_new_sample()
+    new_sample = get_new_sample(API_KEY)
     # get [elabftw] id of newly created sample:
     new_elabid = new_sample['id']
     # get userid of newly created sample
     new_userid = new_sample['userid']
     # patch new sample to inject metadata not accepted by post request:
     patch_sample(
+        API_KEY=API_KEY,
         new_elabid=new_elabid,
         new_userid=new_userid,
         body=body,
@@ -176,12 +175,12 @@ def create_sample(title, tags, body, std_id, position, batch, subholder, proposa
         )
     # upload attachments
     if attachments:
-        upload_attachments(new_elabid=new_elabid, attachments=attachments)
+        upload_attachments(API_KEY=API_KEY, new_elabid=new_elabid, attachments=attachments)
     # get std-id [yyxxx] and std-name [Aa-yy-xxx] of newly created sample:
     # new_stdname = new_sample['title'][:9]
     return 0 # for confirmation message to user
 
-def batch_pieces_decreaser(batch):
+def batch_pieces_decreaser(API_KEY, batch):
     batch_url = f"{full_elab_url}items/{batch}/"
     header = {
         "Authorization": API_KEY,
@@ -224,7 +223,7 @@ def batch_pieces_decreaser(batch):
 =========================================================================================================================================
 '''
 
-def add_to_position(sample_id, position_id): # POST to empty position
+def add_to_position(API_KEY, sample_id, position_id): # POST to empty position
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"
@@ -237,7 +236,7 @@ def add_to_position(sample_id, position_id): # POST to empty position
     )
     return 0
 
-def move_to_position(sample_id, old_position_id, new_position_id): # DELETE from old position then POST to empty position
+def move_to_position(API_KEY, sample_id, old_position_id, new_position_id): # DELETE from old position then POST to empty position
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"
@@ -262,7 +261,7 @@ def move_to_position(sample_id, old_position_id, new_position_id): # DELETE from
 =========================================================================================================================================
 '''
 
-def get_positions():
+def get_positions(API_KEY):
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"
@@ -283,7 +282,7 @@ def get_positions():
     ]
     return positions # which is a list of dictionaries with 'id' and 'title'
 
-def get_substrate_batches():
+def get_substrate_batches(API_KEY):
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"
@@ -308,7 +307,7 @@ def get_substrate_batches():
     # Unfortunately, that value is still a fucking string and it can be empty; I replace empty string with 0 and turn str to int. THEN it checks if it's >0.
     return batches # which is a list of dictionaries with 'id' and 'title'
 
-def get_proposals():
+def get_proposals(API_KEY):
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"

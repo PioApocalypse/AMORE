@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 from dotenv import load_dotenv
 from amore.var import locations as ll
+from flask import session
 import random # TO REMOVE after feature is finished
 #from random import randrange as rr # TO REMOVE after feature is finished
 #from random import choice as rc # TO REMOVE after feature is finished
@@ -16,7 +17,8 @@ Utils for AMORE to read and elaborate internal ID's
 
 def get_std_id(loc_code):
     API_URL = os.getenv('ELABFTW_BASE_URL')
-    API_KEY = os.getenv('API_KEY')
+    API_KEY = session.get('api_key')
+    # API_KEY = os.getenv('API_KEY')
     every_id = []
     header = {
         "Authorization": API_KEY,

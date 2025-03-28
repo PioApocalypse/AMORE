@@ -84,21 +84,28 @@ def root():
         return check
     return redirect("/create")
 
+'''
+Pages that require a valid r/w API key (login) to work.
+'''
+
 @app.route("/create")
 def home():
     check = check_session()
     if check != 0:
         return check
-    positions = amore.get_positions() # which is a list of dicts
-    batches = amore.get_substrate_batches() # which is a list of dicts
-    proposals = amore.get_proposals() # you get the gist
-    return render_template("create_sample.html", positions=positions, batches=batches, proposals=proposals)
+    API_KEY = session.get('api_key')
+    user = session.get('user') or "unspecified user"
+    positions = amore.get_positions(API_KEY) # which is a list of dicts
+    batches = amore.get_substrate_batches(API_KEY) # which is a list of dicts
+    proposals = amore.get_proposals(API_KEY) # you get the gist
+    return render_template("create_sample.html", user=user, positions=positions, batches=batches, proposals=proposals)
 
 @app.route("/create_sample", methods=["POST"])
 def handle_create_sample():
     check = check_session()
     if check != 0:
         return check
+    API_KEY = session.get('api_key')
     title = request.form.get("title")
     position = request.form.get("position") # ID of item
     batch = request.form.get("batch") # ID of item
@@ -121,14 +128,15 @@ def handle_create_sample():
 
     try: # check for successful decrement of available pieces
         # recall batches variable BEFORE patching batch
-        batches = amore.get_substrate_batches()
+        batches = amore.get_substrate_batches(API_KEY)
         # decrease number of available pieces in selected batch
-        remaining = amore.batch_pieces_decreaser(batch)
+        remaining = amore.batch_pieces_decreaser(API_KEY, batch)
     except Exception as e:
         flash(f"Error handling batch availability: {str(e)}. Sample might have still been created.", 'batch_oos')
     
     try: # this is where the magic happens:
         amore.create_sample(
+            API_KEY=API_KEY,
             title=f"{full_id} - {title}",
             tags=tags,
             std_id=std_id,
@@ -156,9 +164,10 @@ def handle_positions():
     check = check_session()
     if check != 0:
         return check
-    positions = amore.get_positions() # which is a list of dicts
-    batches = amore.get_substrate_batches() # which is a list of dicts
-    proposals = amore.get_proposals() # you get the gist
+    API_KEY = session.get('api_key')
+    positions = amore.get_positions(API_KEY) # which is a list of dicts
+    batches = amore.get_substrate_batches(API_KEY) # which is a list of dicts
+    proposals = amore.get_proposals(API_KEY) # you get the gist
     return render_template("positions.html", positions=positions, batches=batches, proposals=proposals)
 
 
