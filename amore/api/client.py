@@ -11,11 +11,6 @@ from flask import session, request
 API_URL = os.getenv('ELABFTW_BASE_URL')
 full_elab_url = f"{API_URL}api/v2/" # API endpoint root for eLabFTW
 ssl_verification = os.getenv('VERIFY_SSL').lower() == 'true' # this way you can toggle SSL verification in .env file
-"""
-ED: about the key - would it be better to just implement a login page?
-The software would save the api key of each user locally in cache and
-discard it as soon as the user logs out...
-"""
 
 '''
 =========================================================================================================================================
