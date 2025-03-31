@@ -22,101 +22,19 @@
         {% endwith %}
     </div>
 
-    <div class="home-grid">
-        <!-- TITLE -->
-        <div class="home-column">
-            <div class="title-box">
-                <a href="/"><h1>AMORE for eLabFTW</h1></a>
-                <p align="center">Autonomous Management of Outputs<br>for Research Efficiency</p>
-            </div>
-        </div>
 
-        <!-- FORM -->
-        <div class="home-column">
-            <div class="form-container">
-                <form action="/create_sample" method="post" enctype="multipart/form-data">
-                    <h2>Manage sample positions</h2>
-                    <div class="form-grid">
-                        <!-- FIRST COLUMN -->
-                        <div class="form-column">
-                            <div class="form-group">
-                                <label for="title">Title<span class="red" title="Required">*</span>:</label>
-                                <input type="text" id="title" name="title" placeholder="Name of your sample" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="position" title="Where is it located in your faculty?">Position:<span class="red" title="Required">*</span>:</label>
-                                <!-- THIS PART GETS POSITIONS (ITEMS) FROM ELABFTW AND AUTOMATICALLY PUTS THEM IN OUR FORM -->
-                                <select id="position" name="position" required>
-                                    <option value="" selected="selected">- Select a position -</option>
-                                    {% for i in positions %}
-                                        <option value="{{ i['id'] }}">{{ i['title'] }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="batch" title="From which batch have you taken your substrate?">Substrate Batch<span class="red" title="Required">*</span>:</label>
-                                <!-- THIS PART GETS BATCHES (ITEMS) FROM ELABFTW AND AUTOMATICALLY PUTS THEM IN OUR FORM -->
-                                <select id="batch" name="batch" required>
-                                    <option value="" selected="selected">- Select a batch -</option>
-                                    {% for i in batches %}
-                                        <option value="{{ i['id'] }}">{{ i['title'] }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="subholder">Substrate Holder:</label>
-                                <input type="text" id="subholder" name="subholder">
-                            </div>
-                        </div>
-                        <!-- SECOND COLUMN -->
-                        <div class="form-column">
-                            <div class="form-group">
-                                <label for="location">Location of faculty<span class="red" title="Required">*</span>:</label>
-                                <select id="location" name="location" required>
-                                    <option value="Napoli" selected="selected">Naples</option>
-                                    <option value="Roma">Rome</option>
-                                    <option value="Genova">Genoa</option>
-                                    <option value="LAquila">L'Aquila</option>
-                                    <option value="Salerno">Salerno</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="proposal">Proposal:</label>
-                                <!-- THIS PART GETS PROPOSALS (ITEMS) FROM ELABFTW AND AUTOMATICALLY PUTS THEM IN OUR FORM -->
-                                <select id="proposal" name="proposal">
-                                    <option value="" selected="selected">-- No proposal --</option>
-                                    {% for i in proposals %}
-                                        <option value="{{ i['id'] }}">{{ i['title'] }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="tags" title="To quickly retrieve your sample later.">Tags (comma-separated):</label>
-                                <input type="text" id="tags" name="tags" placeholder="e.g.: deposition, nffa, [...]">
-                            </div>
-                            <div class="form-group" style="margin-top: 3rem;">
-                                <p>Note: Fields with <span class="red" title="Required">*</span> are required.</p>
-                            </div>
-                        </div>
-                        <!-- THIRD COLUMN -->
-                        <div class="form-column">
-                            <div class="form-group">
-                                <label for="description">Description:</label>
-                                <textarea id="description" name="description" maxlength="128" placeholder="Other things you might want to write down for later? Nothing at all?"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="attachments">Attachments (max 100 MB each):</label>
-                                <input type="file" id="attachments" name="attachments" multiple>
-                                <span class="label">Virtually any file format is supported.<br>Drag & drop is allowed.</span>
-                            </div>
-                        </div>
-                    </div>
-        
-                    <button type="submit">Create Sample</button>
-                </form>
-            </div>
-        </div>
-    </div>
+    <p style="font-size: xx-large; font-weight: bold;">
+        <a target="_blank" href="https://youtu.be/f9Z8_Bi7Vl8" style="color: #333">
+            Oh hi Mister Frog!<br>
+            <span style="font-weight: bolder;">You're not supposed to be here.</span>
+        </a>
+    </p>
+
+    <p>
+        <a href="/" style="color: #fff;">__________________________________________________________________</a>
+    </p>
+
+
     <footer>
         <div>alpha ver. for development only</div>
         <div align="right"><a href="https://github.com/PioApocalypse/AMORE" target="_blank">Star me on GitHub</a></div>
