@@ -2,6 +2,7 @@ import os
 import requests
 import json
 from datetime import datetime
+from amore.var import categories as cat
 from .utils import normalize_to_int as to_int
 from .utils import normalize_position_name as norm_pos_name
 from flask import session, request
@@ -128,7 +129,7 @@ def create_sample(API_KEY, title, tags, body, std_id, position, batch, subholder
         "Content-Type": "application/json"
     }
     payload = {
-        "template": 10, # 10 defines this item as 'sample' in our database
+        "template": cat.cat("Sample"), # 10 defines this item as 'sample' in our database
         "title": title,
         "tags": tags
     }
@@ -253,7 +254,7 @@ def get_positions(API_KEY):
         "Content-Type": "application/json"
     }
 
-    search_query = f'{API_URL}api/v2/items?q=&cat=17&limit=9999' # dove 17 = "SAMPLE POSITION"
+    search_query = f'{API_URL}api/v2/items?q=&cat={cat.cat("SAMPLE POSITION")}&limit=9999' # "SAMPLE POSITION" should be id = 17
     
     response = requests.get(
         headers=header,
@@ -275,7 +276,7 @@ def get_substrate_batches(API_KEY):
         "Content-Type": "application/json"
     }
 
-    search_query = f'{API_URL}api/v2/items?q=&cat=9&limit=9999' # dove 9 = "SUBSTRATE BATCH"
+    search_query = f'{API_URL}api/v2/items?q=&cat={cat.cat("SUBTRATES BATCH")}&limit=9999' # "SUBTRATES BATCH" should be id = 9
     
     response = requests.get(
         headers=header,
@@ -300,7 +301,7 @@ def get_proposals(API_KEY):
         "Content-Type": "application/json"
     }
 
-    search_query = f'{API_URL}api/v2/items?q=&cat=15&limit=9999' # dove 15 = "PROPOSAL"
+    search_query = f'{API_URL}api/v2/items?q=&cat={cat.cat("PROPOSAL")}&limit=9999' # "PROPOSAL" should be id = 15
     
     response = requests.get(
         headers=header,
