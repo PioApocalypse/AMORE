@@ -85,7 +85,8 @@ def root():
     check = check_session()
     if check != 0:
         return check
-    return redirect("/create")
+    user = session.get('user') or "unspecified user"
+    return render_template("index.html", user=user)
 
 '''
 Pages that require a valid r/w API key (login) to work.
