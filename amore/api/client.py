@@ -3,6 +3,7 @@ import requests
 import json
 from datetime import datetime
 from .utils import normalize_to_int as to_int
+from .utils import normalize_position_name as norm_pos_name
 from flask import session, request
 
 # Import ENV variables api url and boolean ssl verification
@@ -266,10 +267,11 @@ def get_positions(API_KEY):
     )
     
     # from response parse only useful info - which is title for the enduser and id for the create_sample client function
-    positions = [
-        {'id': item.get('id'), 'title': item.get('title')[4:]} # WARNING! .get method avoids KeyError exceptions - but it's really bad if eLab allows missing title or id
+    unsorted_positions = [
+        {'id': item.get('id'), 'title': norm_pos_name(item.get('title'))} # WARNING! .get method avoids KeyError exceptions - but it's really bad if eLab allows missing title or id
         for item in response.json() # which is an array of json objects/dictionaries
     ]
+    positions = sorted(unsorted_positions, key=lambda item: (item['title'], item['id']) ) # sort by title first, id second - although no two items should have the same name for any reason
     return positions # which is a list of dictionaries with 'id' and 'title'
 
 def get_substrate_batches(API_KEY):
