@@ -4,9 +4,10 @@ External modules. In particular, from flask:
 - request is used to get variables values from the HTML form upon submission.
 - render_template and redirect are quite obvious, look them up.
 - flash allows for "flash" (pop-up) messages to warn user if something goes wrong (or right).
+- get_flashed_messages to show messages created before redirect (Use: get_flashed_messages() on first line of destination route function).
 - session allows to store information into cookies.
 '''
-from flask import Flask, request, render_template, redirect, flash, session
+from flask import Flask, request, render_template, redirect, flash, get_flashed_messages, session
 import secrets # for session cookies
 import os # use method os.environ.get() to bypass the need for a .env file/dotenv module
 import amore.api.client as amore # client module, see: amore/api/client.py
@@ -51,6 +52,8 @@ is just redirect to login page, otherwise, execute the rest.
 
 @app.route("/login", methods=["GET","POST"])
 def login():
+    # Inherit flashed messages from functions redirecting to this (i.e. the logout pop-up message).
+    get_flashed_messages()
     # First of all check if session already exists and user doesn't need to login.
     check = check_session()
     if check == 0:
@@ -74,7 +77,7 @@ def login():
 @app.route("/logout")
 def logout():
     session.clear()
-    flash(f"Successfully logged out.", 'success')
+    flash("Successfully logged out.", 'success')
     return redirect("/login")
 
 @app.route("/")
