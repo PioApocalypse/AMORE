@@ -75,10 +75,9 @@ Sanification, normalization
 def normalize_position_name(position_name):
     if position_name[0:3] == "POS":
         noPOS = position_name[3:].strip()
-        if noPOS[0] in ["-", "/", "\\", "|", ":", "#", "*", "—"]:
-            return noPOS[1:].strip()
-        else:
-            return noPOS
+        while noPOS[0] in ["-", "/", "\\", "|", ":", "#", "*", "—"]:
+            noPOS = noPOS[1:].strip()
+        return noPOS
     else:
         return position_name
 
