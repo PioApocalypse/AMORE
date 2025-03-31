@@ -122,6 +122,23 @@ button,
   transition: background-color 0.3s ease;
 }
 
+.lesser-button {
+  background-color: #ffe6c6 !important;
+  color: #4e1d1d !important;
+}
+
+/* 
+  Class to wipe out entirely after every button is effective.
+  Only to use on test buttons.
+  Inactive buttons:
+    - login.html: positions
+*/
+.inactive-button {
+  background-color: #999 !important;
+  color: #fff !important;
+  cursor: default !important;
+}
+
 button:hover,
 .button:hover {
   background-color: #0056b3;
