@@ -71,14 +71,19 @@ def login():
             flash(str(e), 'error')
             # return redirect("/login")
 
-    # If user is just loading the page then method is GET, therefore render login page:
+    # If user is just loading the page then method is GET, therefore render login page.
     return render_template("login.html")
 
 @app.route("/logout")
 def logout():
-    session.clear()
-    flash("Successfully logged out.", 'success')
-    return redirect("/login")
+    check = check_session()
+    if check != 0:
+        flash(f"You're already unauthenticated. Login to logout.", 'error')
+        return redirect("/login")
+    else:
+        session.clear()
+        flash("Successfully logged out.", 'success')
+        return redirect("/login")
 
 @app.route("/")
 def root():
