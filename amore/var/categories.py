@@ -37,7 +37,7 @@ def scan_for_categories(API_KEY):
 # Hardcoded (titles in lower):
 categories = {
     "compound": 2,
-    "subtrates batch": 9,
+    "substrates batch": 9,
     "sample": 10,
     "pld target": 11,
     "process instrument": 12,

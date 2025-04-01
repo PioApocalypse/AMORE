@@ -276,7 +276,7 @@ def get_substrate_batches(API_KEY):
         "Content-Type": "application/json"
     }
 
-    search_query = f'{API_URL}api/v2/items?q=&cat={cat.cat("SUBTRATES BATCH")}&limit=9999' # "SUBTRATES BATCH" should be id = 9
+    search_query = f'{API_URL}api/v2/items?q=&cat={cat.cat("SUBSTRATES BATCH")}&limit=9999' # "SUBSTRATES BATCH" should be id = 9
     
     response = requests.get(
         headers=header,
