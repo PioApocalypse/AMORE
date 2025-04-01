@@ -10,6 +10,7 @@ echo
 
 # FUNCTIONS
 # Define function which checks for valid root dir url in the stupidest way possible: DOES IT REDIRECT?
+# TO-DO: Better idea for later - check if api/v2 endpoint exists, why did I not think about it before?
 # To-do: sanify this check, currently it works very poorly and doesn't differentiate between https and http
 check_elabftw() {
     local url=$1
@@ -66,27 +67,28 @@ echo
 
 # Normalize and check for elab instance if proper flags not specified
 while true; do
-    read -p "Please input the url of a valid eLabFTW instance: " URL
     if [[ "$literal_mode" == false ]]; then
-        URL=$(normalize_url "$URL")
+        read -p "Please input the url of a valid eLabFTW instance: " ELABFTW_BASE_URL
+        ELABFTW_BASE_URL=$(normalize_url "$ELABFTW_BASE_URL")
     else echo "Warning: Literal mode enabled, URL will be passed as-is."
         echo "Please make sure to include the correct protocol prefix (e.g. http://...)"
         echo "And make sure the URL ends with a trailing slash (e.g. ...host.it/)."
+        read -p "Please input the url of a valid eLabFTW instance: " ELABFTW_BASE_URL
     fi
     if [[ "$force_mode" == true ]]; then
         echo "Warning: Force mode enabled, skipping website validation."
-        echo "Normalized URL: $URL"
+        echo "Normalized URL: $ELABFTW_BASE_URL"
         echo
         break
     fi
 
     echo "Checking..." && sleep $SLEEP
-    if check_elabftw "$URL"; then
-        echo "Valid eLabFTW URL: $URL"
+    if check_elabftw "$ELABFTW_BASE_URL"; then
+        echo "Valid eLabFTW URL: $ELABFTW_BASE_URL"
         echo
         break
     else
-        echo -e "Error: eLabFTW instance not found on $URL.\nIf you're sure an instance exists you may\noverride this lock with the --force option."
+        echo -e "Error: eLabFTW instance not found on $ELABFTW_BASE_URL.\nIf you're sure an instance exists you may\noverride this lock with the --force option."
         echo
     fi
 done
@@ -100,18 +102,37 @@ done
 read -p "Only allow secure connections (Y/n)? " secure
 secure=${secure,,} # to lowercase
 if [[ -z "$secure" ]]; then
-    VERIFY=True
+    VERIFY_SSL=True
     else case "$secure" in
-        y|ye|yes) VERIFY=True ;;  # 0 = true (yes)
-        n|nay|no) VERIFY=False ;;   # 1 = false (no)
-        *) echo I assume you mean 'yes' then... ; VERIFY=True ;;
+        y|ye|yes) VERIFY_SSL=True ;;  # 0 = true (yes)
+        n|nay|no) VERIFY_SSL=False ;;   # 1 = false (no)
+        *) echo I assume you mean 'yes' then... ; VERIFY_SSL=True ;;
     esac
+fi
+
+# echo "Please provide a temporary API key (it won't be stored)."
+# echo "API keys can be generated on your profile."
+# echo "See: https://doc.elabftw.net/api.html#generating-a-key"
+# echo
+# read -s -p "Paste your key here (echo off): " KEY # password-like
+# echo # new line
+# if [[ -z "$KEY" ]]; then
+#     echo "API key not provided. Please make sure to run:"
+#     echo "  python amore/scan_for_categories.py"
+#     echo "BEFORE running this script."
+#     exit 1
+# fi
+export ELABFTW_BASE_URL=$ELABFTW_BASE_URL
+export VERIFY_SSL=$VERIFY_SSL
+python amore/scan_for_categories.py
+if [ ${PIPESTATUS[0]} -ne 0 ]; then
+    exit 1
 fi
 
 
 echo
 echo "Building the docker image with following parameters:"
-echo -e "URL: $URL\nSSL verification: $VERIFY"
+echo -e "URL: $ELABFTW_BASE_URL\nSSL verification: $VERIFY_SSL"
 read -p "Press enter to continue, or ^C to abort."
 
 echo
@@ -136,8 +157,8 @@ fi
 # end
 
 docker build \
-  --build-arg URL=${URL} \
-  --build-arg VERIFY=${VERIFY} \
+  --build-arg URL=${ELABFTW_BASE_URL} \
+  --build-arg VERIFY=${VERIFY_SSL} \
   -t amore .
 
 echo

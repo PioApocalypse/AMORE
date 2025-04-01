@@ -2,7 +2,7 @@ import os
 import requests
 import json
 from datetime import datetime
-from amore.var import categories as cat
+# from amore.var.categories import categories as cat
 from .utils import normalize_to_int as to_int
 from .utils import normalize_position_name as norm_pos_name
 from flask import session, request
@@ -12,6 +12,12 @@ from flask import session, request
 API_URL = os.getenv('ELABFTW_BASE_URL')
 full_elab_url = f"{API_URL}api/v2/" # API endpoint root for eLabFTW
 ssl_verification = os.getenv('VERIFY_SSL').lower() == 'true' # this way you can toggle SSL verification in .env file
+
+if os.path.isfile('amore/var/categories.json'):
+    with open('amore/var/categories.json', 'r') as catfile:
+        cat = json.load(catfile)
+else:
+    print(f'No "amore/var/categories.json" file found.\nPlease run amore/scan_for_categories.py.')
 
 '''
 =========================================================================================================================================
@@ -129,7 +135,7 @@ def create_sample(API_KEY, title, tags, body, std_id, position, batch, subholder
         "Content-Type": "application/json"
     }
     payload = {
-        "template": cat.cat("Sample"), # 10 defines this item as 'sample' in our database
+        "template": cat.get("sample"), # 10 defines this item as 'sample' in our database
         "title": title,
         "tags": tags
     }
@@ -254,7 +260,7 @@ def get_positions(API_KEY):
         "Content-Type": "application/json"
     }
 
-    search_query = f'{API_URL}api/v2/items?q=&cat={cat.cat("SAMPLE POSITION")}&limit=9999' # "SAMPLE POSITION" should be id = 17
+    search_query = f'{API_URL}api/v2/items?q=&cat={cat.get("sample position")}&limit=9999' # "SAMPLE POSITION" should be id = 17
     
     response = requests.get(
         headers=header,
@@ -276,7 +282,7 @@ def get_substrate_batches(API_KEY):
         "Content-Type": "application/json"
     }
 
-    search_query = f'{API_URL}api/v2/items?q=&cat={cat.cat("SUBSTRATES BATCH")}&limit=9999' # "SUBSTRATES BATCH" should be id = 9
+    search_query = f'{API_URL}api/v2/items?q=&cat={cat.get("substrates batch")}&limit=9999' # "SUBSTRATES BATCH" should be id = 9
     
     response = requests.get(
         headers=header,
@@ -301,7 +307,7 @@ def get_proposals(API_KEY):
         "Content-Type": "application/json"
     }
 
-    search_query = f'{API_URL}api/v2/items?q=&cat={cat.cat("PROPOSAL")}&limit=9999' # "PROPOSAL" should be id = 15
+    search_query = f'{API_URL}api/v2/items?q=&cat={cat.get("proposal")}&limit=9999' # "PROPOSAL" should be id = 15
     
     response = requests.get(
         headers=header,
