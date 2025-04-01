@@ -21,7 +21,7 @@ The only way is making a GET request to the apikey endpoint and look for the one
 def check_apikey(KEY=""):
     # No sense proceeding if the user somehow submitted an empty key...
     if KEY == "":
-        raise Exception('HOW DID YOU EVEN MANAGE TO SUBMIT AN EMPTY KEY?!')
+        raise Exception('You submitted an empty key.')
     # Request section
     endpoint = f"{API_URL}api/v2/apikeys"
     header = {
