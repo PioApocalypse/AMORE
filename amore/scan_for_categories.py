@@ -1,6 +1,7 @@
 import requests
 import os
 import json
+from datetime import datetime
 # Global variables:
 API_URL = os.getenv('ELABFTW_BASE_URL')
 types_endpoint = f"{API_URL}api/v2/items_types/"
