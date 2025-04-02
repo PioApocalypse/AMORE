@@ -9,12 +9,12 @@ echo "==============================================="
 echo
 
 # FUNCTIONS
-# Define function which checks for valid root dir url in the stupidest way possible: DOES IT REDIRECT?
-# TO-DO: Better idea for later - check if api/v2 endpoint exists, why did I not think about it before?
+# Define function which checks for valid root dir url in the stupidest way possible:
+#   curl GET a non existent (404) page, check for "eLabFTW" (which should be in the meta description)
 # To-do: sanify this check, currently it works very poorly and doesn't differentiate between https and http
 check_elabftw() {
-    local url=$1
-    if curl -s "$url" -k | grep -q "Redirecting to /dashboard.php"; then
+    local url="$1/api"
+    if curl -s "$url" -k | grep -q "eLabFTW"; then
         return 0
     else
         return 1
