@@ -110,11 +110,19 @@ if [[ -z "$secure" ]]; then
     esac
 fi
 
-echo "Please provide a temporary API key (it won't be stored)."
+echo "Please provide a temporary API key."
+echo "It will be deleted automatically after successful setup."
 echo "API keys can be generated on your profile."
 echo "See: https://doc.elabftw.net/api.html#generating-a-key"
 echo
-read -s -p "Paste your key here (echo off): " KEY # password-like
+while true; do
+    read -s -p "Paste your key here (echo off): " API_KEY # password-like
+    if [[ -z "$API_KEY" ]]; then
+        echo "Don't leave this field empty."
+    else
+        break
+    fi
+done
 # echo # new line
 # if [[ -z "$KEY" ]]; then
 #     echo "API key not provided. Please make sure to run:"
@@ -122,8 +130,8 @@ read -s -p "Paste your key here (echo off): " KEY # password-like
 #     echo "BEFORE running this script."
 #     exit 1
 # fi
-export ELABFTW_BASE_URL=$ELABFTW_BASE_URL
-export VERIFY_SSL=$VERIFY_SSL
+# export ELABFTW_BASE_URL=$ELABFTW_BASE_URL
+# export VERIFY_SSL=$VERIFY_SSL
 # export PYTHONPATH=$(pwd)
 # python3 amore/scan_for_categories.py
 # if [ ${PIPESTATUS[0]} -ne 0 ]; then
@@ -157,11 +165,21 @@ else
 fi
 # end
 
+touch config.json
+cat > config.json <<EOF
+{
+    "API_KEY": "$API_KEY",
+    "ELABFTW_BASE_URL": "$ELABFTW_BASE_URL",
+    "VERIFY_SSL": "$VERIFY_SSL"
+}
+EOF
+
 docker build \
   --build-arg URL=${ELABFTW_BASE_URL} \
   --build-arg VERIFY=${VERIFY_SSL} \
-  --build-arg API_KEY=${API_KEY} \
   -t amore .
+
+rm -f config.json
 
 echo
 echo "Docker image ready."

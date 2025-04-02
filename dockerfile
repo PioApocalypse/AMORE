@@ -11,8 +11,8 @@ ARG URL
 ARG VERIFY
 ENV ELABFTW_BASE_URL=$URL
 ENV VERIFY_SSL=$VERIFY
-ARG API_KEY
-RUN python3 amore/scan_for_categories.py $API_KEY $URL $VERIFY
+RUN python3 amore/scan_for_categories.py
+RUN rm -f config.json
 
 ENV FLASK_APP=amore/gui/app.py
 ENV FLASK_ENV=production

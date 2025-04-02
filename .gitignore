@@ -1,6 +1,7 @@
 # envs
 **/.env
 **/.venv
+config.json
 
 # pytest cache
 #**/tests

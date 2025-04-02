@@ -1,12 +1,14 @@
 import requests
 import os
-import sys
 import json
 from datetime import datetime
 # Global variables:
-API_URL = sys.argv[2]
+with open('config.json') as cfg:
+    config = json.load(cfg)
+
+API_URL = config.get('ELABFTW_BASE_URL')
 types_endpoint = f"{API_URL}api/v2/items_types/"
-ssl_verification = sys.argv[3].lower() == 'true' # this way you can toggle SSL verification in .env file
+ssl_verification = str(config.get('VERIFY_SSL')).lower() == 'true' # this way you can toggle SSL verification in .env file
 
 def check_apikey(KEY=""):
     # No sense proceeding if the user somehow submitted an empty key...
@@ -63,12 +65,9 @@ def scan_for_categories(API_KEY):
     return categories
 
 if __name__=="__main__":
-    if len(sys.argv) > 4:
-        raise Exception("Usage: python3 scan_for_categories [API_KEY] [ELABFTW_BASE_URL] [True | False].")
-
     x = 3 # number of possible attempts
     while x > 0: # loop to decrease attempts
-        API_KEY = sys.argv[1] or str(input("Enter a valid API key - it won't be stored: ")) # if not provided it's taken from environment variable
+        API_KEY = config.get('API_KEY') # or str(input("Enter a valid API key - it won't be stored: ")) # if not provided it's taken from environment variable
         try:
             check_apikey(API_KEY) # if it checks out it's all good
             break
