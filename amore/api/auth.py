@@ -35,10 +35,10 @@ def check_apikey(KEY=""):
     )
     # Check zero: is the request not accepted by the server?
     if response.status_code // 100 == 5:
-        raise Exception('There''s a problem on the server. Try asking the sysadmin.')
+        raise Exception("There's a problem on the server. Try asking the sysadmin.")
     # First check: is the API key invalid? If so server returns 4xx error and no further check is required.
     if response.status_code // 100 == 4:
-        raise Exception('Invalid API key.')
+        raise Exception("Invalid API key.")
 
     # Get last used API key - the one you made your request with - and see if it can write.
     apikeys = [
