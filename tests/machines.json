@@ -1,0 +1,79 @@
+[
+    {
+        "title": "PLD-MODA",
+        "id": 110,
+        "metadata":
+            {
+                "elabftw":
+                    {
+                        "extra_fields_groups":
+                        [
+                            {
+                                "id":1,
+                                "name":"Main"
+                            },
+                            {
+                                "id":2,
+                                "name":"LOST"
+                            }
+                        ]
+                    
+                    },
+                "extra_fields":
+                    {
+                        "Heater": { "type": "items", "value": "", "group_id": 1 },
+                        "Auxiliar": { "type": "items", "value": "Campione_A", "group_id": 1 },
+                        "Fork": { "type": "items", "value": "Campione_F", "group_id": 1 },
+                        "Top": { "type": "items", "value": "Campione_T", "group_id": 1 },
+                        "Mid": { "type": "items", "value": "", "group_id": 1 },
+                        "Bot": { "type": "items", "value": "Campione_B", "group_id": 1 },
+                        "LOST - 1": { "type": "items", "value": "Campione_PLDL1", "group_id": 2 },
+                        "LOST - 2": { "type": "items", "value": "Campione_PLDL2", "group_id": 2 }
+                    }
+            }
+    },
+    {
+        "title": "SPM",
+        "id": 111,
+        "metadata":
+            {
+                "elabftw":
+                    {
+                        "extra_fields_groups":
+                        [
+                            {
+                                "id":1,
+                                "name":"Load"
+                            },
+                            {
+                                "id":2,
+                                "name":"T"
+                            },
+                            {
+                                "id":3,
+                                "name":"D"
+                            },
+                            {
+                                "id":4,
+                                "name":"LOST"
+                            }
+                        ]
+                    
+                    },
+                "extra_fields":
+                    {
+                        "Load - Top": { "type": "items", "value": "Campione_LT", "group_id": 1 },
+                        "Load - Mid": { "type": "items", "value": "Campione_LM", "group_id": 1 },
+                        "Load - Bot": { "type": "items", "value": "Campione_LB", "group_id": 1 },
+                        "T - 1": { "type": "items", "value": "", "group_id": 2 },
+                        "T - 2": { "type": "items", "value": "Campione_T2", "group_id": 2 },
+                        "T - 3": { "type": "items", "value": "Campione_T3", "group_id": 2 },
+                        "D - 1": { "type": "items", "value": "Campione_D1", "group_id": 3 },
+                        "D - 2": { "type": "items", "value": "Campione_D2", "group_id": 3 },
+                        "D - 3": { "type": "items", "value": "", "group_id": 3 },
+                        "LOST - 1": { "type": "items", "value": "Campione_SPML1", "group_id": 4 },
+                        "LOST - 2": { "type": "items", "value": "Campione_SPML2", "group_id": 4 }
+                    }
+            }
+    }
+]
