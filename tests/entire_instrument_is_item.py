@@ -155,7 +155,7 @@ class Instrument:
     #         "title": self.title,
     #         "id": self.id,
     #         "avail": self.avail,
-    #         "machine": self.getmachine(),
+    #         "instrument": self.getinstrument(),
     #         "slot": self.getslot(),
     #         "sector": self.getsector(),
     #         "lost": self.isthisloss()
@@ -187,13 +187,13 @@ class Instrument:
 #actualpos = client.get_positions(API_KEY)
 #print(list_available_slots(actualpos))
 
-with open('tests/machines.json') as f:
-    machines = json.load(f)
+with open('tests/instruments.json') as f:
+    instruments = json.load(f)
 
-machinesObj = []
-for machine in machines:
-    machineObj = Instrument(machine.get('title'), machine.get('id'), machine.get('metadata')) # machineObj is class 'position'
-    machinesObj.append(machineObj)
+instruments_list = []
+for instrument in instruments:
+    obj = Instrument(instrument.get('title'), instrument.get('id'), instrument.get('metadata')) # instrumentObj is of class 'Instrument'
+    instruments_list.append(obj)
 
 # My list of slots is now created, let's put it to good use: checking if a slot is clear or not.
 available = []
@@ -201,20 +201,14 @@ not_available = []
 available_test = []
 lost = []
 freelost = []
-for machineObj in machinesObj:
-    # slots = machineObj.getslots() # list of objects with 'name', 'sector' and 'sample' keys
-    # for slot in slots:
-    #     if slot.get('sample'):
-    #         not_available.append(slot)
-    #     else:
-    #         available.append(slot)
-    for item in machineObj.isthisloss():
+for obj in instruments_list: # two iterations are necessary: one for every instrument taken from eLab...
+    for item in obj.isthisloss(): # ...the other for the methods whose output is a list, like isthisloss()...
         lost.append(item)
-    for item in machineObj.getavailable():
+    for item in obj.getavailable(): # ...or getavailable().
         available_test.append(item)
-    freelost.append(machineObj.freelost())
-print(lost)
+    freelost.append(obj.freelost()) # freelost() returns an integer therefore it doesn't require an iteration.
+print(f"LOST: {lost}\n")
 # print(available)
-print(available_test)
+print(f"AVAILABLE: {available_test}\n")
 # print(not_available)
-print(freelost)
+print(f"SMALLEST FREE LOST: {freelost}\n")
