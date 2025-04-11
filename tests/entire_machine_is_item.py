@@ -92,6 +92,11 @@ class Instrument:
             if slot.get("sector").lower() == "lost":
                 lost.append(slot)
         return lost
+    def free_lost(self): # returns number (int) of smallest available lost slot in the machine, eg. if LOST - 1 through LOST - 5 are assigned it returns 6
+        lost = self.isthisloss()
+        latest_lost = max(lost, key=lambda x: int(x.get("name").split("-")[-1]))
+        latest_lost_number = int(latest_lost.get("name").split("-")[-1])
+        return latest_lost_number +1
     # def dump(self):
     #     for item in self.getslots():
 
@@ -144,6 +149,7 @@ available = []
 not_available = []
 available_test = []
 lost = []
+freelost = []
 for machineObj in machinesObj:
     # slots = machineObj.getslots() # list of objects with 'name', 'sector' and 'sample' keys
     # for slot in slots:
@@ -153,7 +159,9 @@ for machineObj in machinesObj:
     #         available.append(slot)
     available_test.append(machineObj.getavailable())
     lost.append(machineObj.isthisloss())
+    freelost.append(machineObj.free_lost())
 print(lost)
 # print(available)
 print(available_test)
 # print(not_available)
+print(freelost)

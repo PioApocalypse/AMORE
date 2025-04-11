@@ -28,6 +28,7 @@
                         "Mid": { "type": "items", "value": "", "group_id": 1 },
                         "Bot": { "type": "items", "value": "Campione_B", "group_id": 1 },
                         "LOST - 1": { "type": "items", "value": "Campione_PLDL1", "group_id": 2 },
+                        "LOST - 3": { "type": "items", "value": "Campione_PLDL3", "group_id": 2 },
                         "LOST - 2": { "type": "items", "value": "Campione_PLDL2", "group_id": 2 }
                     }
             }
