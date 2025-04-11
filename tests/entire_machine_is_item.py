@@ -42,7 +42,7 @@ positions = [
     "Intro-2",
     "Intro-lost" ]
 
-class Position:
+class Instrument:
     def __init__(self,
                  title,
                  id,
@@ -62,27 +62,28 @@ class Position:
         slotlist = []
         for slot in self.extra: # for every slot in extra fields
             slotname = f"{self.title} - {slot}"
-            slotsample = self.extra.get(slot).get("value")
-            slotgroup = self.extra.get(slot).get("group_id")
+            slotsample = self.extra.get(slot).get("value") # id, not title of sample - to get title requests.get is necessary
+            slotgroup = self.extra.get(slot).get("group_id") # id, not name of sector
             slotsector = [item.get("name")
                 for item in self.getsectors()
-                if item.get("id") == slotgroup][0]
+                if item.get("id") == slotgroup][0] # actual name of sector
             response = {
                 "name": slotname,
                 "sector": slotsector,
-                "sample": slotsample
+                "sample": slotsample # again: id not title
             }
-            slotlist.append(response) # object containing full location of the slot ("slot" key) and the sample associated ("sample" key)
+            slotlist.append(response) # object containing full location of the slot ("name" key), sector name ("sector" key) and the sample associated ("sample" key)
         return slotlist
-    def getmachine(self):
+    def getmachine(self): # equivalent to self.title
         return self.title # if we opt for the "every machine is an item" approach
         #return self.data[0] # if we opt for the "every slot of every machine is an item" approach
-    def getsample(self, slot):
-        sector_slots = self.meta.get(sector)
-        locate_sample = sector_slots.get(slot) or ""
-        if locate_sample: #or locate_sample != "None":
-            return locate_sample
-        return None
+    def getavailable(self):
+        slotlist = self.getslots()
+        available = [ { "name": f"{self.title} - LOST", "sector": "LOST", "sample": "" } ]
+        for slot in slotlist:
+            if slot.get("sample") == "":
+                available.append(slot)
+        return available
     def isthisloss(self): # returns full titles
         if self.data[-1].lower() == "lost":
             # I  II
@@ -133,12 +134,13 @@ with open('tests/machines.json') as f:
 
 machinesObj = []
 for machine in machines:
-    machineObj = Position(machine.get('title'), machine.get('id'), machine.get('metadata')) # machineObj is class 'position'
+    machineObj = Instrument(machine.get('title'), machine.get('id'), machine.get('metadata')) # machineObj is class 'position'
     machinesObj.append(machineObj)
 
 # My list of slots is now created, let's put it to good use: checking if a slot is clear or not.
 available = []
 not_available = []
+available_test = []
 for machineObj in machinesObj:
     slots = machineObj.getslots() # list of objects with 'name', 'sector' and 'sample' keys
     for slot in slots:
@@ -146,5 +148,7 @@ for machineObj in machinesObj:
             not_available.append(slot)
         else:
             available.append(slot)
+    available_test.append(machineObj.getavailable())
 print(available)
-print(not_available)
+print(available_test)
+# print(not_available)
