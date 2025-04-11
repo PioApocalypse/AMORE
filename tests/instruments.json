@@ -73,7 +73,7 @@
                         "D - 2": { "type": "items", "value": "Campione_D2", "group_id": 3 },
                         "D - 3": { "type": "items", "value": "", "group_id": 3 },
                         "LOST - 1": { "type": "items", "value": "Campione_SPML1", "group_id": 4 },
-                        "LOST - 2": { "type": "items", "value": "Campione_SPML2", "group_id": 4 }
+                        "LOST - 4": { "type": "items", "value": "Campione_SPML4", "group_id": 4 }
                     }
             }
     }

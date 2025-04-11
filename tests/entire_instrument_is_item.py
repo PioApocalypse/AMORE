@@ -68,7 +68,7 @@ class Instrument:
         Returns list of dictionaries with every sector's id and name.
         '''
         sectors = [ { "id": item.get("id"), "name": item.get("name") } for item in self.groups ]
-        return sectors
+        return sectors # unordered list
     def getslots(self):
         '''
         Returns list of dictionaries with full location of
@@ -89,7 +89,7 @@ class Instrument:
                 "sample": slotsample # again: id not title
             }
             slotlist.append(response) # object containing full location of the slot ("name" key), sector name ("sector" key) and the sample associated ("sample" key)
-        return slotlist
+        return slotlist # unordered list
     def getinstrument(self):
         '''Equivalent to self.title.'''
         return self.title
@@ -104,8 +104,8 @@ class Instrument:
         for slot in self.getslots():
             if slot.get("sector").lower() == "lost":
                 lost.append(slot)
-        return lost
-    def freelost(self): 
+        return lost # unordered list
+    def freelost_number(self): 
         '''
         Returns number (integer) of the smallest available
         slot in the instrument's LOST sector.
@@ -119,6 +119,23 @@ class Instrument:
         latest_lost = max(lost, key=lambda x: int(x.get("name").split("-")[-1]))
         latest_lost_number = int(latest_lost.get("name").split("-")[-1])
         return latest_lost_number +1
+    def freelost(self):
+        '''
+        Returns object of empty slot of the LOST sector of
+        the instrument, whose name is that of the smallest
+        available LOST slot (see "freelost_number()").
+
+        E.g.: if LOST - 1 through LOST - 5 are assigned it
+        returns: { "name": "<inst> - LOST - 6", "sector":
+        "LOST", "sample": "" } - even if slot LOST - 3 is
+        unassigned.
+        '''
+        freelost = {
+            "name": f"{self.title} - LOST - {self.freelost_number()}",
+            "sector": "LOST",
+            "sample": ""
+        }
+        return freelost
     def getavailable(self):
         '''
         Returns list of slots (see "getslots()") whose
@@ -127,12 +144,12 @@ class Instrument:
         "freelost()").
         '''
         slotlist = self.getslots()
-        available = [ { "name": f"{self.title} - LOST - {self.freelost()}", "sector": "LOST", "sample": "" } ]
+        available = [ self.freelost() ]
         for slot in slotlist:
             if slot.get("sample") == "":
                 available.append(slot)
-        return available
-    # def dump(self):
+        return available # unordered list
+    def dump(self):
         '''
         Returns list of dictionaries which is a full dump
         of every single existent slot of every single
@@ -144,23 +161,22 @@ class Instrument:
             - "sector_name": Sector.name
             - "slot_name": Slot.name
             - "sample_id": Sample.itemID (if present)
-            - "sample_title": Sample.title (if present)
 
         Remember:   items have titles and ids,
                     metadata have names.
         '''
-    #     for item in self.getslots():
-
-    #     s = {
-    #         "title": self.title,
-    #         "id": self.id,
-    #         "avail": self.avail,
-    #         "instrument": self.getinstrument(),
-    #         "slot": self.getslot(),
-    #         "sector": self.getsector(),
-    #         "lost": self.isthisloss()
-    #         }
-    #     return s
+        dump = []
+        slot_list = self.getslots()
+        for slot in slot_list:
+            obj = {
+                "instrument_id": self.id,
+                "instrument_title": self.title,
+                "sector_name": slot.get("sector"),
+                "slot_name": slot.get("name"),
+                "sample_id": slot.get("sample") # where do I turn this into a sample title?
+            }
+            dump.append(obj)
+        return dump # unordered list
 
 # def list_available_slots(dictlist):
 #     parsed_dictlist = parse_slots(dictlist)
@@ -206,7 +222,7 @@ for obj in instruments_list: # two iterations are necessary: one for every instr
         lost.append(item)
     for item in obj.getavailable(): # ...or getavailable().
         available_test.append(item)
-    freelost.append(obj.freelost()) # freelost() returns an integer therefore it doesn't require an iteration.
+    freelost.append(obj.freelost_number()) # freelost_number() returns an integer therefore it doesn't require an iteration.
 print(f"LOST: {lost}\n")
 # print(available)
 print(f"AVAILABLE: {available_test}\n")
