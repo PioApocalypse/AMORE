@@ -84,12 +84,14 @@ class Instrument:
             if slot.get("sample") == "":
                 available.append(slot)
         return available
-    def isthisloss(self): # returns full titles
-        if self.data[-1].lower() == "lost":
-            # I  II
-            # II  L
-            return True
-        return False
+    def isthisloss(self): # returns only lost samples
+        # I  II
+        # II  L
+        lost = []
+        for slot in self.getslots():
+            if slot.get("sector").lower() == "lost":
+                lost.append(slot)
+        return lost
     # def dump(self):
     #     for item in self.getslots():
 
@@ -141,14 +143,17 @@ for machine in machines:
 available = []
 not_available = []
 available_test = []
+lost = []
 for machineObj in machinesObj:
-    slots = machineObj.getslots() # list of objects with 'name', 'sector' and 'sample' keys
-    for slot in slots:
-        if slot.get('sample'):
-            not_available.append(slot)
-        else:
-            available.append(slot)
+    # slots = machineObj.getslots() # list of objects with 'name', 'sector' and 'sample' keys
+    # for slot in slots:
+    #     if slot.get('sample'):
+    #         not_available.append(slot)
+    #     else:
+    #         available.append(slot)
     available_test.append(machineObj.getavailable())
-print(available)
+    lost.append(machineObj.isthisloss())
+print(lost)
+# print(available)
 print(available_test)
 # print(not_available)
