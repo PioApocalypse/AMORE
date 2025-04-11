@@ -65,7 +65,7 @@ class Instrument:
         self.groups = self.meta.get("elabftw").get("extra_fields_groups") or [""] # list of dictionaries containing every sector's id and name
     def getsectors(self):
         '''
-        Returns list of dictionaries with every sector's id and name.
+        Returns list of dictionaries with every sector's ID and name.
         '''
         sectors = [ { "id": item.get("id"), "name": item.get("name") } for item in self.groups ]
         return sectors # unordered list
@@ -97,9 +97,18 @@ class Instrument:
         '''
         Returns list of slots (see "getslots()") whose
         "sector" is equal to "LOST" (case insensitive).
+
+        These slots all contain the IDs of samples lost
+        within the chambers of the instruments, which can
+        be listed with:
+        
+            [ item.get("sample")
+            for item in Istrument.isthisloss() ]
+
+        I  II
+        II  L
+        iykyk
         '''
-        # I  II
-        # II  L
         lost = []
         for slot in self.getslots():
             if slot.get("sector").lower() == "lost":
@@ -126,9 +135,12 @@ class Instrument:
         available LOST slot (see "freelost_number()").
 
         E.g.: if LOST - 1 through LOST - 5 are assigned it
-        returns: { "name": "<inst> - LOST - 6", "sector":
-        "LOST", "sample": "" } - even if slot LOST - 3 is
-        unassigned.
+        returns:
+        
+            { "name": "<inst> - LOST - 6",
+            "sector": "LOST", "sample": "" }
+            
+        ...even if slot LOST - 3 is unassigned.
         '''
         freelost = {
             "name": f"{self.title} - LOST - {self.freelost_number()}",
@@ -162,7 +174,7 @@ class Instrument:
             - "slot_name": Slot.name
             - "sample_id": Sample.itemID (if present)
 
-        Remember:   items have titles and ids,
+        Remember:   items have titles and IDs,
                     metadata have names.
         '''
         dump = []
