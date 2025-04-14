@@ -9,6 +9,7 @@ External modules. In particular, from flask:
 '''
 from flask import Flask, request, render_template, redirect, flash, get_flashed_messages, session
 import secrets # for session cookies
+from datetime import timedelta # for session timeout
 import os # use method os.environ.get() to bypass the need for a .env file/dotenv module
 import amore.api.client as amore # client module, see: amore/api/client.py
 import amore.api.utils as utils # utilities module, see: amore/api/utils.py
@@ -48,6 +49,10 @@ is just redirect to login page, otherwise, execute the rest.
     # <rest of the function>
 '''
 
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=10)
 
 
 @app.route("/login", methods=["GET","POST"])
