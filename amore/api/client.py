@@ -5,6 +5,7 @@ from datetime import datetime
 # from amore.var.categories import categories as cat
 from .utils import normalize_to_int as to_int
 from .utils import normalize_position_name as norm_pos_name
+from ..classes import Tracker
 from flask import session, request
 
 # Import ENV variables api url and boolean ssl verification
