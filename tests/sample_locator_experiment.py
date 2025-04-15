@@ -20,6 +20,7 @@ class Tracker:
         '''
         self.title = dictionary.get("title")
         self.id = dictionary.get("id")
+        self.links = dictionary.get("items_links")
         self.meta = json.loads(dictionary.get("metadata"))
         self.groups = self.meta.get("elabftw").get("extra_fields_groups")
         self.positions = self.meta.get("extra_fields")
@@ -27,6 +28,17 @@ class Tracker:
         '''Gets list of every instrument's name.'''
         instruments = [ item.get("name") for item in self.groups ]
         return instruments
+    def getsamples(self):
+        '''
+        Gets list of selected data about samples present in any
+        instrument, regardless of its position. Data returned is
+        a dictionary with ID, standard-ID and name of the sample.
+        '''
+        samples = [ { "id": item.get("entityid"),
+            "std-id": item.get("title")[:9],
+            "name": item.get("title")[10:].replace("-","",1).strip() }
+            for item in self.links ]
+        return samples
     def getslots(self):
         '''
         Returns list of objects containing relevant data about every
@@ -35,12 +47,12 @@ class Tracker:
         slotlist = []
         groups = self.groups
         for position in self.positions:  # for every slot in extra fields
-            slotgroup = self.positions.get(position).get("group_id") # id, not name of sector
+            slotgroup = self.positions.get(position).get("group_id") # ID, not name of sector
             if slotgroup != ("" or None):
                 slotinstrument = [ item.get("name")
                     for item in self.groups
                     if item.get("id") == slotgroup ][0] # actual name of sector
-                slotsample = self.positions.get(position).get("value") # id, not title of sample - to get title requests.get is necessary
+                slotsample = self.positions.get(position).get("value") # ID, not title of sample
                 splitname = position.replace(" ","").split("-")
                 slotinstcode = splitname[0]
                 slotcode = splitname[-1]
@@ -53,13 +65,25 @@ class Tracker:
                         s = " - " # separator
                         slotsector = s.join(splitname[1:-1]) # join back everything that isn't instrument or slot
                 available = (slotsample == None)
+                if not available:
+                    samplestdid = [ item.get("std-id")
+                    for item in self.getsamples()
+                    if item.get("id") == slotsample ][0] # actual name of sample
+                    samplename = [ item.get("name")
+                    for item in self.getsamples()
+                    if item.get("id") == slotsample ][0] # actual name of sample
+                else:
+                    samplestdid = None
+                    samplename = None
                 response = {
                     "name": position,
                     "slot": slotcode,
                     "sector": slotsector,
                     "inst_name": slotinstrument,
                     "inst_code": slotinstcode,
-                    "sample": slotsample, # again: ID not title
+                    "sample_id": slotsample, # again: ID not title
+                    "sample_stdid": samplestdid, # our standard-ID
+                    "sample_name": samplename, # THIS is the title
                     "available": available
                 }
                 slotlist.append(response) # object containing full location of the slot ("name" key), instrument name ("inst" key) and the sample associated if any ("sample" key)
@@ -99,6 +123,6 @@ with open("tests/sample_locator.json", 'r') as f:
 
 # print( [ item for item in tracker.getslots() if item.get("sample") != None ]) # print occupied slots
 # print( [ item for item in tracker.getslots() if item.get("sample") == None ]) # print available slots
-print( tracker.getslots() ) # print available slots through Tracker class
+print( tracker.getslots() ) # print slots through Tracker class
 # print(help(Tracker))
 # print( tracker.isthisloss() )
