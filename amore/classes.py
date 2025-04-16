@@ -22,6 +22,8 @@ class Tracker:
         self.id = dictionary.get("id")
         self.links = dictionary.get("items_links")
         self.meta = json.loads(dictionary.get("metadata"))
+        # self.groups and self.positions are taken from self.meta
+        # They are convenient for code readability but not necessary
         self.groups = self.meta.get("elabftw").get("extra_fields_groups")
         self.positions = self.meta.get("extra_fields")
     def getinstruments(self):

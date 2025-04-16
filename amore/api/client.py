@@ -22,7 +22,7 @@ else:
 
 '''
 =========================================================================================================================================
-== EXPERIMENT SECTION ===================================================================================================================
+== EXPERIMENT SECTION / SAMPLE LOCATOR ==================================================================================================
 =========================================================================================================================================
 '''
 '''
@@ -54,6 +54,32 @@ def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results)
     response.raise_for_status()
     return response.json()
 '''
+
+def sample_locator(API_KEY):
+    experiments_url = f"{full_elab_url}experiments"
+    search_query = f"{experiments_url}?q=%22sample+locator%22"
+    header = {
+        "Authorization": API_KEY,
+        "Content-Type": "application/json"
+    }
+    response = requests.get(
+        headers=header,
+        url=search_query,
+        verify=ssl_verification
+    )
+    if len(response.json()) != 0:
+        for item in response.json():
+            if item.get("title").lower() == "sample locator":
+                locator_id = item.get("id")
+                locator = requests.get(
+                    headers=header,
+                    url=f"{experiments_url}/{locator_id}",
+                    verify=ssl_verification
+                ).json()
+                tracker = Tracker(locator)
+                return tracker
+    raise Exception(f"No experiment \"Sample Locator\" found in eLabFTW's database.")
+
 '''
 =========================================================================================================================================
 == RESOURCES SECTION ====================================================================================================================
