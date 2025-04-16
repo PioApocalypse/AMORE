@@ -1,0 +1,6 @@
+{
+    "ELABFTW_BASE_URL": "https://demo.elabftw.net/",
+    "API_KEY": "",
+    "VERIFY_SSL": "True",
+    "HOST_PORT": 80
+}
