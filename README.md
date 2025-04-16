@@ -199,10 +199,10 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [x] Log out buttons
 - [x] Testing on server
 - [x] Post new sample to only available positions
-- [ ] Add sample to its position in "Sample Locator" experiment
+- [x] Add sample to its position in "Sample Locator" experiment
+- [ ] Visualize list of all samples in laboratory
 - [ ] Move sample from one position to the other
 - [ ] Make sure position is not shared among different samples
-- [ ] Visualize list of all samples in laboratory
 
 ### Phase 6 - Error handling, data validation, sanification
 - [ ] Sanification of inputs provided - avoid code/SQL injections
