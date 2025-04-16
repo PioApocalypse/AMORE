@@ -68,7 +68,7 @@ class Tracker:
                     case _:
                         s = " - " # separator
                         slotsector = s.join(splitname[1:-1]) # join back everything that isn't instrument or slot
-                available = (slotsample == None or slotsample == "")
+                available = (slotsample is None or slotsample == "")
                 try:
                     samplestdid = [ item.get("std-id")
                     for item in self.getsamples()

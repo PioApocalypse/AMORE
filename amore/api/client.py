@@ -12,6 +12,7 @@ from flask import session, request
 # PLEASE DO NOT push api keys to public repos
 API_URL = os.getenv('ELABFTW_BASE_URL')
 full_elab_url = f"{API_URL}api/v2/" # API endpoint root for eLabFTW
+experiments_url = f"{full_elab_url}experiments" # API endpoint /experiments
 ssl_verification = os.getenv('VERIFY_SSL').lower() == 'true' # this way you can toggle SSL verification in .env file
 
 if os.path.isfile('amore/var/categories.json'):
@@ -56,7 +57,6 @@ def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results)
 '''
 
 def sample_locator(API_KEY):
-    experiments_url = f"{full_elab_url}experiments"
     search_query = f"{experiments_url}?q=%22sample+locator%22"
     header = {
         "Authorization": API_KEY,
@@ -92,7 +92,7 @@ def add_to_position(API_KEY, sample_id, position_name): # POST to empty position
         "metadata": json.dumps(metadata)
     }
 
-    tracker_url = f"{full_elab_url}experiments/{tracker.id}"
+    tracker_url = f"{experiments_url}/{tracker.id}"
     patching_meta = requests.patch(
         headers=header,
         url=tracker_url,
@@ -107,23 +107,47 @@ def add_to_position(API_KEY, sample_id, position_name): # POST to empty position
     )
     return 0
 
-def move_to_position(API_KEY, sample_id, old_position_id, new_position_id): # DELETE from old position then POST to empty position
+def move_to_position(API_KEY, sample_id, old_position_name, new_position_name): # DELETE from old position then POST to empty position
+    if (old_position_name == new_position_name
+        or (not old_position_name and not new_position_name)): # neutral condition, just to be safe (both null or both equal)
+        return 0
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"
     }
-    old_position_url = f'{API_URL}api/v2/items/{old_position_id}/items_links/{sample_id}'
-    new_position_url = f'{API_URL}api/v2/items/{new_position_id}/items_links/{sample_id}'
-    delete = requests.delete(
+    tracker = sample_locator(API_KEY)
+    tracker_url = f"{experiments_url}/{tracker.id}"
+    metadata = tracker.meta
+    if (old_position_name == "") or (old_position_name is None):
+        metadata["extra_fields"][new_position_name]["value"] = sample_id
+        method = "post" # if old position doesn't exist, item is not linked yet so do it
+        link_url = f"{tracker_url}/items_links/{sample_id}"
+    elif (new_position_name == "") or (new_position_name is None):
+        metadata["extra_fields"][old_position_name]["value"] = None
+        method = "delete" # if new position doesn't exist, unlink item
+        link_url = f"{tracker_url}/items_links/{sample_id}"
+    else:
+        metadata["extra_fields"][old_position_name]["value"] = None
+        metadata["extra_fields"][new_position_name]["value"] = sample_id
+    patch = {
+        "metadata": json.dumps(metadata)
+    }
+    patching_meta = requests.patch(
         headers=header,
-        url=old_position_url,
-        verify=ssl_verification  
-    )
-    add = requests.post(
-        headers=header,
-        url=new_position_url,
+        url=tracker_url,
+        json=patch,
         verify=ssl_verification
     )
+    try:
+        method # if method variable is assigned it means we need to create or delete the link between the sample and the Locator
+        linking_item = requests.request(
+            method=method,
+            headers=header,
+            url=link_url,
+            verify=ssl_verification
+        )
+    except:
+        pass
     return 0
 
 
