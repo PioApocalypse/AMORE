@@ -22,8 +22,10 @@ class Tracker:
         self.id = dictionary.get("id")
         self.links = dictionary.get("items_links")
         self.meta = json.loads(dictionary.get("metadata"))
+        # Replicate original dictionary:
+        self.all = dictionary
         # self.groups and self.positions are taken from self.meta
-        # They are convenient for code readability but not necessary
+        # They are convenient for code readability but not necessary:
         self.groups = self.meta.get("elabftw").get("extra_fields_groups")
         self.positions = self.meta.get("extra_fields")
     def getinstruments(self):
@@ -66,15 +68,15 @@ class Tracker:
                     case _:
                         s = " - " # separator
                         slotsector = s.join(splitname[1:-1]) # join back everything that isn't instrument or slot
-                available = (slotsample == None)
-                if not available:
+                available = (slotsample == None or slotsample == "")
+                try:
                     samplestdid = [ item.get("std-id")
                     for item in self.getsamples()
                     if item.get("id") == slotsample ][0] # actual name of sample
                     samplename = [ item.get("name")
                     for item in self.getsamples()
                     if item.get("id") == slotsample ][0] # actual name of sample
-                else:
+                except:
                     samplestdid = None
                     samplename = None
                 response = {

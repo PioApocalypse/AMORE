@@ -22,7 +22,7 @@ else:
 
 '''
 =========================================================================================================================================
-== EXPERIMENT SECTION / SAMPLE LOCATOR ==================================================================================================
+== EXPERIMENT SECTION / SAMPLE LOCATION =================================================================================================
 =========================================================================================================================================
 '''
 '''
@@ -73,12 +73,59 @@ def sample_locator(API_KEY):
                 locator_id = item.get("id")
                 locator = requests.get(
                     headers=header,
-                    url=f"{experiments_url}/{locator_id}",
+                    url=f"{experiments_url}/31",
                     verify=ssl_verification
                 ).json()
                 tracker = Tracker(locator)
                 return tracker
     raise Exception(f"No experiment \"Sample Locator\" found in eLabFTW's database.")
+
+def add_to_position(API_KEY, sample_id, position_name): # POST to empty position
+    header = {
+        "Authorization": API_KEY,
+        "Content-Type": "application/json"
+    }
+    tracker = sample_locator(API_KEY)
+    metadata = tracker.meta
+    metadata["extra_fields"][position_name]["value"] = sample_id
+    patch = {
+        "metadata": json.dumps(metadata)
+    }
+
+    tracker_url = f"{full_elab_url}experiments/{tracker.id}"
+    patching_meta = requests.patch(
+        headers=header,
+        url=tracker_url,
+        json=patch,
+        verify=ssl_verification
+    )
+    link_url = f"{tracker_url}/items_links/{sample_id}"
+    linking_item = requests.post(
+        headers=header,
+        url=link_url,
+        verify=ssl_verification
+    )
+    return 0
+
+def move_to_position(API_KEY, sample_id, old_position_id, new_position_id): # DELETE from old position then POST to empty position
+    header = {
+        "Authorization": API_KEY,
+        "Content-Type": "application/json"
+    }
+    old_position_url = f'{API_URL}api/v2/items/{old_position_id}/items_links/{sample_id}'
+    new_position_url = f'{API_URL}api/v2/items/{new_position_id}/items_links/{sample_id}'
+    delete = requests.delete(
+        headers=header,
+        url=old_position_url,
+        verify=ssl_verification  
+    )
+    add = requests.post(
+        headers=header,
+        url=new_position_url,
+        verify=ssl_verification
+    )
+    return 0
+
 
 '''
 =========================================================================================================================================
@@ -193,6 +240,7 @@ def create_sample(API_KEY, title, tags, body, std_id, position, batch, subholder
         subholder=subholder,
         proposal=proposal,
         )
+    add_to_position(API_KEY=API_KEY, sample_id=new_elabid, position_name=position)
     # upload attachments
     if attachments:
         upload_attachments(API_KEY=API_KEY, new_elabid=new_elabid, attachments=attachments)
@@ -237,43 +285,6 @@ def batch_pieces_decreaser(API_KEY, batch):
     # Bonus: return remaining pieces to warn user if number is too low or zero
     return remaining
 
-'''
-=========================================================================================================================================
-== ADDING/MOVING TO POSITIONS ===========================================================================================================
-=========================================================================================================================================
-'''
-
-def add_to_position(API_KEY, sample_id, position_id): # POST to empty position
-    header = {
-        "Authorization": API_KEY,
-        "Content-Type": "application/json"
-    }
-    position_url = f'{API_URL}api/v2/items/{position_id}/items_links/{sample_id}'
-    add = requests.post(
-        headers=header,
-        url=position_url,
-        verify=ssl_verification
-    )
-    return 0
-
-def move_to_position(API_KEY, sample_id, old_position_id, new_position_id): # DELETE from old position then POST to empty position
-    header = {
-        "Authorization": API_KEY,
-        "Content-Type": "application/json"
-    }
-    old_position_url = f'{API_URL}api/v2/items/{old_position_id}/items_links/{sample_id}'
-    new_position_url = f'{API_URL}api/v2/items/{new_position_id}/items_links/{sample_id}'
-    delete = requests.delete(
-        headers=header,
-        url=old_position_url,
-        verify=ssl_verification  
-    )
-    add = requests.post(
-        headers=header,
-        url=new_position_url,
-        verify=ssl_verification
-    )
-    return 0
 
 '''
 =========================================================================================================================================
@@ -281,9 +292,7 @@ def move_to_position(API_KEY, sample_id, old_position_id, new_position_id): # DE
 =========================================================================================================================================
 '''
 
-def get_available_slots(API_KEY):
-    tracker = sample_locator(API_KEY)
-    # from response parse only useful info - which is title for the enduser and id for the create_sample client function
+def get_available_slots(API_KEY, tracker):
     available_slots = tracker.getavailable()
     sorted_slots = sorted(available_slots, key=lambda item: (item["name"]))
     return sorted_slots
