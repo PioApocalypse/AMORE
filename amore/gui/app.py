@@ -109,7 +109,7 @@ def home():
         return check
     API_KEY = session.get('api_key')
     user = session.get('user') or "unspecified user"
-    positions = amore.get_positions(API_KEY) # which is a list of dicts
+    positions = amore.get_available_slots(API_KEY) # which is a list of dicts
     batches = amore.get_substrate_batches(API_KEY) # which is a list of dicts
     proposals = amore.get_proposals(API_KEY) # you get the gist
     return render_template("create_sample.html", user=user, positions=positions, batches=batches, proposals=proposals)
@@ -121,7 +121,7 @@ def handle_create_sample():
         return check
     API_KEY = session.get('api_key')
     title = request.form.get("title")
-    position = request.form.get("position") # ID of item
+    position = request.form.get("position") # name of position
     batch = request.form.get("batch") # ID of item
     subholder = request.form.get("subholder")
 

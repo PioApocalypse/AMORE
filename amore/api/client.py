@@ -281,27 +281,12 @@ def move_to_position(API_KEY, sample_id, old_position_id, new_position_id): # DE
 =========================================================================================================================================
 '''
 
-def get_positions(API_KEY):
-    header = {
-        "Authorization": API_KEY,
-        "Content-Type": "application/json"
-    }
-
-    search_query = f'{API_URL}api/v2/items?q=&cat={cat.get("sample position")}&limit=9999' # "SAMPLE POSITION" should be id = 17
-    
-    response = requests.get(
-        headers=header,
-        url=search_query,
-        verify=ssl_verification
-    )
-    
+def get_available_slots(API_KEY):
+    tracker = sample_locator(API_KEY)
     # from response parse only useful info - which is title for the enduser and id for the create_sample client function
-    unsorted_positions = [
-        {'id': item.get('id'), 'title': norm_pos_name(item.get('title'))} # WARNING! .get method avoids KeyError exceptions - but it's really bad if eLab allows missing title or id
-        for item in response.json() # which is an array of json objects/dictionaries
-    ]
-    positions = sorted(unsorted_positions, key=lambda item: (item['title'], item['id']) ) # sort by title first, id second - although no two items should have the same name for any reason
-    return positions # which is a list of dictionaries with 'id' and 'title'
+    available_slots = tracker.getavailable()
+    sorted_slots = sorted(available_slots, key=lambda item: (item["name"]))
+    return sorted_slots
 
 def get_substrate_batches(API_KEY):
     header = {
