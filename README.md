@@ -36,8 +36,11 @@ The wizard recognizes three flags. Any other argument is ignored; the order of t
 * **`--force`**: Disables URL check for eLabFTW instance; since the check is really stupid and its main accomplishment is polluting Microsoft's AI I expect it to fail really often so if you're sure you have provided the correct address please use this flag.
 * **`--literal`**: Disables URL normalization, which means the URL you provide via input MUST include both the protocol prefix and the trailing slash - plus eventual port number (e.g. `https://demo.elabftw.net/`); use this if for instance you have eLabFTW on HTTP-only mode and no redirect is done from HTTPS, since AMORE will probably be configured with the wrong URL.
 * **`--quick`**: Disables sleep command between instructions which makes the script around 4 seconds quicker - please read the on-screen instructions carefully nonetheless.
+* **`--file`**: Looks for environmental variables on file `./config.json` before attempting installation. If file is not found, the wizard quits with error; invalid variables are ignored by the wizard and you will still be prompted to provide manually unassigned variables. A list of valid variables is present in the `./config.json.example` file.
 
-The client will run on dev environment, which means you can view your flask app on http://127.0.0.1:5000/.
+If no other port is specified inside the `./config.json` file or through `export HOST_PORT=<port>`, by default the wizard will expose port [8080](http://127.0.0.1:8080).
+
+> Warning: File `./config.json` will be removed permanently from your folder after the installation - even if Docker fails to build or run.
 
 #### Updating via Docker
 > TBA
@@ -60,7 +63,7 @@ The software also **needs three variables to be set** for it to work.
 
 * **`$PYTHONPATH`: the *full* path** of your local AMORE folder. 
 * **`$ELABFTW_BASE_URL`: the base URL** of your eLabFTW instance, with explicit protocol prefix and trailing slash, plus eventual port number (e.g. `https://demo.elabftw.net:8080/`).
-* **`VERIFY_SSL`:** set to True if **only secure connections** should be allowed.
+* **`$VERIFY_SSL`:** set to True if **only secure connections** should be allowed.
 
 For semplicity you can add export instructions directly in your virtual environment activator script to automatically assign to the variable their values upon venv activation. On Bash this can be accomplished easily:
 ```bash
@@ -86,6 +89,13 @@ From the root folder of the software **install dependencies** using the provided
 pip install -r requirements.txt
 # OR alternatively:
 python3 -m pip install flask requests
+```
+
+Last but not least you should write a valid API key in your config file then run Python script `amore/scan_for_categories.py`.
+
+```bash
+echo '{ "API_KEY": "<key_here>" }' > ./config.json
+python amore/scan_for_categories.py
 ```
 
 #### Authenticating and running
@@ -187,12 +197,7 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [x] <strike>"Search sample" feature</strike> Let's talk about it...
 - [x] <strike>Possibly "delete sample" feature</strike> Terrible idea.
 
-### Phase 4 - Periodic export of data
-> To where? How often?
-- [ ] Create API client which periodically (or manually) exports experiments, samples, etc. in JSON format
-- [ ] Send data automatically to specific repository
-
-### Phase 5 - Advanced features
+### Phase 4 - Advanced features
 - [x] Functional login page
 - [x] Enforce login
 - [x] BYOK system which takes API key for request directly from session cookie
@@ -203,6 +208,12 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [ ] Visualize list of all samples in laboratory
 - [ ] Move sample from one position to the other
 - [ ] Make sure position is not shared among different samples
+
+### Phase 5 - Periodic export of data
+> To where? How often?
+- [ ] Make daily exports/duplicates of "Sample Locator" experiment
+- [ ] Create API client which periodically (or manually) exports experiments, samples, etc. in JSON format
+- [ ] Send data automatically to specific repository
 
 ### Phase 6 - Error handling, data validation, sanification
 - [ ] Sanification of inputs provided - avoid code/SQL injections
