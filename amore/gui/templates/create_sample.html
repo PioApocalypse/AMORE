@@ -57,7 +57,7 @@
                                 <select id="position" name="position" required>
                                     <option value="" selected="selected">- Select a position -</option>
                                     {% for i in positions %}
-                                        <option value="{{ i['id'] }}">{{ i['title'] }}</option> <!-- ID for position {{ i['title'] }} is: {{ i['id'] }} -->
+                                        <option value="{{ i['name'] }}">{{ i["name"] }}</option> <!-- ID for position {{ i['title'] }} is: {{ i['id'] }} -->
                                     {% endfor %}
                                 </select>
                             </div>
@@ -67,7 +67,7 @@
                                 <select id="batch" name="batch" required>
                                     <option value="" selected="selected">- Select a batch -</option>
                                     {% for i in batches %}
-                                        <option value="{{ i['id'] }}">{{ i['title'] }}</option>
+                                        <option value="{{ i['id'] }}">{{ i["title"] }}</option>
                                     {% endfor %}
                                 </select>
                             </div>

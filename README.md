@@ -197,16 +197,16 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [x] Enforce login
 - [x] BYOK system which takes API key for request directly from session cookie
 - [x] Log out buttons
-- [ ] Testing on server
-- [x] Post new sample to any position, linking sample to position
-- [x] Move sample from one position to the other
+- [x] Testing on server
+- [x] Post new sample to only available positions
+- [x] Add sample to its position in "Sample Locator" experiment
+- [ ] Visualize list of all samples in laboratory
+- [ ] Move sample from one position to the other
 - [ ] Make sure position is not shared among different samples
-    * Don't even show position in create_sample form if already occupied (except for "*LOST", "out-of-chamber", etc.)
-- [ ] Visualize list of positions
 
 ### Phase 6 - Error handling, data validation, sanification
 - [ ] Sanification of inputs provided - avoid code/SQL injections
-- [ ] Warn user if posting fails, say reason
+- [x] Warn user if posting fails, say reason
 > TBA
 
 ### Phase 7 COMPLETE - Login shenanigans
