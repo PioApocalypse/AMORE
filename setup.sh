@@ -158,25 +158,14 @@ if [[ -z "$API_KEY" ]]; then
         fi
     done
 fi
-# echo # new line
-# if [[ -z "$KEY" ]]; then
-#     echo "API key not provided. Please make sure to run:"
-#     echo "  python amore/scan_for_categories.py"
-#     echo "BEFORE running this script."
-#     exit 1
-# fi
-# export ELABFTW_BASE_URL=$ELABFTW_BASE_URL
-# export VERIFY_SSL=$VERIFY_SSL
-# export PYTHONPATH=$(pwd)
-# python3 amore/scan_for_categories.py
-# if [ ${PIPESTATUS[0]} -ne 0 ]; then
-#     exit 1
-# fi
 
+if [[ -z "$HOST_PORT" ]]; then
+    export HOST_PORT=8080
+fi
 
 echo
 echo "Building the docker image with following parameters:"
-echo -e "URL: $ELABFTW_BASE_URL\nSSL verification: $VERIFY_SSL"
+echo -e "URL: $ELABFTW_BASE_URL\nSSL verification: $VERIFY_SSL\nPublishing on port: $HOST_PORT"
 read -p "Press enter to continue, or ^C to abort."
 
 echo
@@ -220,9 +209,9 @@ echo
 echo "Docker image ready."
 echo "Running the container..."
 sleep $SLEEP
-docker run -d -p 80:5000 --name amore-container --restart always amore && \
+docker run -d -p ${HOST_PORT}:5000 --name amore-container --restart always amore && \
     echo && \
-    echo "AMORE is now running on http://localhost:80." && \
+    echo "AMORE is now running on http://localhost:${HOST_PORT}." && \
     echo "Thank you for your patience. ♥"
 sleep $SLEEP
 
