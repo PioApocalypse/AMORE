@@ -197,12 +197,7 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [x] <strike>"Search sample" feature</strike> Let's talk about it...
 - [x] <strike>Possibly "delete sample" feature</strike> Terrible idea.
 
-### Phase 4 - Periodic export of data
-> To where? How often?
-- [ ] Create API client which periodically (or manually) exports experiments, samples, etc. in JSON format
-- [ ] Send data automatically to specific repository
-
-### Phase 5 - Advanced features
+### Phase 4 - Advanced features
 - [x] Functional login page
 - [x] Enforce login
 - [x] BYOK system which takes API key for request directly from session cookie
@@ -213,6 +208,12 @@ ERROR tests/post_sample.py - requests.exceptions.JSONDecodeError: Expecting valu
 - [ ] Visualize list of all samples in laboratory
 - [ ] Move sample from one position to the other
 - [ ] Make sure position is not shared among different samples
+
+### Phase 5 - Periodic export of data
+> To where? How often?
+- [ ] Make daily exports/duplicates of "Sample Locator" experiment
+- [ ] Create API client which periodically (or manually) exports experiments, samples, etc. in JSON format
+- [ ] Send data automatically to specific repository
 
 ### Phase 6 - Error handling, data validation, sanification
 - [ ] Sanification of inputs provided - avoid code/SQL injections
