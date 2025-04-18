@@ -9,6 +9,7 @@ External modules. In particular, from flask:
 '''
 from flask import Flask, request, render_template, redirect, flash, get_flashed_messages, session
 import secrets # for session cookies
+from datetime import timedelta # for session timeout
 import os # use method os.environ.get() to bypass the need for a .env file/dotenv module
 import amore.api.client as amore # client module, see: amore/api/client.py
 import amore.api.utils as utils # utilities module, see: amore/api/utils.py
@@ -48,6 +49,10 @@ is just redirect to login page, otherwise, execute the rest.
     # <rest of the function>
 '''
 
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=10)
 
 
 @app.route("/login", methods=["GET","POST"])
@@ -104,7 +109,8 @@ def home():
         return check
     API_KEY = session.get('api_key')
     user = session.get('user') or "unspecified user"
-    positions = amore.get_positions(API_KEY) # which is a list of dicts
+    tracker = amore.sample_locator(API_KEY)
+    positions = amore.get_available_slots(API_KEY, tracker) # which is a list of dicts
     batches = amore.get_substrate_batches(API_KEY) # which is a list of dicts
     proposals = amore.get_proposals(API_KEY) # you get the gist
     return render_template("create_sample.html", user=user, positions=positions, batches=batches, proposals=proposals)
@@ -116,7 +122,7 @@ def handle_create_sample():
         return check
     API_KEY = session.get('api_key')
     title = request.form.get("title")
-    position = request.form.get("position") # ID of item
+    position = request.form.get("position") # name of position
     batch = request.form.get("batch") # ID of item
     subholder = request.form.get("subholder")
 

@@ -31,11 +31,30 @@ normalize_url() {
     # Add https:// prefix and trailing slash
     echo "https://$url/"
 }
+# Get setup variables from config.json
+parse_and_export_json() {
+    local json_file="$1"
+    # Is jq installed?
+    if ! command -v jq &> /dev/null; then
+        echo "ERROR: jq not installed, skipping read from --file option."
+        exit 1
+    fi
+    while IFS="=" read -r key value; do
+        if [[ -n "$key" ]]; then
+            export "$key"="$value"
+            echo "Exporting: $key=$( echo $value | cut -c1-20 )..."
+        fi
+    done < <(jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" "$json_file")
+    sleep $SLEEP
+    echo
+}
 
 
 # Check arguments for options: --force, --literal
 # Literal mode: do not normalize the url
 literal_mode=false
+force_mode=false
+SLEEP=1
 for arg in "$@"; do
     if [[ "$arg" == "--literal" ]]; then
         literal_mode=true
@@ -43,7 +62,6 @@ for arg in "$@"; do
     fi
 done
 # Force mode: skip check for elab instance on url
-force_mode=false
 for arg in "$@"; do
     if [[ "$arg" == "--force" ]]; then
         force_mode=true
@@ -51,10 +69,23 @@ for arg in "$@"; do
     fi
 done
 # Quick mode: no sleeping between instructions
-SLEEP=1
 for arg in "$@"; do
     if [[ "$arg" == "--quick" ]]; then
         SLEEP=0
+        break
+    fi
+done
+# Look for config file
+for arg in "$@"; do
+    if [[ "$arg" == "--file" ]]; then
+        file_path="./config.json"
+        if [[ -f "$file_path" ]]; then
+            echo "Config file found: $file_path"
+            parse_and_export_json "$file_path"
+        else
+            echo "File not found: $file_path"
+            exit 1
+        fi
         break
     fi
 done
@@ -66,32 +97,34 @@ sleep $SLEEP
 echo
 
 # Normalize and check for elab instance if proper flags not specified
-while true; do
-    if [[ "$literal_mode" == false ]]; then
-        read -p "Please input the url of a valid eLabFTW instance: " ELABFTW_BASE_URL
-        ELABFTW_BASE_URL=$(normalize_url "$ELABFTW_BASE_URL")
-    else echo "Warning: Literal mode enabled, URL will be passed as-is."
-        echo "Please make sure to include the correct protocol prefix (e.g. http://...)"
-        echo "And make sure the URL ends with a trailing slash (e.g. ...host.it/)."
-        read -p "Please input the url of a valid eLabFTW instance: " ELABFTW_BASE_URL
-    fi
-    if [[ "$force_mode" == true ]]; then
-        echo "Warning: Force mode enabled, skipping website validation."
-        echo "Normalized URL: $ELABFTW_BASE_URL"
-        echo
-        break
-    fi
+if [[ -z "$ELABFTW_BASE_URL" ]]; then
+    while true; do
+        if [[ "$literal_mode" == false ]]; then
+            read -p "Please input the url of a valid eLabFTW instance: " ELABFTW_BASE_URL
+            ELABFTW_BASE_URL=$(normalize_url "$ELABFTW_BASE_URL")
+        else echo "Warning: Literal mode enabled, URL will be passed as-is."
+            echo "Please make sure to include the correct protocol prefix (e.g. http://...)"
+            echo "And make sure the URL ends with a trailing slash (e.g. ...host.it/)."
+            read -p "Please input the url of a valid eLabFTW instance: " ELABFTW_BASE_URL
+        fi
+        if [[ "$force_mode" == true ]]; then
+            echo "Warning: Force mode enabled, skipping website validation."
+            echo "Normalized URL: $ELABFTW_BASE_URL"
+            echo
+            break
+        fi
 
-    echo "Checking..." && sleep $SLEEP
-    if check_elabftw "$ELABFTW_BASE_URL"; then
-        echo "Valid eLabFTW URL: $ELABFTW_BASE_URL"
-        echo
-        break
-    else
-        echo -e "Error: eLabFTW instance not found on $ELABFTW_BASE_URL.\nIf you're sure an instance exists you may\noverride this lock with the --force option."
-        echo
-    fi
-done
+        echo "Checking..." && sleep $SLEEP
+        if check_elabftw "$ELABFTW_BASE_URL"; then
+            echo "Valid eLabFTW URL: $ELABFTW_BASE_URL"
+            echo
+            break
+        else
+            echo -e "Error: eLabFTW instance not found on $ELABFTW_BASE_URL.\nIf you're sure an instance exists you may\noverride this lock with the --force option."
+            echo
+        fi
+    done
+fi
 
 # echo "Please provide your own API key."
 # echo "API keys can be generated on your profile"
@@ -110,38 +143,29 @@ if [[ -z "$secure" ]]; then
     esac
 fi
 
-echo "Please provide a temporary API key."
-echo "It will be deleted automatically after successful setup."
-echo "API keys can be generated on your profile."
-echo "See: https://doc.elabftw.net/api.html#generating-a-key"
-echo
-while true; do
-    read -s -p "Paste your key here (echo off): " API_KEY # password-like
-    if [[ -z "$API_KEY" ]]; then
-        echo "Don't leave this field empty."
-    else
-        break
-    fi
-done
-# echo # new line
-# if [[ -z "$KEY" ]]; then
-#     echo "API key not provided. Please make sure to run:"
-#     echo "  python amore/scan_for_categories.py"
-#     echo "BEFORE running this script."
-#     exit 1
-# fi
-# export ELABFTW_BASE_URL=$ELABFTW_BASE_URL
-# export VERIFY_SSL=$VERIFY_SSL
-# export PYTHONPATH=$(pwd)
-# python3 amore/scan_for_categories.py
-# if [ ${PIPESTATUS[0]} -ne 0 ]; then
-#     exit 1
-# fi
+if [[ -z "$API_KEY" ]]; then
+    echo "Please provide a temporary API key."
+    echo "It will be deleted automatically after successful setup."
+    echo "API keys can be generated on your profile."
+    echo "See: https://doc.elabftw.net/api.html#generating-a-key"
+    echo
+    while true; do
+        read -s -p "Paste your key here (echo off): " API_KEY # password-like
+        if [[ -z "$API_KEY" ]]; then
+            echo "Don't leave this field empty."
+        else
+            break
+        fi
+    done
+fi
 
+if [[ -z "$HOST_PORT" ]]; then
+    export HOST_PORT=8080
+fi
 
 echo
 echo "Building the docker image with following parameters:"
-echo -e "URL: $ELABFTW_BASE_URL\nSSL verification: $VERIFY_SSL"
+echo -e "URL: $ELABFTW_BASE_URL\nSSL verification: $VERIFY_SSL\nPublishing on port: $HOST_PORT"
 read -p "Press enter to continue, or ^C to abort."
 
 echo
@@ -185,9 +209,9 @@ echo
 echo "Docker image ready."
 echo "Running the container..."
 sleep $SLEEP
-docker run -d -p 5000:5000 --name amore-container --restart always amore && \
+docker run -d -p ${HOST_PORT}:5000 --name amore-container --restart always amore && \
     echo && \
-    echo "AMORE is now running on http://localhost:5000." && \
+    echo "AMORE is now running on http://localhost:${HOST_PORT}." && \
     echo "Thank you for your patience. ♥"
 sleep $SLEEP
 
