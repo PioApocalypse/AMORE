@@ -180,11 +180,21 @@ def handle_positions():
     if check != 0:
         return check
     API_KEY = session.get('api_key')
+    ELABFTW_BASE_URL = os.getenv('ELABFTW_BASE_URL')
     user = session.get('user') or "unspecified user"
     tracker = amore.sample_locator(API_KEY) # which is an object of class Tracker
     slots = tracker.getslots() # see help(Tracker.getslots)
-    return render_template("tracker.html", user=user, slots=slots)
+    return render_template("tracker.html", baseurl=ELABFTW_BASE_URL, user=user, slots=slots)
 
+# check = check_session()
+# if check != 0:
+#     check
+# else:
+#     API_KEY = session.get('api_key')
+#     tracker = amore.sample_locator(API_KEY)
+
+# @app.route("/")
+    
 
 if __name__ == '__main__':
     app.run(debug=True)

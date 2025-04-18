@@ -13,3 +13,19 @@ button {
     display: flex;
     justify-content: center;
 }
+
+.available {
+    color: #a4a4a4;
+}
+
+.lesser-button {
+    padding:0.5rem;
+    background-color: #ffe6c6 !important;
+    color: #4e1d1d !important;
+}
+
+.lesser-button:hover {
+    padding:0.5rem;
+    background-color: #ffd6a1 !important;
+    color: #4e1d1d !important;
+}
