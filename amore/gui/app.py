@@ -186,14 +186,23 @@ def handle_positions():
     slots = tracker.getslots() # see help(Tracker.getslots)
     return render_template("tracker.html", baseurl=ELABFTW_BASE_URL, user=user, slots=slots)
 
-# check = check_session()
-# if check != 0:
-#     check
-# else:
-#     API_KEY = session.get('api_key')
-#     tracker = amore.sample_locator(API_KEY)
+try:
+    shortlist = utils.slots_shortlist()
+except FileNotFoundError as f:
+    print(f"One or more configuration files were not found:\n{f}")
+    
+for item in shortlist:
+    name = item.get("name").replace(" ","")
 
-# @app.route("/")
+    @app.route(f"/tracker/{name}", endpoint=f"tracker_{name}") # it is necessary to specify the endpoint name to be unique to avoid conflicts 
+    def manage_slot(item=item):
+        check = check_session()
+        if check != 0:
+            return check
+        API_KEY = session.get('api_key')
+        tracker = amore.sample_locator(API_KEY)
+        slot = [ i for i in tracker.getslots() if i.get("name") == item.get("name") ][0]
+        return render_template("slot.html", slot=item, a=slot)
     
 
 if __name__ == '__main__':
