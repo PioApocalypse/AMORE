@@ -15,11 +15,12 @@ full_elab_url = f"{API_URL}api/v2/" # API endpoint root for eLabFTW
 experiments_url = f"{full_elab_url}experiments" # API endpoint /experiments
 ssl_verification = os.getenv('VERIFY_SSL').lower() == 'true' # this way you can toggle SSL verification in .env file
 
-if os.path.isfile('amore/var/categories.json'):
-    with open('amore/var/categories.json', 'r') as catfile:
+filename = "amore/var/categories.json"
+if os.path.isfile(filename):
+    with open(filename, 'r') as catfile:
         cat = json.load(catfile)
 else:
-    print(f'No "amore/var/categories.json" file found.\nPlease run amore/scan_elab.py.')
+    raise FileNotFoundError(f"No {filename} file found.\nPlease run amore/scan_elab.py.")
 
 '''
 =========================================================================================================================================

@@ -124,7 +124,22 @@ def tmp_remover(attachments):
     for _, (_, file) in attachments:
         file.close()
         os.remove(file.name)
-        
+
+'''
+=============
+Miscellaneous
+=============
+'''
+
+def slots_shortlist():
+    filename = "amore/var/slots.json"
+    if os.path.isfile(filename):
+        with open(filename) as f:
+            shortlist = json.load(f)
+        return shortlist
+    else:
+        raise FileNotFoundError(f"No {filename} file found.\nPlease run amore/scan_elab.py.")
+
 
 if __name__=="__main__":
     print("Debug mode.")
