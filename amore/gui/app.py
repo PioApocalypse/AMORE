@@ -180,10 +180,9 @@ def handle_positions():
     if check != 0:
         return check
     API_KEY = session.get('api_key')
-    positions = amore.get_positions(API_KEY) # which is a list of dicts
-    batches = amore.get_substrate_batches(API_KEY) # which is a list of dicts
-    proposals = amore.get_proposals(API_KEY) # you get the gist
-    return render_template("positions.html", positions=positions, batches=batches, proposals=proposals)
+    tracker = amore.sample_locator(API_KEY) # which is an object of class Tracker
+    slots = tracker.getslots() # see help(Tracker.getslots)
+    return #render_template("positions.html", slots=slots)
 
 
 if __name__ == '__main__':
