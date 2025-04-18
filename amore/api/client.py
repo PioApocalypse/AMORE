@@ -110,7 +110,7 @@ def add_to_position(API_KEY, sample_id, position_name): # POST to empty position
 def move_to_position(API_KEY, sample_id, old_position_name, new_position_name): # DELETE from old position then POST to empty position
     if (old_position_name == new_position_name
         or (not old_position_name and not new_position_name)): # neutral condition, just to be safe (both null or both equal)
-        return 0
+        raise Exception("New and old position correspond.")
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"
