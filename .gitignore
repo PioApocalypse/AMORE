@@ -9,3 +9,4 @@ config.json
 # other
 **/__pycache__
 **/categories.json
+**/slots.json

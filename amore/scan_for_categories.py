@@ -2,13 +2,18 @@ import requests
 import os
 import json
 from datetime import datetime
+from amore.api.client import sample_locator
+
 # Global variables:
 with open('config.json') as cfg:
     config = json.load(cfg)
 
-API_URL = config.get('ELABFTW_BASE_URL')
+API_URL = config.get('ELABFTW_BASE_URL') or os.environ('ELABFTW_BASE_URL') # software will eventually return error if no URL is provided
 types_endpoint = f"{API_URL}api/v2/items_types/"
-ssl_verification = str(config.get('VERIFY_SSL')).lower() == 'true' # this way you can toggle SSL verification in .env file
+if config.get('VERIFY_SSL'):
+    ssl_verification = str(config.get('VERIFY_SSL')).lower() == 'true' # this way you can toggle SSL verification in .env file
+else:
+    ssl_verification = True # in case VERIFY_SSL is not provided
 
 def check_apikey(KEY=""):
     # No sense proceeding if the user somehow submitted an empty key...
@@ -52,10 +57,8 @@ def check_apikey(KEY=""):
     user = response.json()['fullname']
     return user
 
-'''
-Function to scan the endpoint and save in a dictionary with 'title' as key and 'id' as value:
-'''
 def scan_for_categories(API_KEY):
+    '''Function to scan the endpoint and save in a dictionary with 'title' as key and 'id' as value.'''
     header = {"Authorization": API_KEY, "Content-Type": "application/json"}
     response = requests.get(
         url=types_endpoint,
@@ -63,6 +66,7 @@ def scan_for_categories(API_KEY):
         verify=ssl_verification)
     categories = { item['title'].lower(): item['id'] for item in response.json() }
     return categories
+
 
 if __name__=="__main__":
     x = 3 # number of possible attempts
@@ -80,7 +84,11 @@ if __name__=="__main__":
             x -= 1
 
     categories = scan_for_categories(API_KEY)
-    with open('amore/var/categories.json', 'w') as cat:
-        json.dump(categories, cat)
+    with open('amore/var/categories.json', 'w') as f:
+        json.dump(categories, f)
         print("Categories file updated.")
+    slots = sample_locator(API_KEY).shortlist()
+    with open('amore/var/slots.json', 'w') as f:
+        json.dump(slots, f, indent=1)
+        print("Slots file updated.")
     API_KEY = ""

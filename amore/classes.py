@@ -92,6 +92,17 @@ class Tracker:
                 }
                 slotlist.append(response) # object containing full location of the slot ("name" key), instrument name ("inst" key) and the sample associated if any ("sample" key)
         return slotlist
+    def shortlist(self):
+        '''Trimmed version of "getslots()" with fewer keys.'''
+        slotlist = self.getslots()
+        shortlist = [ {
+            "name": item.get("name"),
+            "slot": item.get("slot"),
+            "sector": item.get("sector"),
+            "inst_name": item.get("inst_name"),
+            "inst_code": item.get("inst_code") }
+            for item in slotlist ]
+        return shortlist
     def getavailable(self):
         '''Returns list of available slots.'''
         available = []
