@@ -1,0 +1,16 @@
+= AMORE User Manual
+:author: Emanuele D'Amico
+:mail: <pioapocalypse@proton.me>
+:toc:
+:toclevels: 3
+:version: alpha-0.1.0
+
+== Login and session
+
+== "Create Sample" feature
+
+== "Sample Tracking" feature
+
+=== Export "Sample Locator" experiment
+
+== Export info on specific sample
