@@ -3,9 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMORE for eLabFTW</title>
-    <link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}">
+    <title>Positions - AMORE for eLabFTW</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
+    <link rel="stylesheet" href="{{ url_for('static',filename='tracker.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='flash.css') }}">
+    <script
+			  src="https://code.jquery.com/jquery-3.7.1.js"
+			  integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+			  crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js">let table = new DataTable('#myTable');</script>
+		
 </head>
 <body>
     <!-- Flask flash pop-ups -->
@@ -22,36 +30,44 @@
         {% endwith %}
     </div>
 
-    <div class="form-container">
-    <div class="home-grid" style="gap: 2rem;">
+    <div class="home-grid">
         <div class="home-column">
             <div class="title-box">
-                <a title="Refresh page" href="/"><h1>AMORE for eLabFTW</h1></a>
-                <p align="center"><b>Autonomous Management of Outputs<br>for Research Efficiency</b></p>
+                <a title="Back to index" href="/"><h1>AMORE for eLabFTW</h1></a>
+                <h3 align="center">Sample Tracker</h3>
             </div>
+        </div>
+        <div class="home-column">
             <div class="title-box">
                 <p align="center">Authenticated as <u>{{ user }}</u></p>
             </div>
-        </div>
-        <div class="home-column" style="min-width: 300px; margin: 0 0; gap: 1rem">
-            <a href="/create">
-                <div align=center class="button lesser-button">
-                    <p style="font-size: 1.1rem;">Create New Sample</p>
-                </div>
-            </a>
-            <a href="/tracker">
-                <div align=center class="button lesser-button">
-                    <p style="font-size: 1.1rem;">Sample Tracker</p>
-                </div>
-            </a>
-            <a href="/logout">
+            <a href="/logout" style="width: auto; margin: 0 5rem;">
                 <div align=center class="button">
                     <p style="font-size: 1.1rem;">Log Out</p>
                 </div>
             </a>
         </div>
     </div>
-    </div>
+
+    <table id="myTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Instrument</th>
+                <th>Sample ID</th>
+                <th>Sample Name</th>
+            </tr>
+        </thead>
+        {% for item in slots %}
+            <tr>
+                <td>{{ item.get("name") }}</td>
+                <td>{{ item.get("inst_name") }}</td>
+                <td>{{ item.get("sample_stdid") }}</td>
+                <td>{{ item.get("sample_name") }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
     <footer>
         <div>alpha ver. for development only</div>
         <div align="right"><a href="https://github.com/PioApocalypse/AMORE" target="_blank">Star me on GitHub</a></div>
@@ -59,7 +75,7 @@
 
     <!-- Javascript time -->
     <script>
-        // function to remove a flash element
+        // Function to remove a flash element
         function removeFlashMessage(flashElement) {
             flashElement.classList.add('fade-out');
             setTimeout(() => {
@@ -67,7 +83,7 @@
             }, 500); // Wait for the fade-out animation to complete
 }
 
-        // auto-close flash messages after 30 seconds
+        // Auto-close flash messages after 30 seconds
         document.addEventListener('DOMContentLoaded', function() {
             const flashMessages = document.querySelectorAll('.flash');
             const timeout_seconds = 30; // timeout duration stored - in seconds - in other variable
@@ -75,16 +91,25 @@
                 const timebar = flash.querySelector('.timebar');
                 const duration = timeout_seconds*1000; // in milliseconds
 
-                // dynamic animation duration
+                // Dynamic animation duration
                 timebar.style.animationDuration = `${duration / 1000}s`;
 
-                // close after timeout
+                // Close after timeout
                 setTimeout(() => {
                     removeFlashMessage(flash);
                 }, duration);
             });
         });
 
+    </script>
+
+    <!-- Initialize DataTable -->
+    <script>
+        $(document).ready( function () {
+            $('#myTable').DataTable( {
+                "pageLength": 10
+            } );
+        } );
     </script>
 </body>
 </html>

@@ -71,7 +71,7 @@ def login():
             session['api_key'] = API_KEY
             flash(f"Welcome, {session['user']}!", 'success')
             # flash(f"Here's you key: {session['api_key']}", 'success') # debug only
-            return redirect("/create")
+            return redirect("/")
         except Exception as e:
             flash(str(e), 'error')
             # return redirect("/login")
@@ -174,15 +174,16 @@ def handle_create_sample():
     # redirect back to the home page
     return redirect("/create")
 
-@app.route("/positions")
+@app.route("/tracker")
 def handle_positions():
     check = check_session()
     if check != 0:
         return check
     API_KEY = session.get('api_key')
+    user = session.get('user') or "unspecified user"
     tracker = amore.sample_locator(API_KEY) # which is an object of class Tracker
     slots = tracker.getslots() # see help(Tracker.getslots)
-    return #render_template("positions.html", slots=slots)
+    return render_template("tracker.html", user=user, slots=slots)
 
 
 if __name__ == '__main__':

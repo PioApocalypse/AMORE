@@ -1,0 +1,15 @@
+@import "styles.css";
+
+body {
+    display: block; 
+    margin: 2rem 10rem; 
+}
+
+button {
+    width: auto;
+}
+
+.home-grid {
+    display: flex;
+    justify-content: center;
+}
