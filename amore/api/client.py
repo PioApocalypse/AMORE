@@ -19,7 +19,7 @@ if os.path.isfile('amore/var/categories.json'):
     with open('amore/var/categories.json', 'r') as catfile:
         cat = json.load(catfile)
 else:
-    print(f'No "amore/var/categories.json" file found.\nPlease run amore/scan_for_categories.py.')
+    print(f'No "amore/var/categories.json" file found.\nPlease run amore/scan_elab.py.')
 
 '''
 =========================================================================================================================================

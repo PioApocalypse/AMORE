@@ -91,11 +91,11 @@ pip install -r requirements.txt
 python3 -m pip install flask requests
 ```
 
-Last but not least you should write a valid API key in your config file then run Python script `amore/scan_for_categories.py`.
+Last but not least you should write a valid API key in your config file then run Python script `amore/scan_elab.py`.
 
 ```bash
 echo '{ "API_KEY": "<key_here>" }' > ./config.json
-python amore/scan_for_categories.py
+python amore/scan_elab.py
 ```
 
 #### Authenticating and running
