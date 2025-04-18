@@ -3,44 +3,61 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Positions - AMORE for eLabFTW</title>
-        <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
-        <link rel="stylesheet" href="{{ url_for('static',filename='tracker.css') }}">
+        <title>Create new sample - AMORE for eLabFTW</title>
+        <link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}">
         <link rel="stylesheet" href="{{ url_for('static',filename='flash.css') }}">
-        <script
-			  src="https://code.jquery.com/jquery-3.7.1.js"
-			  integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
-			  crossorigin="anonymous">
-    </script>
-    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js">let table = new DataTable('#myTable');</script>
-    
-</head>
-<body>
-    <!-- Flask flash pop-ups -->
-    <div class="flash-messages">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="flash {{ category }}">
-            {{ message }}
-            <span class="close-btn" onclick="this.parentElement.remove()">×</span>
+    </head>
+    <body>    <!-- Flask flash pop-ups -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">
+                            {{ message }}
+                            <span class="close-btn" onclick="this.parentElement.remove()">×</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
         </div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
-    </div>
     
-    <!-- GET NAME OF SLOT -->
-    TESTING {{ slot.get("name") }}
-
-    <!-- IS SLOT AVAILABLE? -->
-    <div>
-        {% if a.get("available") == True %}
-            SLOT IS AVAILABLE
-        {% else %}
-            SLOT IS OCCUPIED BY {{ a.get("sample_stdid") }}
-        {% endif %}
-    </div>
+        <div class="home-grid">
+            <!-- TITLE -->
+            <div class="home-column">
+                <div class="title-box">
+                    <a title="Back to index" href="/"><h1>AMORE for eLabFTW</h1></a>
+                    <p align="center"><b>Autonomous Management of Outputs<br>for Research Efficiency</b></p>
+                </div>
+                <div class="title-box">
+                    <p align="center">Authenticated as <u>{{ user }}</u></p>
+                </div>
+                <a href="/logout" style="width: auto; margin: 0 5rem;">
+                    <div align=center class="button">
+                        <p style="font-size: 1.1rem;">Log Out</p>
+                    </div>
+                </a>
+            </div>
+    
+            <!-- FORM -->
+            <div class="home-column">
+                <div class="form-container form-container">
+                    <!-- GET NAME OF SLOT -->
+                    <h2>POSITION: {{ slot.get("name") }}</h2>
+                
+                    <!-- IS SLOT AVAILABLE? -->
+                    <div>
+                        {% if slot.get("available") == True %}
+                            <h4 style="color: #25a025;">THIS SLOT IS: AVAILABLE</h4>
+                        {% else %}
+                            <h3 style="color: #a02525;">THIS SLOT IS: OCCUPIED BY {{ slot.get("sample_stdid") }}</h3>
+                            <p>Sample from {{ slot.get("sample_stdid")[:2] }} n°{{ slot.get("sample_stdid")[6:9] }} of year 20{{ slot.get("sample_stdid")[3:5] }}:</p>
+                            <p>{{ slot.get("sample_name") }}</p>
+                            <p><a href="{{ baseurl }}database.php?mode=view&id={{ slot.get("sample_id") }}" target="_blank">Open on eLabFTW</a></p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>    
 
     <footer>
         <div>alpha ver. for development only</div>
@@ -49,7 +66,7 @@
 
     <!-- Javascript time -->
     <script>
-        // Function to remove a flash element
+        // function to remove a flash element
         function removeFlashMessage(flashElement) {
             flashElement.classList.add('fade-out');
             setTimeout(() => {
@@ -57,7 +74,7 @@
             }, 500); // Wait for the fade-out animation to complete
 }
 
-        // Auto-close flash messages after 30 seconds
+        // auto-close flash messages after 30 seconds
         document.addEventListener('DOMContentLoaded', function() {
             const flashMessages = document.querySelectorAll('.flash');
             const timeout_seconds = 30; // timeout duration stored - in seconds - in other variable
@@ -65,25 +82,16 @@
                 const timebar = flash.querySelector('.timebar');
                 const duration = timeout_seconds*1000; // in milliseconds
 
-                // Dynamic animation duration
+                // dynamic animation duration
                 timebar.style.animationDuration = `${duration / 1000}s`;
 
-                // Close after timeout
+                // close after timeout
                 setTimeout(() => {
                     removeFlashMessage(flash);
                 }, duration);
             });
         });
 
-    </script>
-
-    <!-- Initialize DataTable -->
-    <script>
-        $(document).ready( function () {
-            $('#myTable').DataTable( {
-                "pageLength": 10
-            } );
-        } );
     </script>
 </body>
 </html>

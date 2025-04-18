@@ -200,9 +200,11 @@ for item in shortlist:
         if check != 0:
             return check
         API_KEY = session.get('api_key')
+        ELABFTW_BASE_URL = os.getenv('ELABFTW_BASE_URL')
+        user = session.get('user') or "unspecified user"
         tracker = amore.sample_locator(API_KEY)
         slot = [ i for i in tracker.getslots() if i.get("name") == item.get("name") ][0]
-        return render_template("slot.html", slot=item, a=slot)
+        return render_template("slot.html", baseurl=ELABFTW_BASE_URL, user=user, slot=slot)
     
 
 if __name__ == '__main__':
