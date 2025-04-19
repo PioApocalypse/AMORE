@@ -77,6 +77,7 @@
                                         <!-- THIS PART GETS POSITIONS (ITEMS) FROM ELABFTW AND AUTOMATICALLY PUTS THEM IN OUR FORM -->
                                         <select id="new_position_name" name="new_position_name" required>
                                             <option value="" selected="selected">- Select a position -</option>
+                                            <option value="None">* Remove from chamber *-</option>
                                             {% for i in available %}
                                                 <option value="{{ i['name'] }}">{{ i["name"] }}</option>
                                             {% endfor %}

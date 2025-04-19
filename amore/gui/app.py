@@ -216,6 +216,8 @@ def move_to_new():
     sample_id = request.form.get("sample_id")
     new_position_name = request.form.get("new_position_name")
     old_position_name = request.form.get("old_position_name")
+    if new_position_name == "None":
+        new_position_name = None
     amore.move_to_position(API_KEY=API_KEY, sample_id=sample_id, old_position_name=old_position_name, new_position_name=new_position_name)
     return render_template("test.html", sample_id=sample_id, old_position_name=old_position_name, new_position_name=new_position_name)
     
