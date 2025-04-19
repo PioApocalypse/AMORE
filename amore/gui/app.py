@@ -192,7 +192,7 @@ except FileNotFoundError as f:
     print(f"One or more configuration files were not found:\n{f}")
     
 for item in shortlist:
-    name = item.get("name").replace(" ","")
+    name = item.get("shortname")
 
     @app.route(f"/tracker/{name}", endpoint=f"tracker_{name}") # it is necessary to specify the endpoint name to be unique to avoid conflicts 
     def manage_slot(item=item):

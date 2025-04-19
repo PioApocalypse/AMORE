@@ -144,6 +144,11 @@ button:hover,
   background-color: #0056b3;
 }
 
+.lesser-button:hover {
+  background-color: #ffd6a1 !important;
+  color: #4e1d1d !important;
+}
+
 .red {
   font-weight: bolder;
   color: red;

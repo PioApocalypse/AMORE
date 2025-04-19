@@ -81,6 +81,7 @@ class Tracker:
                     samplename = None
                 response = {
                     "name": position,
+                    "shortname": position.replace(" ",""),
                     "slot": slotcode,
                     "sector": slotsector,
                     "inst_name": slotinstrument,
@@ -97,6 +98,7 @@ class Tracker:
         slotlist = self.getslots()
         shortlist = [ {
             "name": item.get("name"),
+            "shortname": item.get("shortname"),
             "slot": item.get("slot"),
             "sector": item.get("sector"),
             "inst_name": item.get("inst_name"),
