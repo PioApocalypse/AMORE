@@ -72,12 +72,14 @@ class Tracker:
                 try:
                     samplestdid = [ item.get("std-id")
                     for item in self.getsamples()
-                    if item.get("id") == slotsample ][0] # actual name of sample
-                    samplename = [ item.get("name")
-                    for item in self.getsamples()
-                    if item.get("id") == slotsample ][0] # actual name of sample
+                    if item.get("id") == int(slotsample) ][0] # actual name of sample
                 except:
                     samplestdid = None
+                try:
+                    samplename = [ item.get("name")
+                    for item in self.getsamples()
+                    if item.get("id") == int(slotsample) ][0] # actual name of sample
+                except:
                     samplename = None
                 response = {
                     "name": position,

@@ -47,12 +47,47 @@
                     <!-- IS SLOT AVAILABLE? -->
                     <div>
                         {% if slot.get("available") == True %}
-                            <h4 style="color: #25a025;">THIS SLOT IS: AVAILABLE</h4>
+                        <!--=========================
+                            CASE 1: SLOT IS AVAILABLE
+                        ==========================-->
+                            <h3 style="color: #25a025; margin-bottom: 1rem;">THIS SLOT IS: AVAILABLE</h3>
+                            <form action="/tracker/move_to_new" method="post" enctype="multipart/form-data">
+                                <div class="form-column">
+                                    <div class="form-group" style="gap:0.5rem">
+                                        <label for="sample_id">ID of the Sample on eLabFTW<span class="red" title="Required">*</span>:</label>
+                                        <input type="number" id="sample_id" name="sample_id" placeholder="ID of your sample" required>
+                                    </div>
+                                </div>
+                                <button type="submit">Add Sample to {{ slot.get("shortname") }}</button>
+                            </form>
+            
                         {% else %}
-                            <h3 style="color: #a02525;">THIS SLOT IS: OCCUPIED BY {{ slot.get("sample_stdid") }}</h3>
+                        <!--========================
+                            CASE 2: SLOT IS OCCUPIED
+                        =========================-->
+                            <h3 style="color: #a02525; margin-bottom: 1rem;">THIS SLOT IS: OCCUPIED BY {{ slot.get("sample_stdid") }}</h3>
                             <p>Sample from {{ slot.get("sample_stdid")[:2] }} n°{{ slot.get("sample_stdid")[6:9] }} of year 20{{ slot.get("sample_stdid")[3:5] }}:</p>
                             <p>{{ slot.get("sample_name") }}</p>
                             <p><a href="{{ baseurl }}database.php?mode=view&id={{ slot.get("sample_id") }}" target="_blank">Open on eLabFTW</a></p>
+                            <h3 style="margin: 1rem 0;">MOVE ELSEWHERE</h3>
+                            <form action="/tracker/move_to_new" method="post" enctype="multipart/form-data">
+                                <div class="form-column">
+                                    <div class="form-group">
+                                        <label for="new_position_name" title="Where is it located in your faculty?">New Position Name:<span class="red" title="Required">*</span>:</label>
+                                        <!-- THIS PART GETS POSITIONS (ITEMS) FROM ELABFTW AND AUTOMATICALLY PUTS THEM IN OUR FORM -->
+                                        <select id="new_position_name" name="new_position_name" required>
+                                            <option value="" selected="selected">- Select a position -</option>
+                                            {% for i in available %}
+                                                <option value="{{ i['name'] }}">{{ i["name"] }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <input type="hidden" name="sample_id" value="{{ slot.get("sample_id") }}">
+                                        <input type="hidden" name="old_position_name" value="{{ slot.get("name") }}">
+                                    </div>
+                                </div>
+                                <button type="submit">Move Sample to New Position</button>
+                            </form>
+
                         {% endif %}
                     </div>
                 </div>

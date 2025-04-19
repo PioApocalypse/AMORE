@@ -204,7 +204,20 @@ for item in shortlist:
         user = session.get('user') or "unspecified user"
         tracker = amore.sample_locator(API_KEY)
         slot = [ i for i in tracker.getslots() if i.get("name") == item.get("name") ][0]
-        return render_template("slot.html", baseurl=ELABFTW_BASE_URL, user=user, slot=slot)
+        available = tracker.getavailable()
+        return render_template("slot.html", baseurl=ELABFTW_BASE_URL, user=user, slot=slot, available=available)
+
+@app.route(f"/tracker/move_to_new", methods=["POST"])
+def move_to_new():
+    check = check_session()
+    if check != 0:
+        return check
+    API_KEY = session.get('api_key')
+    sample_id = request.form.get("sample_id")
+    new_position_name = request.form.get("new_position_name")
+    old_position_name = request.form.get("old_position_name")
+    amore.move_to_position(API_KEY=API_KEY, sample_id=sample_id, old_position_name=old_position_name, new_position_name=new_position_name)
+    return render_template("test.html", sample_id=sample_id, old_position_name=old_position_name, new_position_name=new_position_name)
     
 
 if __name__ == '__main__':
