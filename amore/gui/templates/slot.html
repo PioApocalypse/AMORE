@@ -56,6 +56,9 @@
                                     <div class="form-group" style="gap:0.5rem">
                                         <label for="sample_id">ID of the Sample on eLabFTW<span class="red" title="Required">*</span>:</label>
                                         <input type="number" id="sample_id" name="sample_id" placeholder="ID of your sample" required>
+                                        <!-- HIDDEN PRESET VALUES -->
+                                        <input type="hidden" name="old_position_name" value="None">
+                                        <input type="hidden" name="new_position_name" value="{{ slot.get("name") }}">
                                     </div>
                                 </div>
                                 <button type="submit">Add Sample to {{ slot.get("shortname") }}</button>
@@ -82,6 +85,7 @@
                                                 <option value="{{ i['name'] }}">{{ i["name"] }}</option>
                                             {% endfor %}
                                         </select>
+                                        <!-- HIDDEN PRESET VALUES -->
                                         <input type="hidden" name="sample_id" value="{{ slot.get("sample_id") }}">
                                         <input type="hidden" name="old_position_name" value="{{ slot.get("name") }}">
                                     </div>

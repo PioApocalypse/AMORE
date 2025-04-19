@@ -213,9 +213,17 @@ def move_to_new():
     if check != 0:
         return check
     API_KEY = session.get('api_key')
-    sample_id = request.form.get("sample_id")
+    tracker = amore.sample_locator(API_KEY)
+    sample_id = int(request.form.get("sample_id"))
     new_position_name = request.form.get("new_position_name")
     old_position_name = request.form.get("old_position_name")
+    if old_position_name == "None":
+        try:
+            old_position_name = [
+                item.get("name") for item in tracker.getslots()
+                if item.get("sample_id") == sample_id ][0]
+        except IndexError:
+            old_position_name = None
     if new_position_name == "None":
         new_position_name = None
     amore.move_to_position(API_KEY=API_KEY, sample_id=sample_id, old_position_name=old_position_name, new_position_name=new_position_name)
