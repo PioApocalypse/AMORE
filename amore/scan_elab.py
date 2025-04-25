@@ -71,7 +71,7 @@ def scan_for_categories(API_KEY):
 if __name__=="__main__":
     x = 3 # number of possible attempts
     while x > 0: # loop to decrease attempts
-        API_KEY = config.get('API_KEY') # or str(input("Enter a valid API key - it won't be stored: ")) # if not provided it's taken from environment variable
+        API_KEY = config.get('API_KEY') or os.environ.get('API_KEY') or str(input("Enter a valid API key - it won't be stored: ")) # if not provided it's taken from environment variable OR from input
         try:
             check_apikey(API_KEY) # if it checks out it's all good
             break
