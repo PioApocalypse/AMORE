@@ -91,7 +91,7 @@ for arg in "$@"; do
 done
 
 # STARTING POINT
-LICENSE=$(echo $(head -n 1 LICENSE))
+LICENSE=$(echo $(head -n 2 LICENSE))
 echo -e "By proceeding you acknowledge that AMORE is\npublished under $LICENSE."
 sleep $SLEEP
 echo
@@ -160,7 +160,7 @@ if [[ -z "$API_KEY" ]]; then
 fi
 
 if [[ -z "$HOST_PORT" ]]; then
-    export HOST_PORT=8080
+    export HOST_PORT=5000
 fi
 
 echo
