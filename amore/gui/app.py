@@ -1,6 +1,6 @@
 '''
 External modules. In particular, from flask:
-- Flask object implements the WSGI. Usage: app = Flask(__name__) - operations on variable 'app' setup the environment configuration.
+- Flask class implements the WSGI. Usage: app = Flask(__name__) - operations on variable 'app' setup the environment configuration.
 - request is used to get variables values from the HTML form upon submission.
 - render_template and redirect are quite obvious, look them up.
 - flash allows for "flash" (pop-up) messages to warn user if something goes wrong (or right).
@@ -20,14 +20,22 @@ app.secret_key = secrets.token_hex(16)
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024 # default Flask limit is 16 MB
 
 
-'''
-The following function is not associated to a route. It checks if current
-session contains an "api_key" non-null value then calls check_apikey
-function to verify if that value is a valid API key. If both this
-conditions are not met, it clears the entire session altogether and
-redirects to login. Otherwise it returns 0.
-'''
 def check_session():
+    '''
+    The following function is not associated to a route. It checks if current
+    session contains an "api_key" non-null value then calls check_apikey
+    function to verify if that value is a valid API key. If both this
+    conditions are not met, it clears the entire session altogether and
+    redirects to login. Otherwise it returns 0.
+    
+    Usage: if check_session() != 0 return output of check_session, which
+    is just redirect to login page, otherwise, execute the rest.
+
+        check = check_session()
+        if check != 0:
+            return check
+        # <rest of the function>
+    '''
     if session.get('api_key') == None:
         session.clear()
         return redirect("/login")
@@ -39,15 +47,6 @@ def check_session():
             session.clear()
             flash(str(e), 'error')
             return redirect("/login")
-'''
-Usage: if check_session() != 0 return output of check_session, which
-is just redirect to login page, otherwise, execute the rest.
-
-    check = check_session()
-    if check != 0:
-        return check
-    # <rest of the function>
-'''
 
 @app.before_request
 def make_session_permanent():

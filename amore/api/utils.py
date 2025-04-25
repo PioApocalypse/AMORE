@@ -81,8 +81,8 @@ def normalize_position_name(position_name):
     else:
         return position_name
 
-# function to normalize a value which is usually a string with a number or an empty string to integer
 def normalize_to_int(value):
+    '''Function to normalize a value which is usually a string with a number or an empty string to integer.'''
     if value == '':
         value = 0
     elif not isinstance(value, int):

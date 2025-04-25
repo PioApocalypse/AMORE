@@ -35,8 +35,8 @@ class Tracker:
     def getsamples(self):
         '''
         Gets list of selected data about samples present in any
-        instrument, regardless of its position. Data returned is
-        a dictionary with ID, standard-ID and name of the sample.
+        instrument, regardless of their positions. Data returned is
+        a dictionary with ID, Standard ID and name of the sample.
         '''
         samples = [ { "id": item.get("entityid"),
             "std-id": item.get("title")[:9],
