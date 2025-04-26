@@ -1,4 +1,5 @@
 import json
+import os
 
 class Tracker:
     '''
@@ -135,3 +136,20 @@ class Tracker:
             if position.get("sector").lower() == "lost": # case insensitive, just to be safe
                 lost.append(position)
         return lost # unordered list
+
+if __name__=="__main__":
+    try:
+        filenames = [ i for i in os.listdir("tests/")
+            if i.startswith("sample_locator_") and i.endswith(".json") ]
+        if not filenames:
+            raise FileNotFoundError(f"No sample_locator_*.json found in ./tests.")
+        filename = sorted(filenames, key=lambda x: x, reverse=True)[0]
+        with open(f"tests/{filename}", 'r') as f:
+            dic = json.load(f)
+            tracker = Tracker(dic)
+        print(tracker.getslots()[0:3])
+    except FileNotFoundError:
+        print(f"No directory ./tests found.\n"
+            f"Did you remember to run this script in AMORE's root folder?\n"
+            f"Did you remember to export PYTHONPATH?")
+    
