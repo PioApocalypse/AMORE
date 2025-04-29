@@ -4,9 +4,7 @@ import json
 from datetime import datetime
 # from amore.var.categories import categories as cat
 from .utils import normalize_to_int as to_int
-from .utils import normalize_position_name as norm_pos_name
 from ..classes import Tracker
-from flask import session, request
 
 # Import ENV variables api url and boolean ssl verification
 # PLEASE DO NOT push api keys to public repos
@@ -273,7 +271,7 @@ def create_sample(API_KEY, title, tags, body, std_id, position, batch, subholder
     # new_stdname = new_sample['title'][:9]
     return 0 # for confirmation message to user
 
-def batch_pieces_decreaser(API_KEY, batch):
+def batch_pieces_reducer(API_KEY, batch):
     batch_url = f"{full_elab_url}items/{batch}/"
     header = {
         "Authorization": API_KEY,

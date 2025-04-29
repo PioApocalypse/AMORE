@@ -144,7 +144,7 @@ def handle_create_sample():
         # recall batches variable BEFORE patching batch
         batches = amore.get_substrate_batches(API_KEY)
         # decrease number of available pieces in selected batch
-        remaining = amore.batch_pieces_decreaser(API_KEY, batch)
+        remaining = amore.batch_pieces_reducer(API_KEY, batch)
     except Exception as e:
         flash(f"Error handling batch availability: {str(e)}. Sample might have still been created.", 'batch_oos')
     
