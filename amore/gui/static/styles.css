@@ -17,6 +17,15 @@ a {
   text-decoration: none;
 }
 
+a.flash-button {
+  color: #f4f4f4;
+  font-weight: bold;
+  border: 1px solid #f4f4f4;
+  border-radius: 0.2rem;
+  padding: 0.1rem 0.3rem;
+  margin: 0 0.3rem;
+}
+
 .home-grid {
   display: flex;
   align-items: center;

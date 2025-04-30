@@ -43,6 +43,10 @@ def check_session():
         try:
             auth.check_apikey(session['api_key'])
             return 0
+        except ConnectionError as ce:
+            session.clear()
+            flash(f'{ce}\nCheck its status with <a href="https://downforeveryoneorjustme.com/">this service</a>.', 'error')
+            return redirect("/login")            
         except Exception as e:
             session.clear()
             flash(str(e), 'error')
@@ -71,6 +75,11 @@ def login():
             flash(f"Welcome, {session['user']}!", 'success')
             # flash(f"Here's you key: {session['api_key']}", 'success') # debug only
             return redirect("/")
+        except ConnectionError as ce:
+            session.clear()
+            ELABFTW_BASE_URL = os.environ.get("ELABFTW_BASE_URL")
+            flash(f'{ce}<br>Check its status with <a class="flash-button" href="https://downforeveryoneorjustme.com/{ELABFTW_BASE_URL}" target="_blank">Down For Everyone or Just Me.</a>', 'error')
+            return redirect("/login")            
         except Exception as e:
             flash(str(e), 'error')
             # return redirect("/login")

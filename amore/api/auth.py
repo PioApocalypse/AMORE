@@ -28,11 +28,18 @@ def check_apikey(KEY=""):
         "Authorization": KEY,
         "Content-Type": "application/json"
     }
-    response = requests.get(
-        url=endpoint,
-        headers=header,
-        verify=ssl_verification,
-    )
+    try:
+        response = requests.get(
+            url=endpoint,
+            headers=header,
+            verify=ssl_verification,
+        )
+    except requests.exceptions.ConnectionError as ce:
+        if "NewConnectionError" in str(ce):
+            raise ConnectionError("Your eLabFTW server might currently be down.")
+        else:
+            raise Exception("General connection error.")
+
     # Check zero: is the request not accepted by the server?
     if response.status_code // 100 == 5:
         raise Exception("There's a problem on the server. Try asking the sysadmin.")
