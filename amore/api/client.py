@@ -79,13 +79,14 @@ def sample_locator(API_KEY):
                 return tracker
     raise Exception(f"No experiment \"Sample Locator\" found in eLabFTW's database.")
 
-def add_to_position(API_KEY, sample_id, position_name): # POST to empty position
+def add_to_position(API_KEY, sample_id, position_name, userid=""): # POST to empty position
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"
     }
     tracker = sample_locator(API_KEY)
     metadata = tracker.meta
+    metadata["extra_fields"]["User"]["value"] = userid
     metadata["extra_fields"][position_name]["value"] = sample_id
     patch = {
         "metadata": json.dumps(metadata)
@@ -106,7 +107,7 @@ def add_to_position(API_KEY, sample_id, position_name): # POST to empty position
     )
     return 0
 
-def move_to_position(API_KEY, sample_id, old_position_name, new_position_name): # DELETE from old position then POST to empty position
+def move_to_position(API_KEY, sample_id, old_position_name, new_position_name, userid=""): # DELETE from old position then POST to empty position
     if (old_position_name == new_position_name
         or (not old_position_name and not new_position_name)): # neutral condition, just to be safe (both null or both equal)
         raise Exception("New and old position correspond.")
@@ -117,6 +118,7 @@ def move_to_position(API_KEY, sample_id, old_position_name, new_position_name): 
     tracker = sample_locator(API_KEY)
     tracker_url = f"{experiments_url}/{tracker.id}"
     metadata = tracker.meta
+    metadata["extra_fields"]["User"]["value"] = userid
     if (old_position_name == "") or (old_position_name is None):
         metadata["extra_fields"][new_position_name]["value"] = sample_id
         method = "post" # if old position doesn't exist, item is not linked yet so do it
@@ -263,7 +265,7 @@ def create_sample(API_KEY, title, tags, body, std_id, position, batch, subholder
         subholder=subholder,
         proposal=proposal,
         )
-    add_to_position(API_KEY=API_KEY, sample_id=new_elabid, position_name=position)
+    add_to_position(API_KEY=API_KEY, sample_id=new_elabid, position_name=position, userid=new_userid)
     # upload attachments
     if attachments:
         upload_attachments(API_KEY=API_KEY, new_elabid=new_elabid, attachments=attachments)

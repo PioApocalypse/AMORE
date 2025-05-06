@@ -70,9 +70,11 @@ def login():
     if request.method == "POST":
         API_KEY = request.form.get("api_key")
         try:
-            session['user'] = auth.check_apikey(KEY=API_KEY)
-            session['api_key'] = API_KEY
-            flash(f"Welcome, {session['user']}!", 'success')
+            user = auth.check_apikey(KEY=API_KEY)
+            session["user_fullname"] = user["fullname"]
+            session["userid"] = user["userid"]
+            session["api_key"] = API_KEY
+            flash(f"Welcome, {session["user_fullname"]}!", 'success')
             # flash(f"Here's you key: {session['api_key']}", 'success') # debug only
             return redirect("/")
         except ConnectionError as ce:
@@ -103,7 +105,7 @@ def root():
     check = check_session()
     if check != 0:
         return check
-    user = session.get('user') or "unspecified user"
+    user = session.get("user_fullname") or "unspecified user"
     return render_template("index.html", user=user)
 
 '''
@@ -115,8 +117,8 @@ def home():
     check = check_session()
     if check != 0:
         return check
-    API_KEY = session.get('api_key')
-    user = session.get('user') or "unspecified user"
+    API_KEY = session.get("api_key")
+    user = session.get("user_fullname") or "unspecified user"
     tracker = amore.sample_locator(API_KEY)
     positions = amore.get_available_slots(API_KEY, tracker) # which is a list of dicts
     batches = amore.get_substrate_batches(API_KEY) # which is a list of dicts
@@ -128,7 +130,7 @@ def handle_create_sample():
     check = check_session()
     if check != 0:
         return check
-    API_KEY = session.get('api_key')
+    API_KEY = session.get("api_key")
     title = request.form.get("title")
     position = request.form.get("position") # name of position
     batch = request.form.get("batch") # ID of item
@@ -187,9 +189,9 @@ def handle_positions():
     check = check_session()
     if check != 0:
         return check
-    API_KEY = session.get('api_key')
+    API_KEY = session.get("api_key")
     ELABFTW_BASE_URL = os.getenv('ELABFTW_BASE_URL')
-    user = session.get('user') or "unspecified user"
+    user = session.get("user_fullname") or "unspecified user"
     tracker = amore.sample_locator(API_KEY) # which is an object of class Tracker
     slots = tracker.getslots() # see help(Tracker.getslots)
     return render_template("tracker.html", baseurl=ELABFTW_BASE_URL, user=user, slots=slots)
@@ -207,9 +209,9 @@ for item in shortlist:
         check = check_session()
         if check != 0:
             return check
-        API_KEY = session.get('api_key')
+        API_KEY = session.get("api_key")
         ELABFTW_BASE_URL = os.getenv('ELABFTW_BASE_URL')
-        user = session.get('user') or "unspecified user"
+        user = session.get("user_fullname") or "unspecified user"
         tracker = amore.sample_locator(API_KEY)
         slot = [ i for i in tracker.getslots() if i.get("name") == item.get("name") ][0]
         available = tracker.getavailable()
@@ -220,7 +222,8 @@ def move_to_new():
     check = check_session()
     if check != 0:
         return check
-    API_KEY = session.get('api_key')
+    API_KEY = session.get("api_key")
+    userid = session.get("userid")
     tracker = amore.sample_locator(API_KEY)
     sample_id = int(request.form.get("sample_id"))
     new_position_name = request.form.get("new_position_name")
@@ -234,8 +237,8 @@ def move_to_new():
             old_position_name = None
     if new_position_name == "None":
         new_position_name = None
-    amore.move_to_position(API_KEY=API_KEY, sample_id=sample_id, old_position_name=old_position_name, new_position_name=new_position_name)
-    return render_template("test.html", sample_id=sample_id, old_position_name=old_position_name, new_position_name=new_position_name)
+    amore.move_to_position(API_KEY=API_KEY, userid=userid, sample_id=sample_id, old_position_name=old_position_name, new_position_name=new_position_name)
+    return render_template("test.html", sample_id=sample_id, old_position_name=old_position_name, new_position_name=new_position_name, userid=userid)
     
 
 if __name__ == '__main__':

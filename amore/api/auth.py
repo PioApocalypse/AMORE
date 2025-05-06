@@ -63,6 +63,9 @@ def check_apikey(KEY=""):
         url=endpoint,
         headers=header,
         verify=ssl_verification,
-    )
-    user = response.json()['fullname']
+    ).json()
+    user = {
+        "fullname": response.get("fullname"),
+        "userid": response.get("userid")
+    }
     return user
