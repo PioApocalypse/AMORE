@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 # from amore.var.categories import categories as cat
 from .utils import normalize_to_int as to_int
-from ..classes import Tracker
+from ..classes import Tracker, Header
 
 # Import ENV variables api url and boolean ssl verification
 # PLEASE DO NOT push api keys to public repos
@@ -28,23 +28,14 @@ else:
 '''
 '''
 def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results):
-    # a post request needs url, header and payload
-    experiments_url = f"{full_elab_url}""experiments/"
-    
-    header = {
-        "Authorization": API_KEY,
-        "Content-Type": "application/json"
-    }
-
+    header = Header(API_KEY).dump()
     payload = {
         "title": title,
         "date": date,
         "status": status,
-        "tags": tags, # "tag 1|tag 2|tag 3"
+        "tags": tags, # list: [tag1, tag2, tag3]
         "body": f"<h1>Goal:</h1>\n<p>{b_goal}</p>\n<h1>Procedure:</h1>\n<p>{b_procedure}</p>\n<h1>Results:</h1>\n<p>{b_results}</p>\n",
-        "category_title": "Deposition", # hardcoded deposition, might reprogram it later
     }
-
     response = requests.post(
         url=experiments_url,
         headers=header,
@@ -58,10 +49,7 @@ def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results)
 
 def sample_locator(API_KEY):
     search_query = f"{experiments_url}?q=%22sample+locator%22"
-    header = {
-        "Authorization": API_KEY,
-        "Content-Type": "application/json"
-    }
+    header = Header(API_KEY).dump()
     response = requests.get(
         headers=header,
         url=search_query,
@@ -81,10 +69,7 @@ def sample_locator(API_KEY):
     raise Exception(f"No experiment \"Sample Locator\" found in eLabFTW's database.")
 
 def move_sample(API_KEY, sample_id, new_position_name):
-    header = {
-        "Authorization": API_KEY,
-        "Content-Type": "application/json"
-    }
+    header = Header(API_KEY).dump()
     sample = requests.get(
         headers=header,
         url=f"{items_url}/{sample_id}",
@@ -102,10 +87,7 @@ def move_sample(API_KEY, sample_id, new_position_name):
     return 0
 
 def add_to_position(API_KEY, sample_id, position_name, userid=""): # POST to empty position
-    header = {
-        "Authorization": API_KEY,
-        "Content-Type": "application/json"
-    }
+    header = Header(API_KEY).dump()
     tracker = sample_locator(API_KEY)
     metadata = tracker.meta
     metadata["extra_fields"]["User"]["value"] = userid
@@ -133,10 +115,7 @@ def move_to_position(API_KEY, sample_id, old_position_name, new_position_name, u
     if (old_position_name == new_position_name
         or (not old_position_name and not new_position_name)): # neutral condition, just to be safe (both null or both equal)
         raise Exception("New and old position correspond.")
-    header = {
-        "Authorization": API_KEY,
-        "Content-Type": "application/json"
-    }
+    header = Header(API_KEY).dump()
     tracker = sample_locator(API_KEY)
     tracker_url = f"{experiments_url}/{tracker.id}"
     metadata = tracker.meta
@@ -183,19 +162,13 @@ def move_to_position(API_KEY, sample_id, old_position_name, new_position_name, u
 
 def get_new_sample(API_KEY):
     every_id = []
-    header = {
-        "Authorization": API_KEY,
-        "Content-Type": "application/json"
-    }
-
-    search_query = f'{full_elab_url}items?limit=9999'
-    
+    header = Header(API_KEY).dump()
+    search_query = f'{items_url}?limit=9999'
     response = requests.get(
         headers=header,
         url=search_query,
         verify=ssl_verification
     )
-    
     # returns 'id' from entry whose 'id' is max among all entries in response.json()
     # thank god someone on stackoverflow had my same problem...
     new_sample = max(response.json(), key=lambda ev: ev['id'])
@@ -205,11 +178,7 @@ def get_new_sample(API_KEY):
 def patch_sample(API_KEY, new_elabid, new_userid, body, std_id, position, batch, subholder, proposal):
     # like before, different url
     itemurl = f"{items_url}/{new_elabid}/"
-
-    header = {
-        "Authorization": API_KEY,
-        "Content-Type": "application/json"
-    }
+    header = Header(API_KEY).dump()
     metadata = { "extra_fields": {
             "Owner": { "type": "users", "required": True },
             "Position": { "type": "items" },
@@ -229,8 +198,6 @@ def patch_sample(API_KEY, new_elabid, new_userid, body, std_id, position, batch,
         "body": body,
         "metadata": json.dumps(metadata)
     }
-
-    # try:
     response = requests.patch(
         url=itemurl,
         headers=header,
@@ -241,9 +208,9 @@ def patch_sample(API_KEY, new_elabid, new_userid, body, std_id, position, batch,
 
 
 def upload_attachments(API_KEY, new_elabid, attachments):
-    uploads_url = f"{full_elab_url}items/{new_elabid}/uploads"
+    uploads_url = f"{items_url}/{new_elabid}/uploads"
     for field_name, (filename, file) in attachments:
-        header = {"Authorization": API_KEY}
+        header = Header(API_KEY, None).dump()
         files = {field_name: (filename, file)}
         try:
             response = requests.post(
@@ -258,18 +225,12 @@ def upload_attachments(API_KEY, new_elabid, attachments):
 
 
 def create_sample(API_KEY, title, tags, body, std_id, position, batch, subholder, proposal, attachments=None): 
-    header = {
-        "Authorization": API_KEY,
-        "Content-Type": "application/json"
-    }
+    header = Header(API_KEY).dump()
     payload = {
         "template": cat.get("sample"), # 10 defines this item as 'sample' in our database
         "title": title,
         "tags": tags
     }
-    
-    # try:
-        # request item creation with template, title, status and tags as instructed by user
     response = requests.post(
         url=items_url,
         headers=header,
@@ -304,10 +265,7 @@ def create_sample(API_KEY, title, tags, body, std_id, position, batch, subholder
 
 def batch_pieces_reducer(API_KEY, batch):
     batch_url = f"{items_url}/{batch}/"
-    header = {
-        "Authorization": API_KEY,
-        "Content-Type": "application/json"
-    }
+    header = Header(API_KEY).dump()
 
     # Step 1: get metadata from batch id
     batch_data = requests.get(
@@ -352,13 +310,8 @@ def get_available_slots(API_KEY, tracker):
     return sorted_slots
 
 def get_substrate_batches(API_KEY):
-    header = {
-        "Authorization": API_KEY,
-        "Content-Type": "application/json"
-    }
-
-    search_query = f'{API_URL}api/v2/items?q=&cat={cat.get("substrates batch")}&limit=9999' # "SUBSTRATES BATCH" should be id = 9
-    
+    header = Header(API_KEY).dump()
+    search_query = f"{items_url}?q=&cat={cat.get("substrates batch")}&limit=9999" # "SUBSTRATES BATCH" should be id = 9
     response = requests.get(
         headers=header,
         url=search_query,
@@ -377,13 +330,8 @@ def get_substrate_batches(API_KEY):
     return batches # which is a list of dictionaries with 'id' and 'title'
 
 def get_proposals(API_KEY):
-    header = {
-        "Authorization": API_KEY,
-        "Content-Type": "application/json"
-    }
-
-    search_query = f'{API_URL}api/v2/items?q=&cat={cat.get("proposal")}&limit=9999' # "PROPOSAL" should be id = 15
-    
+    header = Header(API_KEY).dump()
+    search_query = f"{items_url}?q=&cat={cat.get("proposal")}&limit=9999" # "PROPOSAL" should be id = 15
     response = requests.get(
         headers=header,
         url=search_query,
