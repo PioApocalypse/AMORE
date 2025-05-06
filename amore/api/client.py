@@ -72,7 +72,7 @@ def sample_locator(API_KEY):
                 locator_id = item.get("id")
                 locator = requests.get(
                     headers=header,
-                    url=f"{experiments_url}/31",
+                    url=f"{experiments_url}/{locator_id}",
                     verify=ssl_verification
                 ).json()
                 tracker = Tracker(locator)
