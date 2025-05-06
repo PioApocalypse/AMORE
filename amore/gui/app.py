@@ -146,7 +146,7 @@ def handle_create_sample():
         attachments = utils.attachment_handler(uploads=uploads)
     except Exception as e:
         flash(str(e), 'error')
-        # return redirect("/")
+        return redirect("/create")
 
     std_id = id_generated[0] # index 0 of id_generator returns numeric id in yyxxx format
     full_id = id_generated[1] # index 1 of id_generator returns full code in Na-{%y}-xxx format
@@ -157,7 +157,8 @@ def handle_create_sample():
         # decrease number of available pieces in selected batch
         remaining = amore.batch_pieces_reducer(API_KEY, batch)
     except Exception as e:
-        flash(f"Error handling batch availability: {str(e)}. Sample might have still been created.", 'batch_oos')
+        flash(f"Error handling batch availability: {str(e)}.", 'batch_oos') # "Sample might still have been created" msg removed
+        return redirect("/create")
     
     try: # this is where the magic happens:
         amore.create_sample(
