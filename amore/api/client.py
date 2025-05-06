@@ -11,6 +11,7 @@ from ..classes import Tracker
 API_URL = os.getenv('ELABFTW_BASE_URL')
 full_elab_url = f"{API_URL}api/v2/" # API endpoint root for eLabFTW
 experiments_url = f"{full_elab_url}experiments" # API endpoint /experiments
+items_url = f"{full_elab_url}items" # API endpoint /items
 ssl_verification = os.getenv('VERIFY_SSL').lower() == 'true' # this way you can toggle SSL verification in .env file
 
 filename = "amore/var/categories.json"
@@ -78,6 +79,27 @@ def sample_locator(API_KEY):
                 tracker = Tracker(locator)
                 return tracker
     raise Exception(f"No experiment \"Sample Locator\" found in eLabFTW's database.")
+
+def move_sample(API_KEY, sample_id, new_position_name):
+    header = {
+        "Authorization": API_KEY,
+        "Content-Type": "application/json"
+    }
+    sample = requests.get(
+        headers=header,
+        url=f"{items_url}/{sample_id}",
+        verify=ssl_verification
+    ).json()
+    metadata = json.loads(sample.get("metadata"))
+    metadata["extra_fields"]["Position"]["value"] = new_position_name
+    patch = json.dumps(metadata)
+    requests.patch(
+        headers=header,
+        url=f"{items_url}/{sample_id}",
+        json={ "metadata": patch },
+        verify=ssl_verification
+    )
+    return 0
 
 def add_to_position(API_KEY, sample_id, position_name, userid=""): # POST to empty position
     header = {
@@ -149,6 +171,7 @@ def move_to_position(API_KEY, sample_id, old_position_name, new_position_name, u
         )
     except:
         pass
+    move_sample(API_KEY, sample_id, new_position_name)
     return 0
 
 
@@ -181,7 +204,7 @@ def get_new_sample(API_KEY):
 
 def patch_sample(API_KEY, new_elabid, new_userid, body, std_id, position, batch, subholder, proposal):
     # like before, different url
-    items_url = f"{full_elab_url}items/{new_elabid}/"
+    itemurl = f"{items_url}/{new_elabid}/"
 
     header = {
         "Authorization": API_KEY,
@@ -209,7 +232,7 @@ def patch_sample(API_KEY, new_elabid, new_userid, body, std_id, position, batch,
 
     # try:
     response = requests.patch(
-        url=items_url,
+        url=itemurl,
         headers=header,
         json=payload,
         verify=ssl_verification
@@ -235,7 +258,6 @@ def upload_attachments(API_KEY, new_elabid, attachments):
 
 
 def create_sample(API_KEY, title, tags, body, std_id, position, batch, subholder, proposal, attachments=None): 
-    items_url = f"{full_elab_url}""items/"
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"
@@ -281,7 +303,7 @@ def create_sample(API_KEY, title, tags, body, std_id, position, batch, subholder
     return 0 # for confirmation message to user
 
 def batch_pieces_reducer(API_KEY, batch):
-    batch_url = f"{full_elab_url}items/{batch}/"
+    batch_url = f"{items_url}/{batch}/"
     header = {
         "Authorization": API_KEY,
         "Content-Type": "application/json"
