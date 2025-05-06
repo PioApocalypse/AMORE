@@ -1,6 +1,18 @@
 import json
 import os
 
+class Header:
+    def __init__(self, API_KEY, content="application/json"):
+        self.Key = API_KEY
+        self.ContentType = content
+    def dump(self):
+        if self.ContentType == None:
+            header = { "Authorization": self.Key }
+            return header
+        header = {"Authorization": self.Key,
+                  "Content-Type": self.ContentType}
+        return header
+
 class Tracker:
     '''
     Class for handling "Sample Locator" eLabFTW experiments via AMORE.
