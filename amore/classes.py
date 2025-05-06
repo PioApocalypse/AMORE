@@ -2,10 +2,30 @@ import json
 import os
 
 class Header:
+    '''
+    Short class for handling HTTP requests headers.
+    To create an object of this class: header = Header(API_KEY, content)
+    Where: 'API_KEY' is the value for Authorization;
+           'content' is the value for Content-Type.
+
+    Content-Type's default value is "application/json", anything else
+    (text/html, multipart/form-data...) must be provided explicitly.
+    If set to None the header will only contain the Authorization key.
+    '''
     def __init__(self, API_KEY, content="application/json"):
+        '''
+        Init method. Allows self.Key and self.ContentType attributes.
+        The attributes return the values of the respective input variables.
+        '''
         self.Key = API_KEY
         self.ContentType = content
     def dump(self):
+        '''
+        Dumps an header dictionary with Authorization and Content-Type
+        set as instructed; can be fed directly to an HTTP request.
+
+        If 'content' is set to None the Content-Type is omitted.
+        '''
         if self.ContentType == None:
             header = { "Authorization": self.Key }
             return header
