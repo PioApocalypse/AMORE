@@ -187,17 +187,24 @@ def patch_sample(API_KEY, new_elabid, new_userid, body, std_id, position, batch,
         "Authorization": API_KEY,
         "Content-Type": "application/json"
     }
+    metadata = { "extra_fields": {
+            "Owner": { "type": "users", "required": True },
+            "Position": { "type": "items" },
+            "Proposal": { "type": "items" },
+            "Substrate Batch": { "type": "items" },
+            "Substrate Holder": { "type": "text" },
+            "STD-ID": { "type": "number" }
+            } }
+    metadata["extra_fields"]["Owner"]["value"] = new_userid
+    metadata["extra_fields"]["Position"]["value"] = position
+    metadata["extra_fields"]["Proposal"]["value"] = proposal
+    metadata["extra_fields"]["Substrate Batch"]["value"] = batch
+    metadata["extra_fields"]["Substrate Holder"]["value"] = subholder
+    metadata["extra_fields"]["STD-ID"]["value"] = std_id
     payload = {
         "custom_id": None,
         "body": body,
-        "metadata": ('{ "extra_fields": {'
-            ' "Owner": { "type": "users", "value": "'+str(new_userid)+'", "required": true },'
-            ' "Position": { "type": "items", "value": "'+str(position)+'" },'
-            ' "Proposal": { "type": "items", "value": "'+str(proposal)+'" },'
-            ' "Substrate Batch": { "type": "items", "value": "'+str(batch)+'" },'
-            ' "Substrate Holder": { "type": "text", "value": "'+str(subholder)+'" },'
-            ' "STD-ID": { "type": "number", "value": "'+str(std_id)+'" }'
-            ' } }'),
+        "metadata": json.dumps(metadata)
     }
 
     # try:
