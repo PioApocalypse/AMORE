@@ -187,6 +187,7 @@ def handle_create_sample():
 
 @app.route("/tracker")
 def handle_positions():
+    get_flashed_messages()
     check = check_session()
     if check != 0:
         return check
@@ -238,8 +239,15 @@ def move_to_new():
             old_position_name = None
     if new_position_name == "None":
         new_position_name = None
-    amore.move_to_position(API_KEY=API_KEY, userid=userid, sample_id=sample_id, old_position_name=old_position_name, new_position_name=new_position_name)
-    return render_template("test.html", sample_id=sample_id, old_position_name=old_position_name, new_position_name=new_position_name, userid=userid)
+    std_id = amore.move_to_position(API_KEY=API_KEY, userid=userid, sample_id=sample_id, old_position_name=old_position_name, new_position_name=new_position_name)
+    ELABFTW_BASE_URL = os.getenv('ELABFTW_BASE_URL')
+    if old_position_name == None:
+        flash(f'Sample <a class="flash-button" href="{ELABFTW_BASE_URL}database.php?mode=view&id={sample_id}" target="_blank">{std_id}</a> added to <b>{new_position_name}</b>.', "success")
+    elif new_position_name == None:
+        flash(f'Sample <a class="flash-button" href="{ELABFTW_BASE_URL}database.php?mode=view&id={sample_id}" target="_blank">{std_id}</a> removed from <b>{old_position_name}</b>.', "success")
+    else:
+        flash(f'Sample <a class="flash-button" href="{ELABFTW_BASE_URL}database.php?mode=view&id={sample_id}" target="_blank">{std_id}</a> moved from <b>{old_position_name}</b> to <b>{new_position_name}</b>.', "success")
+    return redirect("/tracker")
     
 
 if __name__ == '__main__':

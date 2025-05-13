@@ -78,13 +78,14 @@ def move_sample(API_KEY, sample_id, new_position_name):
     metadata = json.loads(sample.get("metadata"))
     metadata["extra_fields"]["Position"]["value"] = new_position_name
     patch = json.dumps(metadata)
-    requests.patch(
+    response = requests.patch(
         headers=header,
         url=f"{items_url}/{sample_id}",
         json={ "metadata": patch },
         verify=ssl_verification
     )
-    return 0
+    std_id = response.json().get("title")[:9]
+    return std_id
 
 def add_to_position(API_KEY, sample_id, position_name, userid=""): # POST to empty position
     header = Header(API_KEY).dump()
@@ -150,8 +151,8 @@ def move_to_position(API_KEY, sample_id, old_position_name, new_position_name, u
         )
     except:
         pass
-    move_sample(API_KEY, sample_id, new_position_name)
-    return 0
+    std_id = move_sample(API_KEY, sample_id, new_position_name)
+    return std_id
 
 
 '''
