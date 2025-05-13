@@ -1,4 +1,37 @@
 import json
+import os
+
+class Header:
+    '''
+    Short class for handling HTTP requests headers.
+    To create an object of this class: header = Header(API_KEY, content)
+    Where: 'API_KEY' is the value for Authorization;
+           'content' is the value for Content-Type.
+
+    Content-Type's default value is "application/json", anything else
+    (text/html, multipart/form-data...) must be provided explicitly.
+    If set to None the header will only contain the Authorization key.
+    '''
+    def __init__(self, API_KEY, content="application/json"):
+        '''
+        Init method. Allows self.Key and self.ContentType attributes.
+        The attributes return the values of the respective input variables.
+        '''
+        self.Key = API_KEY
+        self.ContentType = content
+    def dump(self):
+        '''
+        Dumps an header dictionary with Authorization and Content-Type
+        set as instructed; can be fed directly to an HTTP request.
+
+        If 'content' is set to None the Content-Type is omitted.
+        '''
+        if self.ContentType == None:
+            header = { "Authorization": self.Key }
+            return header
+        header = {"Authorization": self.Key,
+                  "Content-Type": self.ContentType}
+        return header
 
 class Tracker:
     '''
@@ -35,8 +68,8 @@ class Tracker:
     def getsamples(self):
         '''
         Gets list of selected data about samples present in any
-        instrument, regardless of its position. Data returned is
-        a dictionary with ID, standard-ID and name of the sample.
+        instrument, regardless of their positions. Data returned is
+        a dictionary with ID, Standard ID and name of the sample.
         '''
         samples = [ { "id": item.get("entityid"),
             "std-id": item.get("title")[:9],
@@ -68,19 +101,22 @@ class Tracker:
                     case _:
                         s = " - " # separator
                         slotsector = s.join(splitname[1:-1]) # join back everything that isn't instrument or slot
-                available = (slotsample == None or slotsample == "")
+                available = (slotsample is None or slotsample == "")
                 try:
                     samplestdid = [ item.get("std-id")
                     for item in self.getsamples()
-                    if item.get("id") == slotsample ][0] # actual name of sample
-                    samplename = [ item.get("name")
-                    for item in self.getsamples()
-                    if item.get("id") == slotsample ][0] # actual name of sample
+                    if item.get("id") == int(slotsample) ][0] # actual name of sample
                 except:
                     samplestdid = None
+                try:
+                    samplename = [ item.get("name")
+                    for item in self.getsamples()
+                    if item.get("id") == int(slotsample) ][0] # actual name of sample
+                except:
                     samplename = None
                 response = {
                     "name": position,
+                    "shortname": position.replace(" ",""),
                     "slot": slotcode,
                     "sector": slotsector,
                     "inst_name": slotinstrument,
@@ -92,6 +128,18 @@ class Tracker:
                 }
                 slotlist.append(response) # object containing full location of the slot ("name" key), instrument name ("inst" key) and the sample associated if any ("sample" key)
         return slotlist
+    def shortlist(self):
+        '''Trimmed version of "getslots()" with fewer keys.'''
+        slotlist = self.getslots()
+        shortlist = [ {
+            "name": item.get("name"),
+            "shortname": item.get("shortname"),
+            "slot": item.get("slot"),
+            "sector": item.get("sector"),
+            "inst_name": item.get("inst_name"),
+            "inst_code": item.get("inst_code") }
+            for item in slotlist ]
+        return shortlist
     def getavailable(self):
         '''Returns list of available slots.'''
         available = []
@@ -120,3 +168,20 @@ class Tracker:
             if position.get("sector").lower() == "lost": # case insensitive, just to be safe
                 lost.append(position)
         return lost # unordered list
+
+if __name__=="__main__":
+    try:
+        filenames = [ i for i in os.listdir("tests/")
+            if i.startswith("sample_locator_") and i.endswith(".json") ]
+        if not filenames:
+            raise FileNotFoundError(f"No sample_locator_*.json found in ./tests.")
+        filename = sorted(filenames, key=lambda x: x, reverse=True)[0]
+        with open(f"tests/{filename}", 'r') as f:
+            dic = json.load(f)
+            tracker = Tracker(dic)
+        print(tracker.getslots()[0:3])
+    except FileNotFoundError:
+        print(f"No directory ./tests found.\n"
+            f"Did you remember to run this script in AMORE's root folder?\n"
+            f"Did you remember to export PYTHONPATH?")
+    

@@ -17,6 +17,7 @@
     position: relative;
     padding-right: 2.5rem; /* Space for the close button */
     overflow: hidden; /* Ensure the timebar doesn't overflow */
+    line-height: 2rem;
 }
 
 .flash.success {

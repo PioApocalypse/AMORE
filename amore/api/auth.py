@@ -19,6 +19,11 @@ The only way is making a GET request to the apikey endpoint and look for the one
 """
 
 def check_apikey(KEY=""):
+    '''
+    Checks if a given API key is valid and has writing permissions.
+    If yes it fetches and returns the full name of the user to whom
+    the key belongs. If not it raises errors accordingly.
+    '''
     # No sense proceeding if the user somehow submitted an empty key...
     if KEY == "":
         raise Exception('You submitted an empty key.')
@@ -28,11 +33,18 @@ def check_apikey(KEY=""):
         "Authorization": KEY,
         "Content-Type": "application/json"
     }
-    response = requests.get(
-        url=endpoint,
-        headers=header,
-        verify=ssl_verification,
-    )
+    try:
+        response = requests.get(
+            url=endpoint,
+            headers=header,
+            verify=ssl_verification,
+        )
+    except requests.exceptions.ConnectionError as ce:
+        if "NewConnectionError" in str(ce):
+            raise ConnectionError("Your eLabFTW server might currently be down.")
+        else:
+            raise Exception("General connection error.")
+
     # Check zero: is the request not accepted by the server?
     if response.status_code // 100 == 5:
         raise Exception("There's a problem on the server. Try asking the sysadmin.")
@@ -48,7 +60,7 @@ def check_apikey(KEY=""):
     key_can_write = last_used['rw']
     # Last check: is the key read only?
     if key_can_write == 0:
-        raise Exception(f"API key is read-only, not read/write.<br>Please use (eventually create) one with read/write permissions.")
+        raise PermissionError(f"API key is read-only, not read/write.<br>Please use (eventually create) one with read/write permissions.")
     
     # If AND ONLY IF the key exists, is valid and is not read-only, return user's full name:
     endpoint = f"{API_URL}api/v2/users/me/"
@@ -56,6 +68,9 @@ def check_apikey(KEY=""):
         url=endpoint,
         headers=header,
         verify=ssl_verification,
-    )
-    user = response.json()['fullname']
+    ).json()
+    user = {
+        "fullname": response.get("fullname"),
+        "userid": response.get("userid")
+    }
     return user

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sample Tracker - AMORE for eLabFTW</title>
+        <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
+        <link rel="stylesheet" href="{{ url_for('static',filename='tracker.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static',filename='flash.css') }}">
+        <script
+			  src="https://code.jquery.com/jquery-3.7.1.js"
+			  integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+			  crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js">let table = new DataTable('#myTable');</script>
+    
+</head>
+<body>
+    <!-- Flask flash pop-ups -->
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">
+                        {% autoescape false %}
+                            {{ message }}
+                        {% endautoescape %}
+                        <span class="close-btn" onclick="this.parentElement.remove()">×</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+    <div class="home-grid">
+        <div class="home-column">
+            <div class="title-box">
+                <a title="Back to index" href="/"><h1>AMORE for eLabFTW</h1></a>
+                <h3 align="center">Sample Tracker</h3>
+                <div class="title-box">
+                    <p align="center">Authenticated as <u>{{ user }}</u></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <table id="myTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Instrument</th>
+                    <th>Sector</th>
+                    <th>Slot</th>
+                    <th>Sample ID</th>
+                    <th>Sample Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            {% for item in slots %}
+                <tr>
+                    <td>{{ item.get("name") }}</td>
+                    <td>{{ item.get("inst_name") }}</td>
+                    <td>{{ item.get("sector") }}</td>
+                    <td>{{ item.get("slot") }}</td>
+                    {% if item.get("available") == False %}
+                        <td><a href="{{ baseurl }}database.php?mode=view&id={{ item.get("sample_id") }}" target="_blank">{{ item.get("sample_stdid") }}</a></td>
+                        <td>{{ item.get("sample_name") }}</td>
+                        <td><a href="{{ request.path }}/{{ item.get("name").replace(" ","") }}"><button class="lesser-button">Move sample</button></a></td>
+                    {% else %}
+                        <td class="available">-</td>
+                        <td class="available"><i>empty</i></td>
+                        <td><a href="{{ request.path }}/{{ item.get("name").replace(" ","") }}"><button class="lesser-button">Add new sample</button></a></td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+
+
+    <div class="home-grid">
+        <a href="/logout" style="margin: 0 5rem 5rem 5rem; width: 10rem;">
+            <div align=center class="button">
+                <p style="font-size: 1.1rem;">Log Out</p>
+            </div>
+        </a>
+    </div>
+
+    <footer>
+        <div>alpha ver. for development only</div>
+        <div align="right"><a href="https://github.com/PioApocalypse/AMORE" target="_blank">Star me on GitHub</a></div>
+    </footer>
+
+    <!-- Javascript time -->
+    <script>
+        // Function to remove a flash element
+        function removeFlashMessage(flashElement) {
+            flashElement.classList.add('fade-out');
+            setTimeout(() => {
+                flashElement.remove();
+            }, 500); // Wait for the fade-out animation to complete
+}
+
+        // Auto-close flash messages after 30 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash');
+            const timeout_seconds = 30; // timeout duration stored - in seconds - in other variable
+            flashMessages.forEach(flash => {
+                const timebar = flash.querySelector('.timebar');
+                const duration = timeout_seconds*1000; // in milliseconds
+
+                // Dynamic animation duration
+                timebar.style.animationDuration = `${duration / 1000}s`;
+
+                // Close after timeout
+                setTimeout(() => {
+                    removeFlashMessage(flash);
+                }, duration);
+            });
+        });
+
+    </script>
+
+    <!-- Initialize DataTable -->
+    <script>
+        $(document).ready( function () {
+            $('#myTable').DataTable( {
+                "pageLength": 10
+            } );
+        } );
+    </script>
+</body>
+</html>

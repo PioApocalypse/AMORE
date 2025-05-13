@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Pos. {{ slot.get("shortname") }} - AMORE for eLabFTW</title>
+        <link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static',filename='flash.css') }}">
+    </head>
+    <body>    <!-- Flask flash pop-ups -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">
+                            {{ message }}
+                            <span class="close-btn" onclick="this.parentElement.remove()">×</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+    
+        <div class="home-grid">
+            <!-- TITLE -->
+            <div class="home-column">
+                <div class="title-box">
+                    <a title="Back to index" href="/"><h1>AMORE for eLabFTW</h1></a>
+                    <p align="center"><b>Autonomous Management of Outputs<br>for Research Efficiency</b></p>
+                </div>
+                <div class="title-box">
+                    <p align="center">Authenticated as <u>{{ user }}</u></p>
+                </div>
+                <a href="/logout" style="width: auto; margin: 0 5rem;">
+                    <div align=center class="button">
+                        <p style="font-size: 1.1rem;">Log Out</p>
+                    </div>
+                </a>
+            </div>
+    
+            <!-- FORM -->
+            <div class="home-column">
+                <div class="form-container form-container">
+                    <!-- GET NAME OF SLOT -->
+                    <h2>POSITION: {{ slot.get("name") }}</h2>
+                
+                    <!-- IS SLOT AVAILABLE? -->
+                    <div>
+                        {% if slot.get("available") == True %}
+                        <!--=========================
+                            CASE 1: SLOT IS AVAILABLE
+                        ==========================-->
+                            <h3 style="color: #25a025; margin-bottom: 1rem;">THIS SLOT IS: AVAILABLE</h3>
+                            <form action="/tracker/move_to_new" method="post" enctype="multipart/form-data">
+                                <div class="form-column">
+                                    <div class="form-group" style="gap:0.5rem">
+                                        <label for="sample_id">ID of the Sample on eLabFTW<span class="red" title="Required">*</span>:</label>
+                                        <input type="number" id="sample_id" name="sample_id" placeholder="ID of your sample" required>
+                                        <!-- HIDDEN PRESET VALUES -->
+                                        <input type="hidden" name="old_position_name" value="None">
+                                        <input type="hidden" name="new_position_name" value="{{ slot.get("name") }}">
+                                    </div>
+                                </div>
+                                <button type="submit">Add Sample to {{ slot.get("shortname") }}</button>
+                            </form>
+            
+                        {% else %}
+                        <!--========================
+                            CASE 2: SLOT IS OCCUPIED
+                        =========================-->
+                            <h3 style="color: #a02525; margin-bottom: 1rem;">THIS SLOT IS: OCCUPIED BY {{ slot.get("sample_stdid") }}</h3>
+                            <p>Sample from {{ slot.get("sample_stdid")[:2] }} n°{{ slot.get("sample_stdid")[6:9] }} of year 20{{ slot.get("sample_stdid")[3:5] }}:</p>
+                            <p>{{ slot.get("sample_name") }}</p>
+                            <p><a href="{{ baseurl }}database.php?mode=view&id={{ slot.get("sample_id") }}" target="_blank">Open on eLabFTW</a></p>
+                            <h3 style="margin: 1rem 0;">MOVE ELSEWHERE</h3>
+                            <form action="/tracker/move_to_new" method="post" enctype="multipart/form-data">
+                                <div class="form-column">
+                                    <div class="form-group">
+                                        <label for="new_position_name" title="Where is it located in your faculty?">New Position Name:<span class="red" title="Required">*</span>:</label>
+                                        <!-- THIS PART GETS POSITIONS (ITEMS) FROM ELABFTW AND AUTOMATICALLY PUTS THEM IN OUR FORM -->
+                                        <select id="new_position_name" name="new_position_name" required>
+                                            <option value="" selected="selected">- Select a position -</option>
+                                            <option value="None">* Remove from chamber *-</option>
+                                            {% for i in available %}
+                                                <option value="{{ i['name'] }}">{{ i["name"] }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <!-- HIDDEN PRESET VALUES -->
+                                        <input type="hidden" name="sample_id" value="{{ slot.get("sample_id") }}">
+                                        <input type="hidden" name="old_position_name" value="{{ slot.get("name") }}">
+                                    </div>
+                                </div>
+                                <button type="submit">Move Sample to New Position</button>
+                            </form>
+
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>    
+
+    <footer>
+        <div>alpha ver. for development only</div>
+        <div align="right"><a href="https://github.com/PioApocalypse/AMORE" target="_blank">Star me on GitHub</a></div>
+    </footer>
+
+    <!-- Javascript time -->
+    <script>
+        // function to remove a flash element
+        function removeFlashMessage(flashElement) {
+            flashElement.classList.add('fade-out');
+            setTimeout(() => {
+                flashElement.remove();
+            }, 500); // Wait for the fade-out animation to complete
+}
+
+        // auto-close flash messages after 30 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash');
+            const timeout_seconds = 30; // timeout duration stored - in seconds - in other variable
+            flashMessages.forEach(flash => {
+                const timebar = flash.querySelector('.timebar');
+                const duration = timeout_seconds*1000; // in milliseconds
+
+                // dynamic animation duration
+                timebar.style.animationDuration = `${duration / 1000}s`;
+
+                // close after timeout
+                setTimeout(() => {
+                    removeFlashMessage(flash);
+                }, duration);
+            });
+        });
+
+    </script>
+</body>
+</html>

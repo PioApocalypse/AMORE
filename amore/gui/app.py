@@ -1,6 +1,6 @@
 '''
 External modules. In particular, from flask:
-- Flask object implements the WSGI. Usage: app = Flask(__name__) - operations on variable 'app' setup the environment configuration.
+- Flask class implements the WSGI. Usage: app = Flask(__name__) - operations on variable 'app' setup the environment configuration.
 - request is used to get variables values from the HTML form upon submission.
 - render_template and redirect are quite obvious, look them up.
 - flash allows for "flash" (pop-up) messages to warn user if something goes wrong (or right).
@@ -20,14 +20,22 @@ app.secret_key = secrets.token_hex(16)
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024 # default Flask limit is 16 MB
 
 
-'''
-The following function is not associated to a route. It checks if current
-session contains an "api_key" non-null value then calls check_apikey
-function to verify if that value is a valid API key. If both this
-conditions are not met, it clears the entire session altogether and
-redirects to login. Otherwise it returns 0.
-'''
 def check_session():
+    '''
+    The following function is not associated to a route. It checks if current
+    session contains an "api_key" non-null value then calls check_apikey
+    function to verify if that value is a valid API key. If both this
+    conditions are not met, it clears the entire session altogether and
+    redirects to login. Otherwise it returns 0.
+    
+    Usage: if check_session() != 0 return output of check_session, which
+    is just redirect to login page, otherwise, execute the rest.
+
+        check = check_session()
+        if check != 0:
+            return check
+        # <rest of the function>
+    '''
     if session.get('api_key') == None:
         session.clear()
         return redirect("/login")
@@ -35,19 +43,14 @@ def check_session():
         try:
             auth.check_apikey(session['api_key'])
             return 0
+        except ConnectionError as ce:
+            session.clear()
+            flash(f'{ce}\nCheck its status with <a href="https://downforeveryoneorjustme.com/">this service</a>.', 'error')
+            return redirect("/login")            
         except Exception as e:
             session.clear()
             flash(str(e), 'error')
             return redirect("/login")
-'''
-Usage: if check_session() != 0 return output of check_session, which
-is just redirect to login page, otherwise, execute the rest.
-
-    check = check_session()
-    if check != 0:
-        return check
-    # <rest of the function>
-'''
 
 @app.before_request
 def make_session_permanent():
@@ -67,11 +70,18 @@ def login():
     if request.method == "POST":
         API_KEY = request.form.get("api_key")
         try:
-            session['user'] = auth.check_apikey(KEY=API_KEY)
-            session['api_key'] = API_KEY
-            flash(f"Welcome, {session['user']}!", 'success')
+            user = auth.check_apikey(KEY=API_KEY)
+            session["user_fullname"] = user["fullname"]
+            session["userid"] = user["userid"]
+            session["api_key"] = API_KEY
+            flash(f"Welcome, {session["user_fullname"]}!", 'success')
             # flash(f"Here's you key: {session['api_key']}", 'success') # debug only
-            return redirect("/create")
+            return redirect("/")
+        except ConnectionError as ce:
+            session.clear()
+            ELABFTW_BASE_URL = os.environ.get("ELABFTW_BASE_URL")
+            flash(f'{ce}<br>Check its status with <a class="flash-button" href="https://downforeveryoneorjustme.com/{ELABFTW_BASE_URL}" target="_blank">Down For Everyone or Just Me.</a>', 'error')
+            return redirect("/login")            
         except Exception as e:
             flash(str(e), 'error')
             # return redirect("/login")
@@ -95,7 +105,7 @@ def root():
     check = check_session()
     if check != 0:
         return check
-    user = session.get('user') or "unspecified user"
+    user = session.get("user_fullname") or "unspecified user"
     return render_template("index.html", user=user)
 
 '''
@@ -107,8 +117,8 @@ def home():
     check = check_session()
     if check != 0:
         return check
-    API_KEY = session.get('api_key')
-    user = session.get('user') or "unspecified user"
+    API_KEY = session.get("api_key")
+    user = session.get("user_fullname") or "unspecified user"
     tracker = amore.sample_locator(API_KEY)
     positions = amore.get_available_slots(API_KEY, tracker) # which is a list of dicts
     batches = amore.get_substrate_batches(API_KEY) # which is a list of dicts
@@ -120,7 +130,7 @@ def handle_create_sample():
     check = check_session()
     if check != 0:
         return check
-    API_KEY = session.get('api_key')
+    API_KEY = session.get("api_key")
     title = request.form.get("title")
     position = request.form.get("position") # name of position
     batch = request.form.get("batch") # ID of item
@@ -136,7 +146,7 @@ def handle_create_sample():
         attachments = utils.attachment_handler(uploads=uploads)
     except Exception as e:
         flash(str(e), 'error')
-        # return redirect("/")
+        return redirect("/create")
 
     std_id = id_generated[0] # index 0 of id_generator returns numeric id in yyxxx format
     full_id = id_generated[1] # index 1 of id_generator returns full code in Na-{%y}-xxx format
@@ -145,9 +155,10 @@ def handle_create_sample():
         # recall batches variable BEFORE patching batch
         batches = amore.get_substrate_batches(API_KEY)
         # decrease number of available pieces in selected batch
-        remaining = amore.batch_pieces_decreaser(API_KEY, batch)
+        remaining = amore.batch_pieces_reducer(API_KEY, batch)
     except Exception as e:
-        flash(f"Error handling batch availability: {str(e)}. Sample might have still been created.", 'batch_oos')
+        flash(f"Error handling batch availability: {str(e)}.", 'batch_oos') # "Sample might still have been created" msg removed
+        return redirect("/create")
     
     try: # this is where the magic happens:
         amore.create_sample(
@@ -174,17 +185,70 @@ def handle_create_sample():
     # redirect back to the home page
     return redirect("/create")
 
-@app.route("/positions")
+@app.route("/tracker")
 def handle_positions():
+    get_flashed_messages()
     check = check_session()
     if check != 0:
         return check
-    API_KEY = session.get('api_key')
-    positions = amore.get_positions(API_KEY) # which is a list of dicts
-    batches = amore.get_substrate_batches(API_KEY) # which is a list of dicts
-    proposals = amore.get_proposals(API_KEY) # you get the gist
-    return render_template("positions.html", positions=positions, batches=batches, proposals=proposals)
+    API_KEY = session.get("api_key")
+    ELABFTW_BASE_URL = os.getenv('ELABFTW_BASE_URL')
+    user = session.get("user_fullname") or "unspecified user"
+    tracker = amore.sample_locator(API_KEY) # which is an object of class Tracker
+    slots = tracker.getslots() # see help(Tracker.getslots)
+    return render_template("tracker.html", baseurl=ELABFTW_BASE_URL, user=user, slots=slots)
 
+try:
+    shortlist = utils.slots_shortlist()
+except FileNotFoundError as f:
+    print(f"One or more configuration files were not found:\n{f}")
+    
+for item in shortlist:
+    name = item.get("shortname")
+
+    @app.route(f"/tracker/{name}", endpoint=f"tracker_{name}") # it is necessary to specify the endpoint name to be unique to avoid conflicts 
+    def manage_slot(item=item):
+        check = check_session()
+        if check != 0:
+            return check
+        API_KEY = session.get("api_key")
+        ELABFTW_BASE_URL = os.getenv('ELABFTW_BASE_URL')
+        user = session.get("user_fullname") or "unspecified user"
+        tracker = amore.sample_locator(API_KEY)
+        slot = [ i for i in tracker.getslots() if i.get("name") == item.get("name") ][0]
+        available = tracker.getavailable()
+        return render_template("slot.html", baseurl=ELABFTW_BASE_URL, user=user, slot=slot, available=available)
+
+@app.route(f"/tracker/move_to_new", methods=["POST"])
+def move_to_new():
+    check = check_session()
+    if check != 0:
+        return check
+    API_KEY = session.get("api_key")
+    userid = session.get("userid")
+    tracker = amore.sample_locator(API_KEY)
+    sample_id = int(request.form.get("sample_id"))
+    new_position_name = request.form.get("new_position_name")
+    old_position_name = request.form.get("old_position_name")
+    if old_position_name == "None":
+        try:
+            old_position_name = [
+                item.get("name") for item in tracker.getslots()
+                if item.get("sample_id") == sample_id ][0]
+        except IndexError:
+            old_position_name = None
+    if new_position_name == "None":
+        new_position_name = None
+    std_id = amore.move_to_position(API_KEY=API_KEY, userid=userid, sample_id=sample_id, old_position_name=old_position_name, new_position_name=new_position_name)
+    ELABFTW_BASE_URL = os.getenv('ELABFTW_BASE_URL')
+    if old_position_name == None:
+        flash(f'Sample <a class="flash-button" href="{ELABFTW_BASE_URL}database.php?mode=view&id={sample_id}" target="_blank">{std_id}</a> added to <b>{new_position_name}</b>.', "success")
+    elif new_position_name == None:
+        flash(f'Sample <a class="flash-button" href="{ELABFTW_BASE_URL}database.php?mode=view&id={sample_id}" target="_blank">{std_id}</a> removed from <b>{old_position_name}</b>.', "success")
+    else:
+        flash(f'Sample <a class="flash-button" href="{ELABFTW_BASE_URL}database.php?mode=view&id={sample_id}" target="_blank">{std_id}</a> moved from <b>{old_position_name}</b> to <b>{new_position_name}</b>.', "success")
+    return redirect("/tracker")
+    
 
 if __name__ == '__main__':
     app.run(debug=True)

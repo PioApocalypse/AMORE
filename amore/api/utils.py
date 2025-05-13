@@ -81,8 +81,8 @@ def normalize_position_name(position_name):
     else:
         return position_name
 
-# function to normalize a value which is usually a string with a number or an empty string to integer
 def normalize_to_int(value):
+    '''Function to normalize a value which is usually a string with a number or an empty string to integer.'''
     if value == '':
         value = 0
     elif not isinstance(value, int):
@@ -124,7 +124,22 @@ def tmp_remover(attachments):
     for _, (_, file) in attachments:
         file.close()
         os.remove(file.name)
-        
+
+'''
+=============
+Miscellaneous
+=============
+'''
+
+def slots_shortlist():
+    filename = "amore/var/slots.json"
+    if os.path.isfile(filename):
+        with open(filename) as f:
+            shortlist = json.load(f)
+        return shortlist
+    else:
+        raise FileNotFoundError(f"No {filename} file found.\nPlease run amore/scan_elab.py.")
+
 
 if __name__=="__main__":
     print("Debug mode.")

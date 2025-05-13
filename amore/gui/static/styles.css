@@ -10,11 +10,20 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 90vh;
 }
 
 a {
   text-decoration: none;
+}
+
+a.flash-button {
+  color: #f4f4f4;
+  font-weight: bold;
+  border: 1px solid #f4f4f4;
+  border-radius: 0.2rem;
+  padding: 0.1rem 0.3rem;
+  margin: 0 0.3rem;
 }
 
 .home-grid {
@@ -90,6 +99,7 @@ label,
 }
 
 input[type="text"],
+input[type="number"],
 input[type="password"],
 textarea,
 select {
@@ -142,6 +152,11 @@ button,
 button:hover,
 .button:hover {
   background-color: #0056b3;
+}
+
+.lesser-button:hover {
+  background-color: #ffd6a1 !important;
+  color: #4e1d1d !important;
 }
 
 .red {
