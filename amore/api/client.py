@@ -48,6 +48,15 @@ def create_experiment(title, date, status, tags, b_goal, b_procedure, b_results)
 '''
 
 def sample_locator(API_KEY):
+    '''
+    Function which looks up "sample locator" among eLabFTW's Experiments,
+    selects the first one with matching title (caps-insensitive) and returns
+    a Tracker-class object with data taken from said Experiment.
+    See help(Tracker) or file "amore/classes.py" for more info.
+
+    Raises Exception if no Experiment matching the exact name "Sample Locator"
+    is found on eLabFTW.
+    '''
     search_query = f"{experiments_url}?q=%22sample+locator%22"
     header = Header(API_KEY).dump()
     response = requests.get(
@@ -69,6 +78,14 @@ def sample_locator(API_KEY):
     raise Exception(f"No experiment \"Sample Locator\" found in eLabFTW's database.")
 
 def move_sample(API_KEY, sample_id, new_position_name):
+    '''
+    Patches a sample's position with the specified new one.
+    The sample's resource-ID and the new position name is given;
+    the field patched is "metadata/extra_fields/Position".
+
+    The sample's STD-ID is returned - taken from the first 9 characters
+    of the sample's title.
+    '''
     header = Header(API_KEY).dump()
     sample = requests.get(
         headers=header,
@@ -88,6 +105,11 @@ def move_sample(API_KEY, sample_id, new_position_name):
     return std_id
 
 def add_to_position(API_KEY, sample_id, position_name, userid=""): # POST to empty position
+    '''
+    Patches the "Sample Locator" Experiment with the position of a newly created sample.
+
+    Obsolescent, supersided by "move_to_position" and likely to be removed later.
+    '''
     header = Header(API_KEY).dump()
     tracker = sample_locator(API_KEY)
     metadata = tracker.meta
@@ -113,6 +135,18 @@ def add_to_position(API_KEY, sample_id, position_name, userid=""): # POST to emp
     return 0
 
 def move_to_position(API_KEY, sample_id, old_position_name, new_position_name, userid=""): # DELETE from old position then POST to empty position
+    '''
+    Patches the "Sample Locator" Experiment moving a sample from an old position to a new one.
+    It handles the following exceptions:
+        - Old position name is null (new sample is added);
+        - New position name is null (a sample is removed from the chambers);
+        - Both old and new position names are null (neutral condition, raises error).
+    
+    If a new sample is added a POST request is made to link the "Sample Locator" with the
+    sample's eLabFTW entry.
+    If a sample is removed a DELETE request is made to delete the link between the "Sample
+    Locator" and the sample's eLabFTW entry.
+    '''
     if (old_position_name == new_position_name
         or (not old_position_name and not new_position_name)): # neutral condition, just to be safe (both null or both equal)
         raise Exception("New and old position correspond.")
@@ -162,6 +196,9 @@ def move_to_position(API_KEY, sample_id, old_position_name, new_position_name, u
 '''
 
 def get_new_sample(API_KEY):
+    '''
+    Returns the sample with the highest resource-ID.
+    '''
     every_id = []
     header = Header(API_KEY).dump()
     search_query = f'{items_url}?limit=9999'
@@ -177,6 +214,11 @@ def get_new_sample(API_KEY):
 
 
 def patch_sample(API_KEY, new_elabid, new_userid, body, std_id, position, batch, subholder, proposal):
+    '''
+    Patches the [newly created] sample adding important metadata
+    which cannot be added on eLabFTW Items directly on creation
+    in eLabFTW 5.1.15 and before.
+    '''
     # like before, different url
     itemurl = f"{items_url}/{new_elabid}/"
     header = Header(API_KEY).dump()
@@ -209,6 +251,9 @@ def patch_sample(API_KEY, new_elabid, new_userid, body, std_id, position, batch,
 
 
 def upload_attachments(API_KEY, new_elabid, attachments):
+    '''
+    Uploads attachments to the resource-specific "uploads" API endpoint.
+    '''
     uploads_url = f"{items_url}/{new_elabid}/uploads"
     for field_name, (filename, file) in attachments:
         header = Header(API_KEY, None).dump()
@@ -226,6 +271,14 @@ def upload_attachments(API_KEY, new_elabid, attachments):
 
 
 def create_sample(API_KEY, title, tags, body, std_id, position, batch, subholder, proposal, attachments=None): 
+    '''
+    Creates a new Item of the "Sample" category on eLabFTW, providing title, tags, body and
+    all metadata required.
+
+    Up until eLabFTW 5.1.15 Item creation didn't allow most of these informations to be pushed
+    directly with a single POST request, which is why this function calls "get_new_sample" and
+    "patch_sample" to recover the resource-ID of the new sample and patch it with the extra data.
+    '''
     header = Header(API_KEY).dump()
     payload = {
         "template": cat.get("sample"), # 10 defines this item as 'sample' in our database
@@ -265,6 +318,12 @@ def create_sample(API_KEY, title, tags, body, std_id, position, batch, subholder
     return 0 # for confirmation message to user
 
 def batch_pieces_reducer(API_KEY, batch):
+    '''
+    Reduces the "Available pieces" field value of the substrates batch chosen during
+    sample creation by one.
+    Returns remaining pieces to warn the user if the number is too low or zero (depletion
+    of the batch).
+    '''
     batch_url = f"{items_url}/{batch}/"
     header = Header(API_KEY).dump()
 
@@ -306,11 +365,18 @@ def batch_pieces_reducer(API_KEY, batch):
 '''
 
 def get_available_slots(API_KEY, tracker):
+    '''
+    Returns a list of the available slot in a Tracker-class object sorted by name.
+    '''
     available_slots = tracker.getavailable()
     sorted_slots = sorted(available_slots, key=lambda item: (item["name"]))
     return sorted_slots
 
 def get_substrate_batches(API_KEY):
+    '''
+    Looks up every Item of the "Substrates Batch" Category and returns a list of those
+    with at least one available piece.
+    '''
     header = Header(API_KEY).dump()
     search_query = f"{items_url}?q=&cat={cat.get("substrates batch")}&limit=9999" # "SUBSTRATES BATCH" should be id = 9
     response = requests.get(
@@ -331,6 +397,7 @@ def get_substrate_batches(API_KEY):
     return batches # which is a list of dictionaries with 'id' and 'title'
 
 def get_proposals(API_KEY):
+    '''Returns a list of proposals - which are a category of Items on eLabFTW.'''
     header = Header(API_KEY).dump()
     search_query = f"{items_url}?q=&cat={cat.get("proposal")}&limit=9999" # "PROPOSAL" should be id = 15
     response = requests.get(
