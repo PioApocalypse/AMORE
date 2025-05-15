@@ -63,13 +63,25 @@
                     <td>{{ item.get("sector") }}</td>
                     <td>{{ item.get("slot") }}</td>
                     {% if item.get("available") == False %}
-                        <td><a href="{{ baseurl }}database.php?mode=view&id={{ item.get("sample_id") }}" target="_blank">{{ item.get("sample_stdid") }}</a></td>
-                        <td>{{ item.get("sample_name") }}</td>
-                        <td><a href="{{ request.path }}/{{ item.get("name").replace(" ","") }}"><button class="lesser-button">Move sample</button></a></td>
+                        {% if item.get("sample_stdid") == None %}
+                            <td class="available">-</td>
+                            <td class="available"><i>missing or deleted</i></td>
+                            <td>
+                                <form action="/tracker/clear_slot" method="post">
+                                    <input type="hidden" name="slot" value="{{ item.get("name") }}">
+                                    <button class="lesser-button" type="submit">Clear empty slot</button>
+                                </form>
+                            </td>
+                            <!-- <td><a href="{{ request.path }}/{{ item.get("shortname") }}/clear"><button class="lesser-button">Clear empty slot</button></a></td> -->
+                        {% else %}
+                            <td><a href="{{ baseurl }}database.php?mode=view&id={{ item.get("sample_id") }}" target="_blank">{{ item.get("sample_stdid") }}</a></td>
+                            <td>{{ item.get("sample_name") }}</td>
+                            <td><a href="{{ request.path }}/{{ item.get("shortname") }}"><button class="lesser-button">Move sample</button></a></td>
+                        {% endif %}
                     {% else %}
                         <td class="available">-</td>
                         <td class="available"><i>empty</i></td>
-                        <td><a href="{{ request.path }}/{{ item.get("name").replace(" ","") }}"><button class="lesser-button">Add new sample</button></a></td>
+                        <td><a href="{{ request.path }}/{{ item.get("shortname") }}"><button class="lesser-button">Add new sample</button></a></td>
                     {% endif %}
                 </tr>
             {% endfor %}

@@ -136,23 +136,25 @@ def add_to_position(API_KEY, sample_id, position_name, userid=""): # POST to emp
     )
     return 0
 
-def move_to_position(API_KEY, sample_id, old_position_name, new_position_name, userid=""): # DELETE from old position then POST to empty position
+def patch_tracker(API_KEY, sample_id, old_position_name, new_position_name, userid=""):
     '''
     Patches the "Sample Locator" Experiment moving a sample from an old position to a new one.
     It handles the following exceptions:
-        - Old position name is null (new sample is added);
-        - New position name is null (a sample is removed from the chambers);
-        - Both old and new position names are null (neutral condition, raises error).
+        - Old position name is null (new sample is added): only the new position is changed,
+          a POST request is sent to the /items_links endpoint to LINK sample and locator;
+        - New position name is null (a sample is removed from the chambers): the old position
+          is cleared, then a DELETE request is sent to the /items_links endpoint to severe the
+          link between sample and locator;
+        - Both old and new position names are null (neutral condition): Exception is raised.
     
     If a new sample is added a POST request is made to link the "Sample Locator" with the
     sample's eLabFTW entry.
     If a sample is removed a DELETE request is made to delete the link between the "Sample
     Locator" and the sample's eLabFTW entry.
     '''
-    std_id = move_sample(API_KEY, sample_id, new_position_name) # try to fetch the sample first
     if (old_position_name == new_position_name
         or (not old_position_name and not new_position_name)): # neutral condition, just to be safe (both null or both equal)
-        raise Exception("New and old position correspond.")
+        raise Exception("New and old positions correspond.")
     header = Header(API_KEY).dump()
     tracker = sample_locator(API_KEY)
     tracker_url = f"{experiments_url}/{tracker.id}"
@@ -161,11 +163,9 @@ def move_to_position(API_KEY, sample_id, old_position_name, new_position_name, u
     if (old_position_name == "") or (old_position_name is None):
         metadata["extra_fields"][new_position_name]["value"] = sample_id
         method = "post" # if old position doesn't exist, item is not linked yet so do it
-        link_url = f"{tracker_url}/items_links/{sample_id}"
     elif (new_position_name == "") or (new_position_name is None):
         metadata["extra_fields"][old_position_name]["value"] = None
         method = "delete" # if new position doesn't exist, unlink item
-        link_url = f"{tracker_url}/items_links/{sample_id}"
     else:
         metadata["extra_fields"][old_position_name]["value"] = None
         metadata["extra_fields"][new_position_name]["value"] = sample_id
@@ -180,6 +180,7 @@ def move_to_position(API_KEY, sample_id, old_position_name, new_position_name, u
     )
     try:
         method # if method variable is assigned it means we need to create or delete the link between the sample and the Locator
+        link_url = f"{tracker_url}/items_links/{sample_id}"
         linking_item = requests.request(
             method=method,
             headers=header,
@@ -188,6 +189,24 @@ def move_to_position(API_KEY, sample_id, old_position_name, new_position_name, u
         )
     except:
         pass
+    return
+
+def move_to_position(API_KEY, sample_id, old_position_name, new_position_name, userid=""):
+    '''
+    Moves a sample from an old to a new position by:
+        1. Patching the sample Item's metadata adding the new position's name;
+        2. Patching the "Sample Locator" Experiment by emptying the old position and adding the
+           resource ID of the sample to the new position;
+        3. Deleting or creating the link between the sample and the locator - if the sample is
+           being removed or added for the first time.
+
+    It handles the following exceptions (see help(patch_tracker) for more info):
+        - Old position name is null (new sample is added);
+        - New position name is null (a sample is removed from the chambers);
+        - Both old and new position names are null (neutral condition, raises error).
+    '''
+    std_id = move_sample(API_KEY, sample_id, new_position_name) # try to fetch the sample first
+    patch_tracker(API_KEY, sample_id, old_position_name, new_position_name, userid) # patch the sample locator experiment
     return std_id
 
 

@@ -205,7 +205,6 @@ except FileNotFoundError as f:
     
 for item in shortlist:
     name = item.get("shortname")
-
     @app.route(f"/tracker/{name}", endpoint=f"tracker_{name}") # it is necessary to specify the endpoint name to be unique to avoid conflicts 
     def manage_slot(item=item):
         get_flashed_messages()
@@ -255,6 +254,16 @@ def move_to_new():
         flash(f'Sample <a class="flash-button" href="{ELABFTW_BASE_URL}database.php?mode=view&id={sample_id}" target="_blank">{std_id}</a> moved from <b>{old_position_name}</b> to <b>{new_position_name}</b>.', "success")
     return redirect("/tracker")
     
+@app.route(f"/tracker/clear_slot", endpoint=f"clear_slot", methods=["POST"]) # this is to clear a slot containing a missing sample (id pointing to missing/deleted item)
+def clear_slot():
+    check = check_session()
+    if check != 0:
+        return check
+    API_KEY = session.get("api_key")
+    userid = session.get("userid")
+    old_position_name = request.form.get("slot")
+    amore.patch_tracker(API_KEY=API_KEY, userid=userid, sample_id=None, old_position_name=old_position_name, new_position_name=None)
+    return redirect("/tracker")
 
 if __name__ == '__main__':
     app.run(debug=True)
