@@ -215,9 +215,12 @@ for item in shortlist:
         ELABFTW_BASE_URL = os.getenv('ELABFTW_BASE_URL')
         user = session.get("user_fullname") or "unspecified user"
         tracker = amore.sample_locator(API_KEY)
-        slot = [ i for i in tracker.getslots() if i.get("name") == item.get("name") ][0]
-        available = tracker.getavailable()
-        return render_template("slot.html", baseurl=ELABFTW_BASE_URL, user=user, slot=slot, available=available)
+        slot = [ i for i in tracker.getslots() if i.get("name") == item.get("name") ][0] # data on this slot
+        available = tracker.getavailable() # list of available slots for dropdown menu
+        missing_flag = False # is the sample associated to that ID missing? (default: no)
+        if not slot.get("available") and slot.get("sample_stdid") in [None, "", "None"]:
+            missing_flag = True # sample is missing
+        return render_template("slot.html", baseurl=ELABFTW_BASE_URL, user=user, slot=slot, available=available, missing_flag=missing_flag)
 
 @app.route(f"/tracker/move_to_new", methods=["POST"])
 def move_to_new():
@@ -263,6 +266,7 @@ def clear_slot():
     userid = session.get("userid")
     old_position_name = request.form.get("slot")
     amore.patch_tracker(API_KEY=API_KEY, userid=userid, sample_id=None, old_position_name=old_position_name, new_position_name=None)
+    flash(f"Slot {old_position_name} cleared successfully!",'success')
     return redirect("/tracker")
 
 if __name__ == '__main__':

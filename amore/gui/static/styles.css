@@ -54,6 +54,10 @@ a.flash-button {
   max-width: 800px;
 }
 
+.slim {
+  max-width: 500px;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr; /* two columns of 1fr width */

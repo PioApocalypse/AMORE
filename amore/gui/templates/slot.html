@@ -42,7 +42,7 @@
     
             <!-- FORM -->
             <div class="home-column">
-                <div class="form-container form-container">
+                <div class="form-container slim">
                     <!-- GET NAME OF SLOT -->
                     <h2>POSITION: {{ slot.get("name") }}</h2>
                 
@@ -67,11 +67,30 @@
                                 </div>
                                 <button type="submit">Add Sample to {{ slot.get("shortname") }}</button>
                             </form>
-            
+                            
+                        {% elif missing_flag %}
+                        <!--=========================
+                            CASE 2a: SLOT IS OCCUPIED
+                                BUT SAMPLE IS MISSING
+                        ==========================-->
+                            <h3 style="color: #7700ff; margin-bottom: 1rem;">THIS SLOT CONTAINS AN INVALID RESOURCE ID</h3>
+                            <p>The resource ID in this slot (<u>{{ slot.get("sample_id") }}</u>) is not associated to any existing resource on your eLabFTW.</p>
+                            <p><a href="{{ baseurl }}database.php?mode=view&id={{ slot.get("sample_id") }}" target="_blank">Check on eLabFTW</a></p>
+                            <h3 style="margin: 1rem 0;">HOW DID IT HAPPEN?</h3>
+                            <p>Most likely someone has either deleted the eLab entry for the sample associated to this position without updating the Sample Locator Experiment,
+                            or they've added an invalid ID to the Sample Locator Experiment.</p>
+                            <h3 style="margin: 1rem 0;">WHAT CAN I DO?</h3>
+                            <p>You can <b>clean up the slot</b>: this will delete the value stored for that particular slot and make it available again.
+                            Make sure the entry associated to the ID <u>{{ slot.get("sample_id") }}</u> is actually missing, then use this button to automatically clear the slot.</p><br>
+                            <form action="/tracker/clear_slot" method="post">
+                                <input type="hidden" name="slot" value="{{ slot.get("name") }}">
+                                <button type="submit">Clear empty slot</button>
+                            </form>
                         {% else %}
-                        <!--========================
-                            CASE 2: SLOT IS OCCUPIED
-                        =========================-->
+                        <!--=========================
+                            CASE 3b: SLOT IS OCCUPIED
+                                    BY A LEGIT SAMPLE
+                        ==========================-->
                             <h3 style="color: #a02525; margin-bottom: 1rem;">THIS SLOT IS: OCCUPIED BY {{ slot.get("sample_stdid") }}</h3>
                             <p>Sample from {{ slot.get("sample_stdid")[:2] }} n°{{ slot.get("sample_stdid")[6:9] }} of year 20{{ slot.get("sample_stdid")[3:5] }}:</p>
                             <p>{{ slot.get("sample_name") }}</p>

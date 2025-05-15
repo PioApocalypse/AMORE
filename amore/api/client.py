@@ -94,6 +94,7 @@ def move_sample(API_KEY, sample_id, new_position_name):
     )
     if sample.status_code == 404:
         raise ValueError(f"No sample exists with resource ID of {sample_id}.")
+    sample = sample.json()
     metadata = json.loads(sample.get("metadata"))
     metadata["extra_fields"]["Position"]["value"] = new_position_name
     patch = json.dumps(metadata)

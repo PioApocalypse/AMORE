@@ -124,7 +124,7 @@ class Tracker:
                     "sample_id": slotsample, # again: ID not title
                     "sample_stdid": samplestdid, # our standard-ID
                     "sample_name": samplename, # THIS is the title
-                    "available": available
+                    "available": available # this is boolean not string
                 }
                 slotlist.append(response) # object containing full location of the slot ("name" key), instrument name ("inst" key) and the sample associated if any ("sample" key)
         return slotlist
