@@ -208,6 +208,7 @@ for item in shortlist:
 
     @app.route(f"/tracker/{name}", endpoint=f"tracker_{name}") # it is necessary to specify the endpoint name to be unique to avoid conflicts 
     def manage_slot(item=item):
+        get_flashed_messages()
         check = check_session()
         if check != 0:
             return check
@@ -239,8 +240,13 @@ def move_to_new():
             old_position_name = None
     if new_position_name == "None":
         new_position_name = None
-    std_id = amore.move_to_position(API_KEY=API_KEY, userid=userid, sample_id=sample_id, old_position_name=old_position_name, new_position_name=new_position_name)
     ELABFTW_BASE_URL = os.getenv('ELABFTW_BASE_URL')
+    try:
+        std_id = amore.move_to_position(API_KEY=API_KEY, userid=userid, sample_id=sample_id, old_position_name=old_position_name, new_position_name=new_position_name)
+    except ValueError as v:
+        flash(f'{str(v)}<br><a class="flash-button" href="{ELABFTW_BASE_URL}database.php" target="_blank">Open eLabFTW</a>','error')
+        previous_url = request.form.get("current_url")
+        return redirect(previous_url)
     if old_position_name == None:
         flash(f'Sample <a class="flash-button" href="{ELABFTW_BASE_URL}database.php?mode=view&id={sample_id}" target="_blank">{std_id}</a> added to <b>{new_position_name}</b>.', "success")
     elif new_position_name == None:

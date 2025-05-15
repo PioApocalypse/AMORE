@@ -91,7 +91,9 @@ def move_sample(API_KEY, sample_id, new_position_name):
         headers=header,
         url=f"{items_url}/{sample_id}",
         verify=ssl_verification
-    ).json()
+    )
+    if sample.status_code == 404:
+        raise ValueError(f"No sample exists with resource ID of {sample_id}.")
     metadata = json.loads(sample.get("metadata"))
     metadata["extra_fields"]["Position"]["value"] = new_position_name
     patch = json.dumps(metadata)
@@ -147,6 +149,7 @@ def move_to_position(API_KEY, sample_id, old_position_name, new_position_name, u
     If a sample is removed a DELETE request is made to delete the link between the "Sample
     Locator" and the sample's eLabFTW entry.
     '''
+    std_id = move_sample(API_KEY, sample_id, new_position_name) # try to fetch the sample first
     if (old_position_name == new_position_name
         or (not old_position_name and not new_position_name)): # neutral condition, just to be safe (both null or both equal)
         raise Exception("New and old position correspond.")
@@ -185,7 +188,6 @@ def move_to_position(API_KEY, sample_id, old_position_name, new_position_name, u
         )
     except:
         pass
-    std_id = move_sample(API_KEY, sample_id, new_position_name)
     return std_id
 
 

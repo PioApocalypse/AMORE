@@ -13,7 +13,9 @@
                 {% if messages %}
                     {% for category, message in messages %}
                         <div class="flash {{ category }}">
-                            {{ message }}
+                            {% autoescape false %}
+                                {{ message }}
+                            {% endautoescape %}
                             <span class="close-btn" onclick="this.parentElement.remove()">×</span>
                         </div>
                     {% endfor %}
@@ -55,10 +57,12 @@
                                 <div class="form-column">
                                     <div class="form-group" style="gap:0.5rem">
                                         <label for="sample_id">ID of the Sample on eLabFTW<span class="red" title="Required">*</span>:</label>
-                                        <input type="number" id="sample_id" name="sample_id" placeholder="ID of your sample" required>
+                                        <input type="number" id="sample_id" name="sample_id" placeholder="ID of your sample" autofocus required>
                                         <!-- HIDDEN PRESET VALUES -->
                                         <input type="hidden" name="old_position_name" value="None">
                                         <input type="hidden" name="new_position_name" value="{{ slot.get("name") }}">
+                                        <!-- ONLY IF SLOT IS AVAILABLE -->
+                                        <input type="hidden" name="current_url" value="{{ request.path }}">
                                     </div>
                                 </div>
                                 <button type="submit">Add Sample to {{ slot.get("shortname") }}</button>
