@@ -11,7 +11,9 @@ ARG URL
 ARG VERIFY
 ENV ELABFTW_BASE_URL=$URL
 ENV VERIFY_SSL=$VERIFY
+RUN touch ok
 RUN python3 amore/scan_elab.py
+RUN rm -f ok
 RUN rm -f config.json
 
 ENV FLASK_APP=amore/gui/app.py

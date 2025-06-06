@@ -18,6 +18,8 @@ filename = "amore/var/categories.json"
 if os.path.isfile(filename):
     with open(filename, 'r') as catfile:
         cat = json.load(catfile)
+elif os.path.isfile("ok"):
+    pass
 else:
     raise FileNotFoundError(f"No {filename} file found.\nPlease run amore/scan_elab.py.")
 
