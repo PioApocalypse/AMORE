@@ -1,24 +1,20 @@
-#!/bin/bash
+#!/bin/sh
 
 # PRESENTATION!
 echo "==============================================="
 echo "======== Welcome to AMORE: Alternative ========"
 echo "=== Manager of Outputs with Reduced Efforts ==="
 echo "================ Setup Wizard. ================"
+echo "============== (Alpine edition). =============="
 echo "==============================================="
 echo
 
 # FUNCTIONS
-# Define function which checks for valid root dir url in the stupidest way possible:
-#   curl GET a non existent (404) page, check for "eLabFTW" (which should be in the meta description)
-# To-do: sanify this check, currently it works very poorly and doesn't differentiate between https and http
+# Check existence: checks if website exists using wget. Errors result in exit code ! 0
 check_elabftw() {
-    local url="$1/api"
-    if curl -s "$url" -k | grep -q "eLabFTW"; then
-        return 0
-    else
-        return 1
-    fi
+    local url="$1"
+    wget --spider "$url"
+    return $?
 }
 # Normalize url to conform to AMORE
 normalize_url() {
@@ -48,14 +44,6 @@ parse_and_export_json() {
     sleep $SLEEP
     echo
 }
-
-if [ -f "/etc/alpine-release" ]; then
-    echo "WARNING: you're currently on Alpine Linux."
-    echo "alpine-setup.sh will be run instead."
-    read -p "Press enter to continue, or ^C to abort."
-    sh ./alpine-setup.sh
-    exit 0
-fi
 
 # Check arguments for options: --force, --literal
 # Literal mode: do not normalize the url
@@ -140,12 +128,11 @@ fi
 # read -s -p "Paste your key here (echo off): " KEY # password-like
 # echo # new line
 read -p "Only allow secure connections (Y/n)? " secure
-secure=${secure,,} # to lowercase
 if [[ -z "$secure" ]]; then
     VERIFY_SSL=True
     else case "$secure" in
-        y|ye|yes) VERIFY_SSL=True ;;  # 0 = true (yes)
-        n|nay|no) VERIFY_SSL=False ;;   # 1 = false (no)
+        [Yy]*) VERIFY_SSL=True ;;  # 0 = true (yes)
+        [Nn]*) VERIFY_SSL=False ;;   # 1 = false (no)
         *) echo I assume you mean 'yes' then... ; VERIFY_SSL=True ;;
     esac
 fi
@@ -167,7 +154,13 @@ if [[ -z "$API_KEY" ]]; then
 fi
 
 if [[ -z "$HOST_PORT" ]]; then
-    export HOST_PORT=5000
+    echo
+    read -p "Which port do you want to expose? [5000] " HOST_PORT
+    export HOST_PORT=$HOST_PORT
+    if [[ -z "$HOST_PORT" ]]; then
+        export HOST_PORT=5000
+        echo "Port set to default (5000)."
+    fi
 fi
 
 echo
@@ -181,20 +174,9 @@ sleep $SLEEP
 if command -v docker &>/dev/null ; then
     echo "Docker found at $(command -v docker)"
 else
-    echo "Docker not installed. Refer to: https://docs.docker.com/engine/install/"
+    echo "Docker not installed. Refer to: https://wiki.alpinelinux.org/wiki/Docker"
     exit 1
 fi
-# Feel free to remove this block if your init system is different from Systemd
-echo "Is docker running?"
-sleep $SLEEP
-if [ "$( systemctl is-active docker )" == "active" ]; then
-    echo "Docker is up and running." && sleep $SLEEP
-else
-    echo "Docker is not running."
-    echo "Have you tried 'systemctl enable --now docker && systemctl start docker'?"
-    exit 1
-fi
-# end
 
 touch config.json
 cat > config.json <<EOF
@@ -223,10 +205,8 @@ docker run -d -p ${HOST_PORT}:5000 --name amore-container --restart always amore
 sleep $SLEEP
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# This script serves as installer of AMORE on a computer.   #
-# Requires Linux and Docker.                                #
-# Developed on Linux Mint 22, Nobara Linux 41.              #
-# Tested and deployed on Almalinux 9.                       #
+# This script serves as installer of AMORE on an Alpine     #
+# Linux machine.                                            #
 #                                                           #
 # May no automation provided by this piece of software ever #
 # save a single second in the work of a military scientist. #

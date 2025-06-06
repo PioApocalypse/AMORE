@@ -25,8 +25,8 @@ cd AMORE/
 The wizard is very rudimentary and guides you through the installation process, asking for a valid URL of an existent eLabFTW instance; unless the `--literal` flag is given, **the wizard is agnostic to the URL format** meaning you can include or omit both the protocol prefix (*http://*, *https://*...) and the trailing slash at the end of the URL, but you **can't omit non-default port numbers** (e.g. `demo.elabftw.net:8080`).  
 You will also be asked if only secure connections should be allowed (yes by default), which is something you only want to toggle off if your eLabFTW instance does not possess a CA SSL certificate (for instance if you're running in a test/local environment).
 
-> Note: `setup.sh` requires Bash 5, Systemd, binary curl and of course Docker. It might even work on different shells but it's not tested yet.  
-> Also: If you're one of those poor brothers running a Linux OS without Systemd - and you have my compassion - you can simply remove the "*Is docker running?*" section from the installer and go on about your business.
+> Note: `setup.sh` requires Bash 5, Systemd, binary curl and of course Docker.  
+> If you're running Alpine Linux, or other distros without Systemd - and you have my compassion - please run `alpine-setup.sh` instead, as said script *DOES NOT* require Bash, curl or Systemd to be installed.
 
 If your wizard does not work or returns errors try one of the following flags or skip to the "[Manual install](#manual-install)" section.
 
