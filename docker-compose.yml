@@ -1,0 +1,27 @@
+services:
+  amore:
+    build:
+      context: .
+      args:
+        URL: ${ELABFTW_BASE_URL}
+        VERIFY: ${VERIFY_SSL}
+      dockerfile: dockerfile
+    container_name: amore
+    environment:
+      - API_KEY=${API_KEY}
+    expose:
+      - "5000"
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:latest
+    container_name: amore-nginx
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/cert.pem:/etc/ssl/certs/cert.pem
+      - ./nginx/key.pem:/etc/ssl/certs/key.pem
+    depends_on:
+      - amore
+    restart: unless-stopped
