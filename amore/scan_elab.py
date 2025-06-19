@@ -1,21 +1,33 @@
 import requests
 import os
 import json
+from dotenv import load_dotenv, find_dotenv
 from datetime import datetime
 from amore.api.client import sample_locator
 
 # Global variables:
-with open('config.json') as cfg:
-    config = json.load(cfg)
 
-API_URL = config.get('ELABFTW_BASE_URL') or os.environ('ELABFTW_BASE_URL') # software will eventually return error if no URL is provided
-types_endpoint = f"{API_URL}api/v2/items_types/"
-if config.get('VERIFY_SSL'):
-    ssl_verification = str(config.get('VERIFY_SSL')).lower() == 'true' # this way you can toggle SSL verification in .env file
+if os.path.isfile('config.json'):
+    with open('config.json') as cfg:
+        config = json.load(cfg)
+    API_URL = config.get('ELABFTW_BASE_URL') #or os.environ('ELABFTW_BASE_URL') # software will eventually return error if no URL is provided
+elif os.path.isfile('.env'):
+    load_dotenv()
+    API_URL = os.getenv('ELABFTW_BASE_URL')
 else:
-    ssl_verification = True # in case VERIFY_SSL is not provided
+    raise FileNotFoundError(f"One of these files is required: config.json or .env.\nRead the official documentation for more.")
 
-def check_apikey(KEY=""):
+types_endpoint = f"{API_URL}api/v2/items_types/"
+
+if not os.getenv('VERIFY_SSL'):
+    if config.get('VERIFY_SSL'):
+        ssl_verification = str(config.get('VERIFY_SSL')).lower() == 'true' # this way you can toggle SSL verification in .env file
+    else:
+        ssl_verification = True # in case VERIFY_SSL is not provided
+else:
+    ssl_verification = str(os.getenv('VERIFY_SSL')).lower() == 'true'
+
+def check_apikey(KEY="", ssl_verification=True):
     # No sense proceeding if the user somehow submitted an empty key...
     if KEY == "":
         raise Exception('You submitted an empty key.')
@@ -71,9 +83,10 @@ def scan_for_categories(API_KEY):
 if __name__=="__main__":
     x = 3 # number of possible attempts
     while x > 0: # loop to decrease attempts
-        API_KEY = config.get('API_KEY') or os.environ.get('API_KEY') or str(input("Enter a valid API key - it won't be stored: ")) # if not provided it's taken from environment variable OR from input
+        API_KEY = os.getenv('API_KEY') or config.get('API_KEY') or str(input("Enter a valid API key - it won't be stored: ")) # if not provided it's taken from environment variable OR from input
+        print(API_KEY)
         try:
-            check_apikey(API_KEY) # if it checks out it's all good
+            check_apikey(API_KEY, ssl_verification) # if it checks out it's all good
             break
         except Exception as e:
             if "read-only" in str(e):
