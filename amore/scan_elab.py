@@ -78,7 +78,7 @@ def scan_for_categories(API_KEY):
         url=types_endpoint,
         headers=header,
         verify=ssl_verification)
-    categories = { item['title'].lower(): item['id'] for item in response.json() }
+    categories = { item['title'].lower(): item['category'] for item in response.json() }
     return categories
 
 
