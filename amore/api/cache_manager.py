@@ -41,7 +41,33 @@ class CacheManager:
             key: 0 for key in self.cache.keys()
         }  # dict. of zeros, incremented later
         # Creates a lock for threading:
+        # To-do: check how Lock objects (prev. functions) changed in Python 3.13.
         self.lock = threading.Lock()
+
+    def _load_from_disk(self, key):
+        """Loads cache from JSON file. Returns json.load(file), or None."""
+        # filepath should be the same in _load_from_disk and _save_to_disk:
+        filepath = os.path.join(self.cache_dir, f"{key}.json")
+        try:
+            if os.path.isfile(filepath):
+                with open(filepath, "r") as f:
+                    return json.load(f)
+        except Exception as e:
+            print(f"Error loading {key} from disk: {str(e)}")
+        return None
+
+    def _save_to_disk(self, key, data):
+        """Persists cache to JSON file."""
+        # filepath should be the same in _load_from_disk and _save_to_disk:
+        filepath = os.path.join(self.cache_dir, f"{key}.json")
+        # error handling favor of Claude Code:
+        try:
+            os.makedirs(self.cache_dir, exist_ok=True)
+            # NOTE: if file exists it gets overwritten.
+            with open(filepath, "w") as f:
+                json.dump(data, f, indent=2)
+        except Exception as e:
+            print(f"Error saving {key} to disk: {str(e)}")
 
     def is_expired(self, key):
         """Checks if cache entry has expired. Returns boolean value."""
@@ -68,6 +94,7 @@ if __name__ == "__main__":
     cache = CacheManager()
     cache.timestamps = {key: time.time() for key in cache.timestamps}
     cache.cache["sample_locator"] = {"SLOT_A": "sample X", "SLOT_B": "another sample"}
+    cache._save_to_disk("sample_locator", data=cache.cache["sample_locator"])
     while not cache.is_expired("sample_locator"):
         print("NOT EXPIRED")
         time.sleep(10)
@@ -77,3 +104,5 @@ if __name__ == "__main__":
         if left >= 30:
             cache.invalidate()
     print("EXPIRED")
+    testcache = cache._load_from_disk("sample_locator")
+    print(testcache)

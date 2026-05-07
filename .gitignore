@@ -10,6 +10,7 @@ config.json
 **/__pycache__
 **/categories.json
 **/slots.json
+**/sample_locator.json
 
 # ssl certificates
 **/*.pem
