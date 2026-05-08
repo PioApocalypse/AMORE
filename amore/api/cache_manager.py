@@ -115,6 +115,64 @@ class CacheManager:
                 self.cache = {key: None for key in self.cache}
                 self.timestamps = {key: 0 for key in self.timestamps}
 
+    def get(self, key, api_key=None, loader_func=None, force_refresh=False):
+        """
+        Retrieves cache entry. If expired or force_refresh is True, it calls the API to update the cache.
+        Returns cached data - or None if that's not available.
+
+        Part of this was written with assistance from Claude Code.
+
+        Args:
+            key:            Category key to retrieve. Must be one of the keys in self.cache.
+            api_key:        Mandatory API key to call the API if cache is expired or force_refresh is True.
+
+            loader_func:    Optional function to load data from API. Should return data to be cached.
+            force_refresh:  If True, forces cache refresh by calling the API even if cache is valid and not expired.
+                            Default is False, of course.
+        """
+        with self.lock:
+            # If cache is valid and force_refresh is False, return cached data:
+            if (
+                not force_refresh
+                and self.cache[key] is not None
+                and not self.is_expired(key)
+            ):
+                return self.cache[key]
+
+            # If cache is None and force_refresh is False, try loading from disk:
+            if self.cache[key] is None and not force_refresh:
+                disk_data = self._load_from_disk(key)
+                if disk_data is not None:
+                    self.cache[key] = disk_data
+                    self.timestamps[key] = time.time()
+                    return disk_data
+
+            # If force_refresh, key is expired or None (implied from previous conditions),
+            # call API to update cache  - which requires API key and loader function:
+            if (
+                loader_func is not None and
+                api_key is not None
+            ):
+                try:
+                    self.cache[key] = loader_func(api_key)
+                    self.timestamps[key] = time.time()
+                    self._save_to_disk(key, data=self.cache[key])
+                    return self.cache[key]
+                except:
+                # Failsafe: try fallback to stale cache if available, otherwise raise exception:
+                    print(f"Error loading {key} from API. Attempting fallback to stale cache...")
+                    try:
+                        if self.cache[key] is not None:
+                            return self.cache[key]
+                        else:
+                            raise Exception(f"No stale cache available for {key}.")
+
+            # If program reaches this point, it means API call failed and no stale cache is available.
+            # This means we have to raise an exception, because returning None would be indistinguishable
+            # from a valid cache entry that is actually None.
+            # Note for self: LazyVim + Copilot is one hell of a setup.
+            raise Exception(f"Failed to retrieve {key} from API and no stale cache available.")
+
 
 # Test:
 if __name__ == "__main__":
