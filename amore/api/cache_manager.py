@@ -10,6 +10,9 @@ class CacheManager:
     Manages application-level caching with TTL (time-to-live) and refresh strategies.
     Frequently-changing data (sample_locator) is handled with less TTL compared to stable data (slots, categories).
 
+    Arguments:
+        cache_dir: Directory to which save the cache (JSON format). Default is "amore/var/".
+
     Attributes:
         cache_dir:  Directory to which save the cache (JSON format).
         ttl:        Dictionary containing every field's Time-to-Live.
@@ -20,6 +23,16 @@ class CacheManager:
                     `time.time()` minus the timestamp value `self.timestamps[key]`
                     is bigger than the TTL `self.ttl[key]`.
         lock:       Enables thread-based parallelism to accelerate cache updates.
+
+    Methods:
+        _load_from_disk:    Loads cache from a JSON file in cache_dir.
+                            Returns json.load(file), or None.
+        _save_to_disk:      Persists cache to a JSON file in cache_dir.
+        is_expired:         Checks if a cache entry has expired based on its timestamp and TTL.
+        invalidate:         Manually invalidates cache entries, either specific keys or all cache.
+        get:                Retrieves cache entry.
+                            If expired or force_refresh is True, it calls the API to update the cache,
+                            then returns cached data (or None if not available).
     """
 
     # fun fact of the day: in English both "zeros" and "zeroes" (noun) are correct,
@@ -45,7 +58,11 @@ class CacheManager:
         self.lock = threading.Lock()
 
     def _load_from_disk(self, key):
-        """Loads cache from JSON file. Returns json.load(file), or None."""
+        """
+        Loads cache from JSON file. Returns json.load(file), or None.
+        Filename must not be specified, all cache is saved in cache_dir.
+        Arg: category key to load. Must be one of the keys in self.cache.
+        """
         # filepath should be the same in _load_from_disk and _save_to_disk:
         filepath = os.path.join(self.cache_dir, f"{key}.json")
         try:
@@ -57,7 +74,13 @@ class CacheManager:
         return None
 
     def _save_to_disk(self, key, data):
-        """Persists cache to JSON file."""
+        """
+        Persists cache to JSON file.
+        Filename must not be specified, all cache is saved in cache_dir.
+        Args:
+            key:    Category key to save. Must be one of the keys in self.cache.
+            data:   Cache data to save. Must be JSON-serializable (dict, list, etc.).
+        """
         # filepath should be the same in _load_from_disk and _save_to_disk:
         filepath = os.path.join(self.cache_dir, f"{key}.json")
         # error handling favor of Claude Code:
@@ -70,13 +93,17 @@ class CacheManager:
             print(f"Error saving {key} to disk: {str(e)}")
 
     def is_expired(self, key):
-        """Checks if cache entry has expired. Returns boolean value."""
+        """
+        Checks if cache entry has expired. Returns True if it has.
+        Arg: key: Category key to check. Must be one of the keys in self.cache.
+        """
         return time.time() - self.timestamps[key] > self.ttl[key]
 
     def invalidate(self, key=None):
         """
         Manually invalidates cache. Resets self.cache to initial condition.
-        If no key is specified all is invalidated.
+        Arg: key: Category key to invalidate. Must be one of the keys in self.cache.
+             If no key is specified all cache is invalidated.
         """
         with self.lock:
             if key:
