@@ -8,7 +8,7 @@ import threading
 class CacheManager:
     """
     Manages application-level caching with TTL (time-to-live) and refresh strategies.
-    Frequently-changing data (sample_locator) is handled with less TTL compared to stable data (slots, categories).
+    Frequently-changing data (sample_positions) is handled with less TTL compared to stable data (slots, categories).
 
     Arguments:
         cache_dir: Directory to which save the cache (JSON format). Default is "amore/var/".
@@ -41,15 +41,25 @@ class CacheManager:
     def __init__(self, cache_dir="amore/var/"):
         self.cache_dir = cache_dir
         # self.ttl = TTL in seconds
+        # Categories should never change, it's possible I will just implement manual refresh;
+        # Sample Positions change frequently because samples are moved frequently - sometimes outside the interface;
+        # Substrates Batches chenge frequently because of residuals; Note for self: should I just decrement residual pieces from the cache too?
+        # Proposals change every 5 minutes because they can be added manually and I won't have people waiting needlessly.
         self.ttl = {
-            "categories": 3600,  # 1 hour
-            "slots": 3600,  # 1 hour too
-            "sample_locator": 60,  # 1 minute
+            "categories": 3600 * 24,  # 1 day
+            "sample_positions": 30,  # 30 seconds because their metadata changes frequently.
+            "substrates_batches": 60,  # 1 minute
+            "proposals": 300,  # 5 minutes
         }
         # self.cache creates and stores the actual cache.
         # This is supposed to be the starting point.
         # Every time the cache is invalidated it *should* get back to this.
-        self.cache = {"categories": None, "slots": None, "sample_locator": None}
+        self.cache = {
+            "categories": None,
+            "sample_positions": None,
+            "substrates_batches": None,
+            "proposals": None,
+        }
         self.timestamps = {
             key: 0 for key in self.cache.keys()
         }  # dict. of zeros, incremented later
@@ -149,45 +159,46 @@ class CacheManager:
 
             # If force_refresh, key is expired or None (implied from previous conditions),
             # call API to update cache  - which requires API key and loader function:
-            if (
-                loader_func is not None and
-                api_key is not None
-            ):
+            if loader_func is not None and api_key is not None:
                 try:
                     self.cache[key] = loader_func(api_key)
                     self.timestamps[key] = time.time()
                     self._save_to_disk(key, data=self.cache[key])
                     return self.cache[key]
                 except:
-                # Failsafe: try fallback to stale cache if available, otherwise raise exception:
-                    print(f"Error loading {key} from API. Attempting fallback to stale cache...")
+                    # Failsafe: try fallback to stale cache if available, otherwise raise exception:
+                    print(
+                        f"Error loading {key} from API. Attempting fallback to stale cache..."
+                    )
                     try:
                         if self.cache[key] is not None:
                             return self.cache[key]
-                        else:
-                            raise Exception(f"No stale cache available for {key}.")
+                    except:
+                        raise Exception(f"No stale cache available for {key}.")
 
             # If program reaches this point, it means API call failed and no stale cache is available.
             # This means we have to raise an exception, because returning None would be indistinguishable
             # from a valid cache entry that is actually None.
             # Note for self: LazyVim + Copilot is one hell of a setup.
-            raise Exception(f"Failed to retrieve {key} from API and no stale cache available.")
+            raise Exception(
+                f"Failed to retrieve {key} from API and no stale cache available."
+            )
 
 
 # Test:
 if __name__ == "__main__":
     cache = CacheManager()
     cache.timestamps = {key: time.time() for key in cache.timestamps}
-    cache.cache["sample_locator"] = {"SLOT_A": "sample X", "SLOT_B": "another sample"}
-    cache._save_to_disk("sample_locator", data=cache.cache["sample_locator"])
-    while not cache.is_expired("sample_locator"):
+    cache.cache["sample_positions"] = {"SLOT_A": "sample X", "SLOT_B": "another sample"}
+    cache._save_to_disk("sample_positions", data=cache.cache["sample_positions"])
+    while not cache.is_expired("sample_positions"):
         print("NOT EXPIRED")
         time.sleep(10)
-        left = time.time() - cache.timestamps["sample_locator"]
+        left = time.time() - cache.timestamps["sample_positions"]
         if left >= 10:
             print(cache.cache)
         if left >= 30:
             cache.invalidate()
     print("EXPIRED")
-    testcache = cache._load_from_disk("sample_locator")
+    testcache = cache._load_from_disk("sample_positions")
     print(testcache)
