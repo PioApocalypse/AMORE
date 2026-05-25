@@ -47,7 +47,7 @@ class CacheManager:
         # Proposals change every 5 minutes because they can be added manually and I won't have people waiting needlessly.
         self.ttl = {
             "categories": 3600 * 24,  # 1 day
-            "sample_positions": 30,  # 30 seconds because their metadata changes frequently.
+            "slots": 30,  # 30 seconds because their metadata changes frequently.
             "substrates_batches": 60,  # 1 minute
             "proposals": 300,  # 5 minutes
         }
@@ -56,7 +56,7 @@ class CacheManager:
         # Every time the cache is invalidated it *should* get back to this.
         self.cache = {
             "categories": None,
-            "sample_positions": None,
+            "slots": None,
             "substrates_batches": None,
             "proposals": None,
         }
@@ -83,7 +83,7 @@ class CacheManager:
             print(f"Error loading {key} from disk: {str(e)}")
         return None
 
-    def _save_to_disk(self, key, data):
+    def _save_to_disk(self, key, data=None):
         """
         Persists cache to JSON file.
         Filename must not be specified, all cache is saved in cache_dir.
@@ -93,6 +93,9 @@ class CacheManager:
         """
         # filepath should be the same in _load_from_disk and _save_to_disk:
         filepath = os.path.join(self.cache_dir, f"{key}.json")
+        # if data is None try to get it from cache:
+        data = data if data is not None else self.cache[key]
+
         # error handling favor of Claude Code:
         try:
             os.makedirs(self.cache_dir, exist_ok=True)
