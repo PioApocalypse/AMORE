@@ -1,0 +1,46 @@
+== Introduction
+// TO-DO: Grammar-check. I'm totally fried right now and can't seem to complete even a single proper
+*Amore* or *AMORE* - short for _{acronym}_ - is a minimal graphical user interface (GUI) developed in Python, created to assist
+the transition from the physical paper laboratory notebook to our own
+eLNfootnote:[Acronym for "_electronic Lab Notebook_".] of choice - link:{elabftw-site}[**eLabFTW**^].
+
+The software serves as a minimal client for our scientists to interact with,
+in order to either:
+
+. Add new samples to eLab (__sample creation__);
+. Track and change the position of existing samples (__sample tracking__).
+
+The interface is designed to automatically fill certain parameters like the name of the sample and the location of the facility, while generating a unique _**Standard ID**_ (**STD-ID**) in compliance with the **FAIR Principles** and the guidelines given within the context of the Italian PNRRfootnote:pnrr[PNRR stands for _National Recovery and Resilience Plan_.] **NFFA-DI**.
+
+
+
+=== NFFA-DI and FAIR Principles
+PNRR (_Piano Nazionale di Ripresa e Resilienza_) is Italy's national recovery plan from the aftermaths of COVID-19. +
+*NFFA-DI* (_Nano Foundries and Fine Analysis - Digital Infrastructure_) is a project within this plan aimed at creating a distributed digital infrastructure for nanoscience and nanotechnology. In practice, NFFA-DI provides a unified cyber-platform for researchers to access advanced instrumentation, simulation tools, and data management services across multiple Italian research centers.
+
+Like most modern scientific projects NFFA-DI is _FAIR by design_, meaning it strives for total compliance to *FAIR Principles*. FAIR is the acronym of the four main characteristics all compliant projects should share:
+
+> * Findable: «Metadata and data should be easy to find for both humans and computers.»
+> * Accessible: «Once the user finds the required data, she/he/they need to know how they can be accessed, possibly including authentication and authorisation.»
+> * Interoperable: «The data usually need to be integrated with other data. In addition, the data need to interoperate with applications or workflows for analysis, storage, and processing.»
+> * Reusable: «Metadata and data should be well-described so that they can be replicated and/or combined in different settings.»
+> 
+> Source: link:{go-fair-site}[GO FAIR^]
+
+
+Amore contributes to NFFA-DI goals by aiding the transition from paper to digital in its own way.
+
+TIP: More info on NFFA-DI at link:{nffa-di-site}[nffa-di.it^].
+
+=== eLabFTW
+*eLabFTW* is an open-source, web-based electronic laboratory notebook and resource manager. It acts as a central digital hub for one or more laboratories, organizing information (as database entries) into two main constructs:
+
+* **Experiments**: They are the core feature of eLabFTW, can contain structured data (via custom JSON fields), unstructured text, timestamps, tags, links to files (attachments), and relations to database items.
+* **Resources** or **Items**: This is a separate, structured inventory for items like raw materials (targets, substrates), instruments (UHV machines) or samples. Each entry is built from customizable templates with defined metadata (e.g. for a substrate batch we have name, manufacturer, geometry, available pieces left...).
+
+Although separated into different database constructs, experiments and items all have their own unique, incremental internal ID, which we'll simply call *elabid* to distinguish it from other identifiers, with no academic utility but extremely important when dealing with eLabFTW from a developer's perspective.
+
+// method-specific
+In a software like eLabFTW where data can (and will) be spread out through multiple entries, a particularly useful feature is **linking**: the software allows you to link experiments or items with each other, using elabid's as identifiers. For a PLD deposition, you can link the experiment describing a single layer to the target used, the substrate, the PLD instrument and the sample produced itself (all of which are eLabFTW items). This creates a complete provenance graph which can be (not-so) easily resolved starting from the sample's metadata and a chain of HTTP requests.
+
+In this optic, Amore interacts with eLabFTW via its REST API (Application Programming Interface). It creates ("__POSTs__") a new sample as a resource/item with its own title, metadata and attachments, linking it to a specified available chamber (or __slot__) inside one of our active instruments. It may also be used to keep track of the contents of every chamber and eventually move samples from one slot to the other.

@@ -1,0 +1,40 @@
+= AMORE User Manual: {description}
+:author: Emanuele D'Amico
+:description: Interface for eLabFTW
+:doctype: book
+:email: emanuele+amore@damico.ing
+:imagesdir: images
+:keywords: nffa-di, elabftw, parser, data science, mdmc, naples, cnr-spin, cnr, spin institute, python, gui
+:revdate: 2026-05-26
+:revnumber: v0.2.0
+:revremark: alpha tested
+:stem: latexmath
+:toc:
+// custom attributes
+:disclamer: I'm in no position to give anyone coding/development/programming/testing tips. The only tips I can give you are based on my personal knowledge of this specific project.
+:acronym: Autonomous Management of Outputs for Research Efficiency
+:repo-url: https://github.com/PioApocalypse/AMORE
+:elabftw-apikey-docs: https://doc.elabftw.net/docs/usage/api/#generating-a-key
+:elabftw-site: https://elabftw.net
+:nffa-di-site: https://nffa-di.it/en/about-us/project/
+:nffa-di-rdp: https://nffa-di.it/it/research-data-policy/#3.1
+:nffa-di-uo-acronyms: https://nffa-di.it/en/uo-acronyms-for-data-infrastructure-naming-convention
+:go-fair-site: https://www.go-fair.org/fair-principles/
+:fairmat-site: https://www.fairmat-nfdi.eu/fairmat/about-fairmat/consortium-fairmat#mission
+:deployed-url: http://172.31.109.40/
+:keepass-site: https://keepassxc.org/
+:bitwarden-site: https://bitwarden.com/
+
+include::01.adoc[]
+
+include::02.adoc[]
+
+== Login and session
+
+== "Create Sample" feature
+
+== "Sample Tracking" feature
+
+=== Export "Sample Locator" experiment
+
+== Export info on specific sample
